@@ -125,8 +125,8 @@
     </div>
 
     <!-- TELA DA CAPA DO RELATÓRIO -->
-    <div id="cover-screen" class="hidden">
-        <div class="container mx-auto p-4">
+    <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
+        <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
             
             <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
@@ -175,8 +175,8 @@
     </div>
 
     <!-- TELA DO ÍNDICE -->
-    <div id="index-screen" class="hidden">
-        <div class="container mx-auto p-4">
+    <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
+        <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
             <div id="index-page" class="report-page">
                 <header class="flex justify-end items-start">
@@ -201,8 +201,8 @@
     </div>
 
     <!-- TELA DE RELATÓRIOS SALVOS -->
-    <div id="saved-reports-screen" class="hidden">
-        <div class="container mx-auto p-4">
+    <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
+        <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos Localmente</h1>
             <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
                 <div id="saved-reports-list" class="space-y-3">
@@ -216,7 +216,7 @@
     </div>
 
     <!-- TELA DA PLANILHA DO GERADOR -->
-    <div id="generator-app-screen" class="hidden">
+    <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
         <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
             <header class="border-b-2 border-gray-200 pb-6 mb-6">
                 <div class="flex justify-between items-start mb-4">
@@ -269,7 +269,7 @@
     </div>
     
     <!-- TELA DA PLANILHA DO MOTOR -->
-    <div id="motor-app-screen" class="hidden">
+    <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
         <div id="motor-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
             <header class="border-b-2 border-gray-200 pb-6 mb-6">
                 <div class="flex justify-between items-start mb-4">
@@ -317,7 +317,7 @@
     </div>
 
     <!-- TELA DA PLANILHA DO TRANSFORMADOR X3 -->
-    <div id="transformer-app-screen" class="hidden">
+    <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
         <div id="transformer-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
             <header class="border-b-2 border-gray-200 pb-6 mb-6">
                 <div class="flex justify-between items-start mb-4">
@@ -739,8 +739,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const showScreen = (screenToShow) => { Object.values(screens).forEach(screen => { if (screen) screen.classList.add('hidden'); }); if (screenToShow) screenToShow.classList.remove('hidden'); };
     
     // Event Listeners de Navegação
-    if (companySelect) { companySelect.addEventListener('change', (e) => { currentCompany = companyData[e.target.value]; updateIndexPage(); }); }
-    document.getElementById('cover-btn').addEventListener('click', () => { showScreen(screens.cover); });
+    if (companySelect) { 
+        companySelect.addEventListener('change', (e) => { 
+            currentCompany = companyData[e.target.value]; 
+            // Atualiza a capa e o índice ao mesmo tempo
+            document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
+            document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+            updateIndexPage(); 
+        }); 
+    }
+    document.getElementById('cover-btn').addEventListener('click', () => { 
+        // Garante que a capa sempre mostra a empresa selecionada
+        document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
+        document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+        showScreen(screens.cover); 
+    });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
     document.getElementById('saved-reports-btn').addEventListener('click', showSavedReportsScreen);
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
@@ -791,6 +804,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-```
-
-Fiz algumas alterações. Corrigi um erro de digitação no ID do botão 'Gerador' que impedia o carregamento da sua respectiva planilha e adicionei uma verificação para garantir que o botão existe antes de tentar adicionar um ouvinte de eventos a e
