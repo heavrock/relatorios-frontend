@@ -21,7 +21,7 @@
         .data-table td.label-cell { text-align: left; font-weight: 500; background-color: #f9fafb; }
         .input-yellow { background-color: #fef9c3; width: 100%; text-align: center; border: 1px solid #fde047; border-radius: 4px; padding: 4px; }
         .input-yellow::placeholder { color: #a1a1aa; }
-        .output-span { display: block; width: 100%; height: 100%; padding: 4px; min-height: 28px; border-radius: 4px; transition: background-color 0.3s; }
+        .output-span { display: block; width: 100%; height: 100%; padding: 4px; min-height: 28px; border-radius: 4px; transition: background-color: 0.3s; }
         .output-blue { background-color: #e0f2fe; }
         .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1.5rem; margin-bottom: 0.5rem; border-radius: 6px; }
         .unit-selector {
@@ -100,26 +100,36 @@
             <div class="mb-8 w-full max-w-sm">
                 <label for="company-select" class="block text-center text-lg text-indigo-300 mb-2">Selecione a Empresa</label>
                 <select id="company-select" class="w-full p-3 text-center rounded-lg border-2 border-indigo-400 bg-gray-700 text-white focus:outline-none focus:border-indigo-200">
-                    <option value="unitech">UNITECH-NIT</option>
-                    <option value="powertech">POWERTECH</option>
-                    <option value="unitedpower">UNITEDPOWER</option>
+                    <!-- Opções de empresa carregadas dinamicamente -->
                 </select>
             </div>
 
-            <div class="w-full max-w-4xl">
-                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+            <div class="w-full max-w-xl">
+                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
                     <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
                     <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
                     <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
-                    
+                    <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DE SELEÇÃO DE EQUIPAMENTOS (NOVA) -->
+    <div id="equipamentos-screen" class="hidden">
+        <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
+            <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
+            <div class="w-full max-w-4xl">
+                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
                     <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
                     <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
                     <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                    <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                    <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
                 </div>
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
-                     <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
-                     <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
-                </div>
+            </div>
+            <div class="mt-8">
+                <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
             </div>
         </div>
     </div>
@@ -170,6 +180,7 @@
 
              <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
                 <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
              </div>
         </div>
     </div>
@@ -215,6 +226,52 @@
         </div>
     </div>
 
+    <!-- TELA DE GERENCIAMENTO DE EMPRESAS -->
+    <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
+        <div class="container mx-auto">
+            <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Formulário de Adicionar/Editar -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
+                    <form id="company-form" class="space-y-4">
+                        <input type="hidden" id="company-id">
+                        <div>
+                            <label for="company-name" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
+                            <input type="text" id="company-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
+                            <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
+                            <input type="text" id="company-phones" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
+                            <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
+                            <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Lista de Empresas -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
+                    <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Lista de empresas será renderizada aqui -->
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-8">
+                <button id="company-management-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TELA DA PLANILHA DO GERADOR -->
     <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
         <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
@@ -237,7 +294,7 @@
                 </div>
             </header>
 
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
                 <button id="gen-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="gen-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="gen-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
@@ -290,7 +347,7 @@
                 </div>
             </header>
 
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
                 <button id="motor-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="motor-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="motor-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
@@ -337,7 +394,7 @@
                 </div>
             </header>
 
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
                 <button id="transformer-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="transformer-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="transformer-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
@@ -396,10 +453,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
     const SAVED_REPORTS_KEY = 'unitechFullReports_v2'; 
+    const COMPANY_DATA_KEY = 'unitechCompanyData_v1';
     let localReportsCache = []; 
     let currentlyEditingIndex = null;
     let coverImageDataUrl = null; 
+    let companyList = [];
+    let currentCompany = null;
 
+    // --- FUNÇÕES DE GERENCIAMENTO DE EMPRESAS ---
+    function getCompanies() {
+        try {
+            const companiesJSON = localStorage.getItem(COMPANY_DATA_KEY);
+            if (companiesJSON) {
+                return JSON.parse(companiesJSON);
+            } else {
+                // Se for o primeiro uso, cria uma lista padrão
+                const defaultCompanies = [
+                    { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184' }
+                ];
+                saveCompanies(defaultCompanies);
+                return defaultCompanies;
+            }
+        } catch (e) {
+            console.error("Erro ao ler dados das empresas:", e);
+            return [];
+        }
+    }
+
+    function saveCompanies(companies) {
+        localStorage.setItem(COMPANY_DATA_KEY, JSON.stringify(companies));
+    }
+
+    function populateCompanyDropdown() {
+        companySelect.innerHTML = '';
+        companyList.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.id;
+            option.textContent = company.name;
+            companySelect.appendChild(option);
+        });
+        // Define a empresa atual com base na seleção (ou a primeira da lista)
+        const selectedCompany = companyList.find(c => c.id === companySelect.value);
+        currentCompany = selectedCompany || companyList[0];
+        if (currentCompany) {
+            companySelect.dispatchEvent(new Event('change'));
+        }
+    }
+
+    function renderCompanyList() {
+        const listEl = document.getElementById('company-list');
+        listEl.innerHTML = '';
+        const companies = getCompanies();
+        if (companies.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500">Nenhuma empresa cadastrada.</p>';
+            return;
+        }
+        companies.forEach(company => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between p-3 rounded-lg border';
+            div.innerHTML = `
+                <div>
+                    <p class="font-semibold">${company.name}</p>
+                    <p class="text-xs text-gray-500">${company.address || 'Sem endereço'}</p>
+                </div>
+                <div class="flex gap-2">
+                    <button data-edit-id="${company.id}" class="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded">Editar</button>
+                    <button data-delete-id="${company.id}" class="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Apagar</button>
+                </div>
+            `;
+            listEl.appendChild(div);
+        });
+    }
+    
     // --- FUNÇÕES DE ARMAZENAMENTO LOCAL ---
 
     function getSavedFullReports() {
@@ -507,10 +632,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
-        document.getElementById('index-company-name').textContent = currentCompany.name;
-        document.getElementById('index-company-address').textContent = currentCompany.address;
-        document.getElementById('index-company-phones').textContent = currentCompany.phones;
-        document.getElementById('index-company-phone2').textContent = currentCompany.phone2;
+        if (currentCompany) {
+            document.getElementById('index-company-name').textContent = currentCompany.name;
+            document.getElementById('index-company-address').textContent = currentCompany.address;
+            document.getElementById('index-company-phones').textContent = currentCompany.phones;
+            document.getElementById('index-company-phone2').textContent = currentCompany.phone2;
+        }
 
         if (!localReportsCache || localReportsCache.length === 0) {
             indexList.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma planilha de equipamento foi adicionada a este relatório ainda.</p>';
@@ -714,6 +841,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const clone = document.getElementById(config.containerId).cloneNode(true);
                 clone.id = 'temp-clone-for-pdf';
                 Object.assign(clone.style, { position: 'absolute', left: '-9999px', top: '0px', width: '1200px', height: 'auto' });
+                
+                // Esconde os botões antes de adicionar ao DOM
+                const buttonContainer = clone.querySelector('.pdf-hide');
+                if (buttonContainer) buttonContainer.style.display = 'none';
+
                 document.body.appendChild(clone);
                 populateSheetFromData(clone, report, config);
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -759,32 +891,42 @@ document.addEventListener('DOMContentLoaded', () => {
         cover: document.getElementById('cover-screen'), 
         index: document.getElementById('index-screen'), 
         savedReports: document.getElementById('saved-reports-screen'),
+        companyManagement: document.getElementById('company-management-screen'),
+        equipamentos: document.getElementById('equipamentos-screen'),
         gen: document.getElementById('generator-app-screen'), 
         motor: document.getElementById('motor-app-screen'), 
         transformer: document.getElementById('transformer-app-screen'), 
     };
     const wipModal = document.getElementById('wip-modal');
     const companySelect = document.getElementById('company-select');
-    const companyData = { 'unitech': { name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184' }, 'powertech': { name: 'POWERTECH', address: 'Endereço Powertech', phones: 'Telefone Powertech', phone2: '' }, 'unitedpower': { name: 'UNITEDPOWER', address: 'Endereço UnitedPower', phones: 'Telefone UnitedPower', phone2: '' } };
-    let currentCompany = companyData['unitech'];
+    
     const showScreen = (screenToShow) => { Object.values(screens).forEach(screen => { if (screen) screen.classList.add('hidden'); }); if (screenToShow) screenToShow.classList.remove('hidden'); };
     
     if (companySelect) { 
         companySelect.addEventListener('change', (e) => { 
-            currentCompany = companyData[e.target.value]; 
-            document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
-            document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
-            updateIndexPage(); 
+            currentCompany = companyList.find(c => c.id === e.target.value); 
+            if (currentCompany) {
+                document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
+                document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+                updateIndexPage(); 
+            }
         }); 
     }
     document.getElementById('cover-btn').addEventListener('click', () => { 
-        document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
-        document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+        if (currentCompany) {
+            document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
+            document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+        }
         showScreen(screens.cover); 
     });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
     document.getElementById('saved-reports-btn').addEventListener('click', showSavedReportsScreen);
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
+    document.getElementById('manage-companies-btn').addEventListener('click', () => {
+        renderCompanyList();
+        showScreen(screens.companyManagement);
+    });
+    document.getElementById('equipamentos-btn').addEventListener('click', () => showScreen(screens.equipamentos));
 
     const setupSheetScreen = (prefix) => {
         const btn = document.getElementById(`${prefix}-btn`);
@@ -793,13 +935,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         btn.addEventListener('click', () => {
-            currentlyEditingIndex = null; // Garante que estamos criando uma nova planilha
+            currentlyEditingIndex = null; 
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
             if(addBtn) {
                 addBtn.textContent = 'Adicionar Planilha ao Relatório Atual';
                 addBtn.disabled = true;
             }
-            document.getElementById(`${prefix}-company-name-header`).textContent = currentCompany.name;
+            if (currentCompany) {
+                document.getElementById(`${prefix}-company-name-header`).textContent = currentCompany.name;
+            }
             document.getElementById(`${prefix}-cliente`).value = document.getElementById('cover-cliente').value;
             document.getElementById(`${prefix}-local`).value = document.getElementById('cover-local').value;
             showScreen(screens[prefix]);
@@ -858,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) { 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    coverImageDataUrl = e.target.result; // Armazena na variável dedicada
+                    coverImageDataUrl = e.target.result; 
                     previews.image.src = coverImageDataUrl;
                 };
                 reader.readAsDataURL(file);
@@ -911,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) { 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    coverImageDataUrl = e.target.result; // Armazena na variável dedicada
+                    coverImageDataUrl = e.target.result; 
                     previews.image.src = coverImageDataUrl;
                 };
                 reader.readAsDataURL(file);
@@ -928,6 +1072,8 @@ document.addEventListener('DOMContentLoaded', () => {
     createApp(transformerConfig);
     createApp(generatorConfig);
     initializeCoverApp();
+    companyList = getCompanies();
+    populateCompanyDropdown();
 });
 </script>
 </body>
