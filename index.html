@@ -88,9 +88,41 @@
         .index-item span { display: block; padding: 4px; border-radius: 4px; font-weight: 500; min-height: 28px; }
         .status-cell { padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; color: white; font-size: 12px; min-height: 32px; display: flex; align-items: center; justify-content: center; width: 100%; }
         .report-page { border: 1px solid #ccc; padding: 2rem; max-width: 800px; aspect-ratio: 210 / 297; margin: 2rem auto; background: white; display: flex; flex-direction: column; }
+        
+        /* Estilo para notificações customizadas */
+        #notification-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast.success { background-color: #28a745; }
+        .toast.error { background-color: #dc3545; }
+        .toast.info { background-color: #17a2b8; }
+
     </style>
 </head>
 <body class="bg-gray-100">
+
+    <!-- Área para notificações -->
+    <div id="notification-area"></div>
 
     <!-- TELA DO MENU PRINCIPAL -->
     <div id="menu-screen">
@@ -139,6 +171,12 @@
         <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
             
+            <!-- BOTÕES MOVIDOS PARA CIMA -->
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
+            </div>
+
             <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
                 <h2 class="text-lg font-semibold mb-4 border-b pb-2">Informações da Capa</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -163,11 +201,10 @@
             <div id="cover-preview" class="report-page">
                 <header class="flex justify-end items-start">
                     <div class="text-right text-xs">
-                        <p class="font-bold" id="cover-preview-company-name">UNITECH-NIT</p>
-                        <p id="cover-preview-company-address">Rua Galvão Nº 28</p>
-                        <p>Barreto – Niterói – Rio de Janeiro</p>
-                        <p>Telefones: (21) 96762-2155 / (21) 97119-2155</p>
-                        <p>(21)2608-4184</p>
+                        <p class="font-bold" id="cover-preview-company-name"></p>
+                        <p id="cover-preview-company-address"></p>
+                        <p id="cover-preview-company-phones"></p>
+                        <p id="cover-preview-company-phone2"></p>
                     </div>
                 </header>
                 <main class="flex-grow flex flex-col items-center justify-center text-center -mt-8">
@@ -177,11 +214,6 @@
                     <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-6 max-w-sm w-full h-auto object-cover rounded-md shadow-lg">
                 </main>
             </div>
-
-             <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
-                <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
-             </div>
         </div>
     </div>
 
@@ -189,12 +221,19 @@
     <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
         <div class="container mx-auto">
             <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
+
+            <!-- BOTÕES MOVIDOS PARA CIMA -->
+            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
+                <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
+            </div>
+
             <div id="index-page" class="report-page">
                 <header class="flex justify-end items-start">
                     <div class="text-right text-xs">
                         <p class="font-bold" id="index-company-name"></p>
                         <p id="index-company-address"></p>
-                        <p>Barreto – Niterói – Rio de Janeiro</p>
                         <p id="index-company-phones"></p>
                         <p id="index-company-phone2"></p>
                     </div>
@@ -202,11 +241,6 @@
                 <main id="index-content-list" class="flex-grow p-4">
                     <!-- Conteúdo do índice será carregado -->
                 </main>
-            </div>
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
-                <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-                <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
             </div>
         </div>
     </div>
@@ -242,7 +276,7 @@
                         </div>
                         <div>
                             <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
-                            <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Rua, Número, Bairro, Cidade, Estado">
                         </div>
                         <div>
                             <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
@@ -267,7 +301,7 @@
                 </div>
             </div>
             <div class="flex justify-center mt-8">
-                <button id="company-management-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+                <button id="company-management-back-to-cover-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar para a Capa</button>
             </div>
         </div>
     </div>
@@ -298,7 +332,7 @@
                 <button id="gen-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="gen-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="gen-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="gen-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório (no Servidor)</button>
+                <button id="gen-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
@@ -351,7 +385,7 @@
                 <button id="motor-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="motor-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="motor-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="motor-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório (no Servidor)</button>
+                <button id="motor-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
@@ -398,7 +432,7 @@
                 <button id="transformer-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="transformer-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
                 <button id="transformer-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="transformer-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório (no Servidor)</button>
+                <button id="transformer-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
@@ -448,7 +482,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
-    // --- V3 - SCRIPT COM SISTEMA DE SALVAR/CARREGAR LOCALMENTE ---
+    // --- V7 - NAVEGAÇÃO COM HISTÓRICO DO NAVEGADOR ---
     // ==================================================================================
 
     // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
@@ -460,6 +494,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let companyList = [];
     let currentCompany = null;
 
+    // --- SISTEMA DE NOTIFICAÇÃO ---
+    function showToast(message, type = 'info') {
+        const notificationArea = document.getElementById('notification-area');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        notificationArea.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }, 3000);
+    }
+
     // --- FUNÇÕES DE GERENCIAMENTO DE EMPRESAS ---
     function getCompanies() {
         try {
@@ -467,9 +521,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (companiesJSON) {
                 return JSON.parse(companiesJSON);
             } else {
-                // Se for o primeiro uso, cria uma lista padrão
                 const defaultCompanies = [
-                    { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184' }
+                    { 
+                        id: 'unitech', 
+                        name: 'UNITECH-NIT', 
+                        address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', 
+                        phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', 
+                        phone2: '(21)2608-4184' 
+                    }
                 ];
                 saveCompanies(defaultCompanies);
                 return defaultCompanies;
@@ -485,6 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateCompanyDropdown() {
+        const companySelect = document.getElementById('company-select');
+        const originalValue = companySelect.value;
         companySelect.innerHTML = '';
         companyList.forEach(company => {
             const option = document.createElement('option');
@@ -492,7 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
             option.textContent = company.name;
             companySelect.appendChild(option);
         });
-        // Define a empresa atual com base na seleção (ou a primeira da lista)
+        
+        if (companyList.some(c => c.id === originalValue)) {
+            companySelect.value = originalValue;
+        }
+
         const selectedCompany = companyList.find(c => c.id === companySelect.value);
         currentCompany = selectedCompany || companyList[0];
         if (currentCompany) {
@@ -503,12 +568,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
-        const companies = getCompanies();
-        if (companies.length === 0) {
+        if (companyList.length === 0) {
             listEl.innerHTML = '<p class="text-gray-500">Nenhuma empresa cadastrada.</p>';
             return;
         }
-        companies.forEach(company => {
+        companyList.forEach(company => {
             const div = document.createElement('div');
             div.className = 'flex items-center justify-between p-3 rounded-lg border';
             div.innerHTML = `
@@ -523,6 +587,15 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             listEl.appendChild(div);
         });
+    }
+
+    function resetCompanyForm() {
+        const form = document.getElementById('company-form');
+        form.reset();
+        document.getElementById('company-id').value = '';
+        document.getElementById('company-form-title').textContent = 'Adicionar Nova Empresa';
+        document.getElementById('company-form-submit-btn').textContent = 'Adicionar Empresa';
+        document.getElementById('company-form-cancel-btn').classList.add('hidden');
     }
     
     // --- FUNÇÕES DE ARMAZENAMENTO LOCAL ---
@@ -550,13 +623,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const local = document.getElementById('cover-local').value.trim();
 
         if (!cliente || !local) {
-            alert('Por favor, preencha os campos "Empresa (Cliente)" e "Embarcação" na capa antes de salvar.');
+            showToast('Preencha "Cliente" e "Embarcação" na capa antes de salvar.', 'error');
             showScreen(screens.cover);
             return;
         }
 
         if (localReportsCache.length === 0) {
-            alert('Não há nenhuma planilha de equipamento no relatório atual para salvar.');
+            showToast('Não há nenhuma planilha para salvar no relatório.', 'error');
             return;
         }
         
@@ -566,7 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cliente: cliente,
                 local: local,
                 imageDataUrl: coverImageDataUrl, 
-                companyKey: companySelect.value
+                companyKey: document.getElementById('company-select').value
             },
             reportSheets: JSON.parse(JSON.stringify(localReportsCache)),
             savedAt: new Date().toISOString()
@@ -575,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedReports = getSavedFullReports();
         savedReports.push(fullReport);
         localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(savedReports));
-        alert(`Relatório para "${cliente} - ${local}" salvo com sucesso localmente!`);
+        showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
         console.log("Relatório salvo:", fullReport);
 
         resetCurrentReport();
@@ -587,12 +660,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const reportToLoad = savedReports.find(r => r.id === reportId);
 
         if (!reportToLoad) {
-            alert("Erro: Relatório não encontrado.");
+            showToast("Erro: Relatório não encontrado.", 'error');
             return;
         }
 
-        localReportsCache = [];
-        currentlyEditingIndex = null;
+        resetCurrentReport();
 
         document.getElementById('cover-cliente').value = reportToLoad.coverData.cliente;
         document.getElementById('cover-local').value = reportToLoad.coverData.local;
@@ -600,26 +672,24 @@ document.addEventListener('DOMContentLoaded', () => {
         coverImageDataUrl = reportToLoad.coverData.imageDataUrl;
         document.getElementById('cover-preview-image').src = coverImageDataUrl;
 
-        companySelect.value = reportToLoad.coverData.companyKey || 'unitech';
-        companySelect.dispatchEvent(new Event('change'));
+        document.getElementById('company-select').value = reportToLoad.coverData.companyKey || 'unitech';
+        document.getElementById('company-select').dispatchEvent(new Event('change'));
 
         localReportsCache = reportToLoad.reportSheets;
 
         initializeCoverApp();
         updateIndexPage();
 
-        alert(`Relatório para "${reportToLoad.coverData.cliente} - ${reportToLoad.coverData.local}" carregado com sucesso!`);
+        showToast(`Relatório para "${reportToLoad.coverData.cliente}" carregado!`, 'info');
         showScreen(screens.menu);
     }
     
     function deleteSavedFullReport(reportId) {
-        if (!confirm('Tem certeza que deseja apagar este relatório salvo? Esta ação é permanente.')) return;
-        
         let savedReports = getSavedFullReports();
         savedReports = savedReports.filter(r => r.id !== reportId);
         localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(savedReports));
         
-        alert('Relatório apagado.');
+        showToast('Relatório apagado.', 'success');
         showSavedReportsScreen();
     }
 
@@ -628,15 +698,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateIndexPage() {
         const indexList = document.getElementById('index-content-list');
-        indexList.innerHTML = ''; // Limpa a lista antes de redesenhar
+        indexList.innerHTML = ''; 
 
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
+        
         if (currentCompany) {
-            document.getElementById('index-company-name').textContent = currentCompany.name;
-            document.getElementById('index-company-address').textContent = currentCompany.address;
-            document.getElementById('index-company-phones').textContent = currentCompany.phones;
-            document.getElementById('index-company-phone2').textContent = currentCompany.phone2;
+            document.getElementById('index-company-name').textContent = currentCompany.name || '';
+            document.getElementById('index-company-address').textContent = currentCompany.address || '';
+            document.getElementById('index-company-phones').textContent = currentCompany.phones || '';
+            document.getElementById('index-company-phone2').textContent = currentCompany.phone2 || '';
         }
 
         if (!localReportsCache || localReportsCache.length === 0) {
@@ -658,7 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function showSavedReportsScreen() {
         const listEl = document.getElementById('saved-reports-list');
-        listEl.innerHTML = ''; // Limpa a lista antes de redesenhar
+        listEl.innerHTML = ''; 
         const savedReports = getSavedFullReports();
         
         if (savedReports.length === 0) {
@@ -707,11 +778,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.target.dataset.deleteIndex) {
             e.preventDefault();
-            if (confirm('Tem certeza que deseja remover esta planilha do relatório atual?')) {
-                const indexToRemove = parseInt(e.target.dataset.deleteIndex, 10);
-                localReportsCache.splice(indexToRemove, 1);
-                updateIndexPage();
-            }
+            const indexToRemove = parseInt(e.target.dataset.deleteIndex, 10);
+            localReportsCache.splice(indexToRemove, 1);
+            showToast('Planilha removida do relatório.', 'info');
+            updateIndexPage();
         }
     });
     
@@ -774,11 +844,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (currentlyEditingIndex !== null) {
                     localReportsCache[currentlyEditingIndex] = sheetData;
-                    alert(`Alterações na planilha "${sheetData.header.equipamento}" foram salvas.`);
+                    showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
                     currentlyEditingIndex = null;
                 } else {
                     localReportsCache.push(sheetData);
-                    alert(`Planilha para "${sheetData.header.equipamento}" adicionada ao relatório atual.`);
+                    showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
                 }
                 
                 clearForm(true); 
@@ -787,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(el) el.value = ''; 
                 });
                 
-                addSheetBtn.textContent = 'Adicionar Planilha ao Relatório Atual';
+                addSheetBtn.textContent = 'Adicionar ao Relatório';
                 validateHeader();
                 
                 showScreen(screens.index);
@@ -799,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('export-current-pdf-btn').addEventListener('click', async () => {
         if (localReportsCache.length === 0) {
-            alert('Não há planilhas no relatório atual para exportar.');
+            showToast('Não há planilhas no relatório para exportar.', 'error');
             return;
         }
         
@@ -817,7 +887,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const pdfHeight = doc.internal.pageSize.getHeight();
             await new Promise(resolve => setTimeout(resolve, 200));
 
-            // --- GERAÇÃO DA CAPA (MÉTODO SIMPLIFICADO E ROBUSTO) ---
             const coverCanvas = await html2canvas(document.getElementById('cover-preview'), { 
                 scale: 2, 
                 useCORS: true 
@@ -827,13 +896,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.addImage(coverCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfWidth, coverPdfHeight);
             }
 
-            // --- GERAÇÃO DO ÍNDICE ---
             doc.addPage();
             const indexCanvas = await html2canvas(document.getElementById('index-page'), { scale: 2, useCORS: true });
             let indexPdfHeight = (indexCanvas.height * pdfWidth) / indexCanvas.width;
             if (isFinite(indexPdfHeight) && indexPdfHeight > 0) doc.addImage(indexCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfWidth, indexPdfHeight);
 
-            // --- GERAÇÃO DAS PLANILHAS COM PAGINAÇÃO ---
             for (const report of localReportsCache) {
                 const config = configMap[report.type];
                 if (!config) continue;
@@ -842,7 +909,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 clone.id = 'temp-clone-for-pdf';
                 Object.assign(clone.style, { position: 'absolute', left: '-9999px', top: '0px', width: '1200px', height: 'auto' });
                 
-                // Esconde os botões antes de adicionar ao DOM
                 const buttonContainer = clone.querySelector('.pdf-hide');
                 if (buttonContainer) buttonContainer.style.display = 'none';
 
@@ -878,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.save(`Relatorio_${cliente.replace(/ /g, '_')}.pdf`);
         } catch (error) {
             console.error("Erro ao gerar o PDF:", error);
-            alert("Ocorreu um erro ao gerar o PDF.");
+            showToast("Ocorreu um erro ao gerar o PDF.", 'error');
         } finally {
             loader.classList.add('hidden');
             loader.classList.remove('flex');
@@ -898,35 +964,61 @@ document.addEventListener('DOMContentLoaded', () => {
         transformer: document.getElementById('transformer-app-screen'), 
     };
     const wipModal = document.getElementById('wip-modal');
-    const companySelect = document.getElementById('company-select');
     
-    const showScreen = (screenToShow) => { Object.values(screens).forEach(screen => { if (screen) screen.classList.add('hidden'); }); if (screenToShow) screenToShow.classList.remove('hidden'); };
-    
-    if (companySelect) { 
-        companySelect.addEventListener('change', (e) => { 
-            currentCompany = companyList.find(c => c.id === e.target.value); 
-            if (currentCompany) {
-                document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
-                document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
-                updateIndexPage(); 
-            }
+    const showScreen = (screenElement, updateHistory = true) => {
+        const screenName = Object.keys(screens).find(key => screens[key] === screenElement);
+        
+        if (!screenName) return;
+
+        Object.values(screens).forEach(screen => { 
+            if (screen) screen.classList.add('hidden'); 
         }); 
-    }
+        if (screenElement) screenElement.classList.remove('hidden');
+
+        if (updateHistory) {
+            history.pushState({ screen: screenName }, '', `#${screenName}`);
+        }
+    };
+
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.screen) {
+            const screenName = event.state.screen;
+            showScreen(screens[screenName], false); // false para não criar um novo estado no histórico
+        } else {
+            // Se o estado for nulo (página inicial), mostre o menu
+            showScreen(screens.menu, false);
+        }
+    });
+    
+    document.getElementById('company-select').addEventListener('change', (e) => { 
+        currentCompany = companyList.find(c => c.id === e.target.value); 
+        if (currentCompany) {
+            document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
+            document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
+            document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
+            document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
+            updateIndexPage(); 
+        }
+    }); 
     document.getElementById('cover-btn').addEventListener('click', () => { 
         if (currentCompany) {
-            document.getElementById('cover-preview-company-name').textContent = currentCompany.name;
-            document.getElementById('cover-preview-company-address').textContent = currentCompany.address;
+            document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
+            document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
+            document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
+            document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
         }
         showScreen(screens.cover); 
     });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
-    document.getElementById('saved-reports-btn').addEventListener('click', showSavedReportsScreen);
+    document.getElementById('saved-reports-btn').addEventListener('click', () => showScreen(screens.savedReports));
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
     document.getElementById('manage-companies-btn').addEventListener('click', () => {
         renderCompanyList();
         showScreen(screens.companyManagement);
     });
     document.getElementById('equipamentos-btn').addEventListener('click', () => showScreen(screens.equipamentos));
+    document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => showScreen(screens.cover));
+
 
     const setupSheetScreen = (prefix) => {
         const btn = document.getElementById(`${prefix}-btn`);
@@ -938,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentlyEditingIndex = null; 
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
             if(addBtn) {
-                addBtn.textContent = 'Adicionar Planilha ao Relatório Atual';
+                addBtn.textContent = 'Adicionar ao Relatório';
                 addBtn.disabled = true;
             }
             if (currentCompany) {
@@ -1009,8 +1101,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         }); 
         
-        coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
-        previews.image.src = coverImageDataUrl;
+        if (!previews.image.src) {
+            coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
+            previews.image.src = coverImageDataUrl;
+        }
 
         updatePreviewText(); 
     }
@@ -1019,54 +1113,71 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     
-    function createPlaceholderDataUrl(width, height, text) {
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#E2E8F0';
-        ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = '#475569';
-        ctx.font = 'bold 20px Inter';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, width / 2, height / 2);
-        return canvas.toDataURL();
-    }
-
-    function initializeCoverApp() { 
-        const inputs = { 
-            cliente: document.getElementById('cover-cliente'), 
-            local: document.getElementById('cover-local'), 
-        }; 
-        const imageUpload = document.getElementById('cover-image-upload'); 
-        const previews = { 
-            cliente: document.getElementById('cover-preview-cliente'), 
-            local: document.getElementById('cover-preview-local'), 
-            image: document.getElementById('cover-preview-image'), 
-        }; 
-        function updatePreviewText() { 
-            previews.cliente.textContent = inputs.cliente.value.toUpperCase() || 'CLIENTE'; 
-            previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO'; 
-        } 
-        Object.values(inputs).forEach(input => input.addEventListener('input', updatePreviewText)); 
-        imageUpload.addEventListener('change', (event) => { 
-            const file = event.target.files[0]; 
-            if (file) { 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    coverImageDataUrl = e.target.result; 
-                    previews.image.src = coverImageDataUrl;
-                };
-                reader.readAsDataURL(file);
-            } 
-        }); 
+    document.getElementById('company-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const companyId = document.getElementById('company-id').value;
+        const companyName = document.getElementById('company-name').value;
         
-        coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
-        previews.image.src = coverImageDataUrl;
+        if (!companyName.trim()) {
+            showToast('O nome da empresa é obrigatório.', 'error');
+            return;
+        }
 
-        updatePreviewText(); 
-    }
+        const newCompanyData = {
+            name: companyName,
+            address: document.getElementById('company-address').value,
+            phones: document.getElementById('company-phones').value,
+            phone2: document.getElementById('company-phone2').value
+        };
+
+        if (companyId) {
+            const companyIndex = companyList.findIndex(c => c.id === companyId);
+            if (companyIndex > -1) {
+                companyList[companyIndex] = { ...companyList[companyIndex], ...newCompanyData };
+                showToast('Empresa atualizada com sucesso!', 'success');
+            }
+        } else {
+            newCompanyData.id = Date.now().toString();
+            companyList.push(newCompanyData);
+            showToast('Empresa adicionada com sucesso!', 'success');
+        }
+
+        saveCompanies(companyList);
+        renderCompanyList();
+        populateCompanyDropdown();
+        resetCompanyForm();
+    });
+
+    document.getElementById('company-list').addEventListener('click', (e) => {
+        const editId = e.target.dataset.editId;
+        const deleteId = e.target.dataset.deleteId;
+
+        if (editId) {
+            const companyToEdit = companyList.find(c => c.id === editId);
+            if (companyToEdit) {
+                document.getElementById('company-id').value = companyToEdit.id;
+                document.getElementById('company-name').value = companyToEdit.name;
+                document.getElementById('company-address').value = companyToEdit.address || '';
+                document.getElementById('company-phones').value = companyToEdit.phones || '';
+                document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
+                
+                document.getElementById('company-form-title').textContent = 'Editar Empresa';
+                document.getElementById('company-form-submit-btn').textContent = 'Salvar Alterações';
+                document.getElementById('company-form-cancel-btn').classList.remove('hidden');
+            }
+        }
+
+        if (deleteId) {
+            companyList = companyList.filter(c => c.id !== deleteId);
+            saveCompanies(companyList);
+            renderCompanyList();
+            populateCompanyDropdown();
+            resetCompanyForm(); 
+            showToast('Empresa apagada.', 'info');
+        }
+    });
+
+    document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
 
     createApp(motorConfig);
     createApp(transformerConfig);
@@ -1074,6 +1185,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeCoverApp();
     companyList = getCompanies();
     populateCompanyDropdown();
+
+    // Define o estado inicial da aplicação
+    const initialScreen = window.location.hash.substring(1) || 'menu';
+    const screenElement = screens[initialScreen] || screens.menu;
+    showScreen(screenElement, false); // Mostra a tela inicial sem criar um novo estado
+    history.replaceState({ screen: initialScreen }, '', `#${initialScreen}`); // Define o estado inicial
 });
 </script>
 </body>
