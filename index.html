@@ -291,7 +291,7 @@
                 </div>
 
                 <div id="cover-preview" class="report-page">
-                    <header class="flex justify-between items-start pb-2 border-b-2 border-black">
+                    <header class="flex justify-between items-start pb-4 border-b-2 border-black">
                         <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-12 w-auto object-contain">
                         <div class="text-right text-xs">
                             <p class="font-bold" id="cover-preview-company-name"></p>
@@ -300,12 +300,12 @@
                             <p id="cover-preview-company-phone2"></p>
                         </div>
                     </header>
-                    <main class="flex-grow flex flex-col items-center justify-start text-center pt-8">
+                    <main class="flex-grow flex flex-col items-center justify-start text-center pt-16">
                         <div class="w-full">
                             <h1 id="cover-preview-cliente" class="text-3xl font-bold text-black">CLIENTE</h1>
                             <h2 id="cover-preview-local" class="text-2xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
                         </div>
-                        <div class="w-full mt-4 pt-4 border-t-2 border-black">
+                        <div class="w-full mt-8 pt-4 border-t-2 border-black">
                             <p class="mt-2 text-lg">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
                             <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-4 max-w-md w-full h-auto object-cover rounded-md shadow-lg mx-auto">
                         </div>
@@ -1469,7 +1469,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text(currentCompany.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
                 doc.text(currentCompany.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
                 doc.setLineWidth(0.5);
-                doc.line(margin, margin + 14, pageWidth - margin, margin + 14);
+                doc.line(margin, margin + 25, pageWidth - margin, margin + 25); // Linha superior ajustada
             }
 
             // Títulos Centrais
@@ -1478,19 +1478,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             doc.setFontSize(26);
             doc.setFont('helvetica', 'bold');
-            doc.text(clienteText, pageWidth / 2, 65, { align: 'center' });
-            doc.text(localText, pageWidth / 2, 77, { align: 'center' });
+            doc.text(clienteText, pageWidth / 2, 95, { align: 'center' });
+            doc.text(localText, pageWidth / 2, 107, { align: 'center' });
             
             const titleWidth = Math.max(doc.getTextWidth(clienteText), doc.getTextWidth(localText));
             const lineX1 = (pageWidth - titleWidth) / 2;
             const lineX2 = (pageWidth + titleWidth) / 2;
             doc.setLineWidth(0.5);
-            doc.line(lineX1, 82, lineX2, 82);
+            doc.line(lineX1, 110, lineX2, 110);
 
             doc.setFontSize(14);
             doc.setFont('helvetica', 'normal');
             const subTitle = 'Relatório técnico de medição de resistência de isolamento elétrico (Megagem)';
-            doc.text(subTitle, pageWidth / 2, 95, { align: 'center' });
+            doc.text(subTitle, pageWidth / 2, 125, { align: 'center' });
             
             // Imagem da Embarcação
             if (coverImageDataUrl && !coverImageDataUrl.startsWith('data:image/svg+xml')) { // Não tenta adicionar o placeholder
@@ -1498,18 +1498,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const imgWidth = 120;
                     const imgHeight = 90;
                     const imgX = (pageWidth - imgWidth) / 2;
-                    const imgY = 110;
+                    const imgY = 135;
                     doc.addImage(coverImageDataUrl, 'PNG', imgX, imgY, imgWidth, imgHeight);
                 } catch (e) {
                     console.error("Erro ao adicionar imagem da capa:", e);
                     doc.setDrawColor(150);
-                    doc.rect((pageWidth - 120) / 2, 110, 120, 90);
-                    doc.text('Imagem indisponível', pageWidth / 2, 155, { align: 'center' });
+                    doc.rect((pageWidth - 120) / 2, 135, 120, 90);
+                    doc.text('Imagem indisponível', pageWidth / 2, 180, { align: 'center' });
                 }
             } else {
                  doc.setDrawColor(150);
-                 doc.rect((pageWidth - 120) / 2, 110, 120, 90);
-                 doc.text('Imagem não carregada', pageWidth / 2, 155, { align: 'center' });
+                 doc.rect((pageWidth - 120) / 2, 135, 120, 90);
+                 doc.text('Imagem não carregada', pageWidth / 2, 180, { align: 'center' });
             }
 
             // Rodapé
