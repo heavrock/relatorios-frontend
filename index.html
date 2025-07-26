@@ -175,6 +175,7 @@
             <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
                 <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                 <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
+                <button id="cover-save-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
             </div>
 
             <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
@@ -485,7 +486,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
-    // --- V9 - CORREÇÃO DE ORDEM DE INICIALIZAÇÃO E REVISÃO DE FUNÇÕES ---
+    // --- V10 - REVISÃO DE FUNÇÕES E CONFIRMAÇÃO DE SAÍDA ---
     // ==================================================================================
 
     // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
@@ -544,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             clearFormBtn.addEventListener('click', () => {
                 if (isFormDirty(container)) {
-                    if (!confirm('Você tem certeza que deseja limpar o formulário?')) {
+                    if (!confirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.')) {
                         return;
                     }
                 }
@@ -1125,6 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
     document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); showScreen(screens.savedReports); });
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
+    document.getElementById('cover-save-report-btn').addEventListener('click', saveFullReport);
     document.getElementById('manage-companies-btn').addEventListener('click', () => {
         renderCompanyList();
         showScreen(screens.companyManagement);
