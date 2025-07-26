@@ -307,7 +307,7 @@
         <!-- TELA DE RELATÓRIOS SALVOS -->
         <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
-                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos Localmente</h1>
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos</h1>
                 <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
                     <div id="saved-reports-list" class="space-y-3">
                         <!-- A lista de relatórios salvos será inserida aqui -->
@@ -565,17 +565,16 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
-    // --- V11 - LÓGICA DE AUTENTICAÇÃO ---
+    // --- V11 - LÓGICA DE AUTENTICAÇÃO E MIGRAÇÃO PARA FIRESTORE ---
     // ==================================================================================
 
     // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
-    const SAVED_REPORTS_KEY = 'unitechFullReports_v2'; 
-    const COMPANY_DATA_KEY = 'unitechCompanyData_v1';
     let localReportsCache = []; 
     let currentlyEditingIndex = null;
     let coverImageDataUrl = null; 
     let companyList = [];
     let currentCompany = null;
+    let currentUserId = null; // Guardará o ID do usuário logado
 
     // --- LÓGICA DE CÁLCULO E CONFIGURAÇÕES DAS PLANILHAS ---
     const getKtInsulation = (temp, targetTemp) => Math.pow(2, (targetTemp - temp) / 10);
@@ -705,32 +704,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
-    function getCompanies() {
-        try {
-            const companiesJSON = localStorage.getItem(COMPANY_DATA_KEY);
-            if (companiesJSON) {
-                return JSON.parse(companiesJSON);
-            } else {
-                const defaultCompanies = [
-                    { 
-                        id: 'unitech', 
-                        name: 'UNITECH-NIT', 
-                        address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', 
-                        phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', 
-                        phone2: '(21)2608-4184' 
-                    }
-                ];
-                saveCompanies(defaultCompanies);
-                return defaultCompanies;
-            }
-        } catch (e) {
-            console.error("Erro ao ler dados das empresas:", e);
-            return [];
+    async function getCompanies() {
+        if (!currentUserId) return [];
+        const docRef = doc(db, "users", currentUserId, "data", "companies");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists() && docSnap.data().list) {
+            return docSnap.data().list;
+        } else {
+            const defaultCompanies = [
+                { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184' }
+            ];
+            await saveCompanies(defaultCompanies);
+            return defaultCompanies;
         }
     }
 
-    function saveCompanies(companies) {
-        localStorage.setItem(COMPANY_DATA_KEY, JSON.stringify(companies));
+    async function saveCompanies(companies) {
+        if (!currentUserId) return;
+        const docRef = doc(db, "users", currentUserId, "data", "companies");
+        await setDoc(docRef, { list: companies });
     }
 
     function populateCompanyDropdown() {
@@ -788,14 +781,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('company-form-cancel-btn').classList.add('hidden');
     }
     
-    function getSavedFullReports() {
-        try {
-            const reportsJSON = localStorage.getItem(SAVED_REPORTS_KEY);
-            return reportsJSON ? JSON.parse(reportsJSON) : [];
-        } catch (e) {
-            console.error("Erro ao ler relatórios salvos localmente:", e);
-            return [];
-        }
+    async function getSavedFullReports() {
+        if (!currentUserId) return [];
+        const reportsCol = collection(db, "users", currentUserId, "reports");
+        const reportSnapshot = await getDocs(reportsCol);
+        const reportList = reportSnapshot.docs.map(doc => ({...doc.data(), firestoreId: doc.id}));
+        return reportList;
     }
 
     function resetCurrentReport() {
@@ -807,6 +798,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveFullReport() {
+        if (!currentUserId) {
+            showToast('Você precisa estar logado para salvar.', 'error');
+            return;
+        }
+
         const cliente = document.getElementById('cover-cliente').value.trim();
         const local = document.getElementById('cover-local').value.trim();
 
@@ -822,7 +818,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const fullReport = {
-            id: Date.now().toString(),
             coverData: {
                 cliente: cliente,
                 local: local,
@@ -833,19 +828,21 @@ document.addEventListener('DOMContentLoaded', () => {
             savedAt: new Date().toISOString()
         };
 
-        const savedReports = getSavedFullReports();
-        savedReports.push(fullReport);
-        localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(savedReports));
-        showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
-        console.log("Relatório salvo:", fullReport);
-
-        resetCurrentReport();
-        showScreen(screens.menu);
+        try {
+            const reportsCol = collection(db, "users", currentUserId, "reports");
+            await addDoc(reportsCol, fullReport);
+            showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
+            resetCurrentReport();
+            showScreen(screens.menu);
+        } catch (error) {
+            console.error("Erro ao salvar relatório: ", error);
+            showToast(`Erro ao salvar: ${error.message}`, 'error');
+        }
     }
 
-    function loadFullReport(reportId) {
-        const savedReports = getSavedFullReports();
-        const reportToLoad = savedReports.find(r => r.id === reportId);
+    async function loadFullReport(reportId) {
+        const savedReports = await getSavedFullReports();
+        const reportToLoad = savedReports.find(r => r.firestoreId === reportId);
 
         if (!reportToLoad) {
             showToast("Erro: Relatório não encontrado.", 'error');
@@ -872,13 +869,16 @@ document.addEventListener('DOMContentLoaded', () => {
         showScreen(screens.menu);
     }
     
-    function deleteSavedFullReport(reportId) {
-        let savedReports = getSavedFullReports();
-        savedReports = savedReports.filter(r => r.id !== reportId);
-        localStorage.setItem(SAVED_REPORTS_KEY, JSON.stringify(savedReports));
-        
-        showToast('Relatório apagado.', 'success');
-        showSavedReportsScreen();
+    async function deleteSavedFullReport(reportId) {
+        if (!currentUserId) return;
+        try {
+            await deleteDoc(doc(db, "users", currentUserId, "reports", reportId));
+            showToast('Relatório apagado.', 'success');
+            showSavedReportsScreen();
+        } catch (error) {
+            console.error("Erro ao apagar relatório: ", error);
+            showToast(`Erro ao apagar: ${error.message}`, 'error');
+        }
     }
 
     function updateIndexPage() {
@@ -912,21 +912,21 @@ document.addEventListener('DOMContentLoaded', () => {
         indexList.innerHTML = html;
     }
     
-    function showSavedReportsScreen() {
+    async function showSavedReportsScreen() {
         const listEl = document.getElementById('saved-reports-list');
-        listEl.innerHTML = ''; 
-        const savedReports = getSavedFullReports();
+        listEl.innerHTML = '<p class="text-gray-500 text-center">Carregando relatórios...</p>';
+        const savedReports = await getSavedFullReports();
         
         if (savedReports.length === 0) {
-            listEl.innerHTML = '<p class="text-gray-500 text-center">Nenhum relatório completo foi salvo ainda.</p>';
+            listEl.innerHTML = '<p class="text-gray-500 text-center">Nenhum relatório salvo na nuvem ainda.</p>';
         } else {
             listEl.innerHTML = savedReports.map(report => `
                 <div class="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50">
                     <div>
-                        <a href="#" data-load-id="${report.id}" class="font-semibold text-blue-700 hover:underline">${report.coverData.cliente} - ${report.coverData.local}</a>
+                        <a href="#" data-load-id="${report.firestoreId}" class="font-semibold text-blue-700 hover:underline">${report.coverData.cliente} - ${report.coverData.local}</a>
                         <p class="text-xs text-gray-500">Salvo em: ${new Date(report.savedAt).toLocaleString('pt-BR')}</p>
                     </div>
-                    <button data-delete-id="${report.id}" class="text-red-500 hover:text-red-700 font-bold text-2xl px-3" title="Apagar este relatório salvo">&times;</button>
+                    <button data-delete-id="${report.firestoreId}" class="text-red-500 hover:text-red-700 font-bold text-2xl px-3" title="Apagar este relatório salvo">&times;</button>
                 </div>
             `).join('');
         }
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showScreen = (screenElement, updateHistory = true) => {
         const screenName = Object.keys(screens).find(key => screens[key] === screenElement);
         
-        if (!screenName) return;
+        if (!screenName && screenElement) return;
 
         Object.values(screens).forEach(screen => { 
             if (screen && screen.id !== 'main-app-wrapper' && screen.id !== 'auth-screen') {
@@ -968,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }); 
         if (screenElement) screenElement.classList.remove('hidden');
 
-        if (updateHistory && history.state?.screen !== screenName) {
+        if (updateHistory && screenName && history.state?.screen !== screenName) {
             history.pushState({ screen: screenName }, '', `#${screenName}`);
         }
     };
@@ -1056,7 +1056,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INICIALIZAÇÃO E EVENT LISTENERS ---
     
-    document.getElementById('company-form').addEventListener('submit', (e) => {
+    document.getElementById('company-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const companyId = document.getElementById('company-id').value;
         const companyName = document.getElementById('company-name').value;
@@ -1085,13 +1085,13 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Empresa adicionada com sucesso!', 'success');
         }
 
-        saveCompanies(companyList);
+        await saveCompanies(companyList);
         renderCompanyList();
         populateCompanyDropdown();
         resetCompanyForm();
     });
 
-    document.getElementById('company-list').addEventListener('click', (e) => {
+    document.getElementById('company-list').addEventListener('click', async (e) => {
         const editId = e.target.dataset.editId;
         const deleteId = e.target.dataset.deleteId;
 
@@ -1113,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteId) {
             if (confirm('Tem certeza que deseja apagar esta empresa?')) {
                 companyList = companyList.filter(c => c.id !== deleteId);
-                saveCompanies(companyList);
+                await saveCompanies(companyList);
                 renderCompanyList();
                 populateCompanyDropdown();
                 resetCompanyForm(); 
@@ -1183,9 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSheetScreen('motor');
     setupSheetScreen('transformer');
     initializeCoverApp();
-    companyList = getCompanies();
-    populateCompanyDropdown();
-
+    
     window.addEventListener('popstate', (event) => {
         if (event.state && event.state.screen) {
             const screenName = event.state.screen;
@@ -1205,7 +1203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showScreen(screens.cover); 
     });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
-    document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); showScreen(screens.savedReports); });
+    document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
     document.getElementById('cover-save-report-btn').addEventListener('click', saveFullReport);
     document.getElementById('manage-companies-btn').addEventListener('click', () => {
@@ -1237,17 +1235,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginFormContainer = document.getElementById('login-form-container');
     const registerFormContainer = document.getElementById('register-form-container');
     
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
+            currentUserId = user.uid;
             // Usuário está logado
             authScreen.classList.add('hidden');
             mainAppWrapper.classList.remove('hidden');
+            
+            // Carrega os dados do usuário do Firestore
+            companyList = await getCompanies();
+            populateCompanyDropdown();
+
             // Define a tela inicial após o login
             const initialScreen = window.location.hash.substring(1) || 'menu';
             const screenElement = screens[initialScreen] || screens.menu;
             showScreen(screenElement, false);
             history.replaceState({ screen: initialScreen }, '', `#${initialScreen}`);
         } else {
+            currentUserId = null;
             // Usuário está deslogado
             authScreen.classList.remove('hidden');
             mainAppWrapper.classList.add('hidden');
