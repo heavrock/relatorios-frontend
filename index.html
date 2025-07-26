@@ -23,7 +23,7 @@
         .input-yellow::placeholder { color: #a1a1aa; }
         .output-span { display: block; width: 100%; height: 100%; padding: 4px; min-height: 28px; border-radius: 4px; transition: background-color: 0.3s; }
         .output-blue { background-color: #e0f2fe; }
-        .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1.5rem; margin-bottom: 0.5rem; border-radius: 6px; }
+        .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1rem; margin-bottom: 0.25rem; border-radius: 6px; }
         .unit-selector {
             padding: 2px 4px;
             font-size: 12px;
@@ -415,7 +415,6 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
                         <div class="header-info"><label>CLIENTE:</label> <input type="text" id="gen-cliente" class="border rounded px-2 py-1 w-full"></div>
-                        <div class="header-info"><label>TÉCNICO:</label> <input type="text" id="gen-tecnico" class="border rounded px-2 py-1 w-full"></div>
                         <div class="header-info"><label>EQUIP.:</label> <input type="text" id="gen-equipamento" class="border rounded px-2 py-1 w-full"></div>
                         <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="gen-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
                         <div class="header-info"><label>LOCAL:</label> <input type="text" id="gen-local" class="border rounded px-2 py-1 w-full"></div>
@@ -449,7 +448,7 @@
                 </div>
                 
                 <div id="gen-main-sections-container"></div>
-                <div class="text-center my-4 flex justify-center flex-wrap gap-4">
+                <div class="text-center my-4 flex justify-center flex-wrap gap-4 pdf-hide">
                     <button id="gen-togglePmg" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Seção PMG</button>
                     <button id="gen-toggleDiodes" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Diodos D7-D12</button>
                 </div>
@@ -1030,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCompany = companyList.find(c => c.id === companySelect.value);
         currentCompany = selectedCompany || companyList[0];
         if (currentCompany) {
-            companySelect.dispatchEvent(new Event('change'));
+            updateCompanyInfoOnPages();
         }
     }
 
@@ -1104,12 +1103,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const fullReport = {
-            coverData: {
-                cliente: cliente,
-                local: local,
-                imageDataUrl: coverImageDataUrl, 
-                companyKey: document.getElementById('company-select').value
-            },
+            cliente: cliente,
+            local: local,
+            imageDataUrl: coverImageDataUrl,
+            companyKey: document.getElementById('company-select').value,
             reportSheets: JSON.parse(JSON.stringify(localReportsCache)),
             savedAt: new Date().toISOString()
         };
@@ -1137,13 +1134,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetCurrentReport();
 
-        document.getElementById('cover-cliente').value = reportToLoad.coverData.cliente;
-        document.getElementById('cover-local').value = reportToLoad.coverData.local;
+        document.getElementById('cover-cliente').value = reportToLoad.cliente;
+        document.getElementById('cover-local').value = reportToLoad.local;
         
-        coverImageDataUrl = reportToLoad.coverData.imageDataUrl;
+        coverImageDataUrl = reportToLoad.imageDataUrl;
         document.getElementById('cover-preview-image').src = coverImageDataUrl;
 
-        document.getElementById('company-select').value = reportToLoad.coverData.companyKey || 'unitech';
+        document.getElementById('company-select').value = reportToLoad.companyKey || 'unitech';
         document.getElementById('company-select').dispatchEvent(new Event('change'));
 
         localReportsCache = reportToLoad.reportSheets;
@@ -1151,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeCoverApp();
         updateIndexPage();
 
-        showToast(`Relatório para "${reportToLoad.coverData.cliente}" carregado!`, 'info');
+        showToast(`Relatório para "${reportToLoad.cliente}" carregado!`, 'info');
         showScreen(screens.menu);
     }
     
@@ -1174,12 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
         
-        if (currentCompany) {
-            document.getElementById('index-company-name').textContent = currentCompany.name || '';
-            document.getElementById('index-company-address').textContent = currentCompany.address || '';
-            document.getElementById('index-company-phones').textContent = currentCompany.phones || '';
-            document.getElementById('index-company-phone2').textContent = currentCompany.phone2 || '';
-        }
+        updateCompanyInfoOnPages();
 
         if (!localReportsCache || localReportsCache.length === 0) {
             indexList.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma planilha de equipamento foi adicionada a este relatório ainda.</p>';
@@ -1209,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.innerHTML = savedReports.map(report => `
                 <div class="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50">
                     <div>
-                        <a href="#" data-load-id="${report.firestoreId}" class="font-semibold text-blue-700 hover:underline">${report.coverData.cliente} - ${report.coverData.local}</a>
+                        <a href="#" data-load-id="${report.firestoreId}" class="font-semibold text-blue-700 hover:underline">${report.cliente} - ${report.local}</a>
                         <p class="text-xs text-gray-500">Salvo em: ${new Date(report.savedAt).toLocaleString('pt-BR')}</p>
                     </div>
                     <button data-delete-id="${report.firestoreId}" class="text-red-500 hover:text-red-700 font-bold text-2xl px-3" title="Apagar este relatório salvo">&times;</button>
@@ -1290,17 +1282,62 @@ document.addEventListener('DOMContentLoaded', () => {
             previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO'; 
         } 
         Object.values(inputs).forEach(input => input.addEventListener('input', updatePreviewText)); 
-        imageUpload.addEventListener('change', (event) => { 
-            const file = event.target.files[0]; 
-            if (file) { 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    coverImageDataUrl = e.target.result; 
+        
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Por favor, selecione um arquivo de imagem.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                    if (dataUrl.length > 1048487) {
+                       showToast('A imagem é muito grande mesmo após a compressão. Tente uma imagem menor.', 'error');
+                       return;
+                    }
+
+                    coverImageDataUrl = dataUrl;
                     previews.image.src = coverImageDataUrl;
+                    showToast('Imagem carregada e otimizada!', 'success');
                 };
-                reader.readAsDataURL(file);
-            } 
-        }); 
+                img.onerror = () => {
+                    showToast('Não foi possível carregar o arquivo de imagem.', 'error');
+                };
+                img.src = e.target.result;
+            };
+            reader.onerror = () => {
+                showToast('Erro ao ler o arquivo.', 'error');
+            };
+            reader.readAsDataURL(file);
+        });
         
         if (!previews.image.src) {
             coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
@@ -1448,8 +1485,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 populateSheetFromData(sheetContainer, reportSheet, config);
                 
                 // Oculta os botões antes de gerar o PDF
-                const buttonsToHide = appContainer.querySelector('.pdf-hide');
-                if (buttonsToHide) buttonsToHide.style.display = 'none';
+                const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
+                elementsToHide.forEach(el => el.style.display = 'none');
                 
                 await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -1458,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.addImage(imgDataSheet, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
                 
                 // Mostra os botões novamente
-                if (buttonsToHide) buttonsToHide.style.display = 'flex';
+                elementsToHide.forEach(el => el.style.display = 'flex');
                 
                 screenToShow.classList.add('hidden');
                 if(originalScreen) originalScreen.classList.remove('hidden');
@@ -1474,6 +1511,22 @@ document.addEventListener('DOMContentLoaded', () => {
             loader.classList.remove('flex');
             showScreen(screens.index, false); // Garante que a tela de índice seja reexibida
         }
+    }
+    
+    function updateCompanyInfoOnPages() {
+        if (!currentCompany) return;
+
+        // Cover Preview
+        document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
+        document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
+        document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
+        document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
+
+        // Index Preview
+        document.getElementById('index-company-name').textContent = currentCompany.name || '';
+        document.getElementById('index-company-address').textContent = currentCompany.address || '';
+        document.getElementById('index-company-phones').textContent = currentCompany.phones || '';
+        document.getElementById('index-company-phone2').textContent = currentCompany.phone2 || '';
     }
 
     // --- INICIALIZAÇÃO E EVENT LISTENERS ---
@@ -1545,6 +1598,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
+    
+    document.getElementById('company-select').addEventListener('change', (e) => {
+        const selectedCompanyId = e.target.value;
+        currentCompany = companyList.find(c => c.id === selectedCompanyId);
+        updateCompanyInfoOnPages();
+    });
 
     const setupSheetScreen = (prefix) => {
         const btn = document.getElementById(`${prefix}-btn`);
@@ -1616,12 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('cover-btn').addEventListener('click', () => { 
-        if (currentCompany) {
-            document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
-            document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
-            document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
-            document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
-        }
+        updateCompanyInfoOnPages();
         showScreen(screens.cover); 
     });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
