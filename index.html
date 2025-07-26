@@ -291,8 +291,8 @@
                 </div>
 
                 <div id="cover-preview" class="report-page">
-                    <header class="flex justify-between items-start">
-                        <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
+                    <header class="flex justify-between items-start pb-2 border-b-2 border-black">
+                        <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-12 w-auto object-contain">
                         <div class="text-right text-xs">
                             <p class="font-bold" id="cover-preview-company-name"></p>
                             <p id="cover-preview-company-address"></p>
@@ -300,16 +300,20 @@
                             <p id="cover-preview-company-phone2"></p>
                         </div>
                     </header>
-                    <main class="flex-grow flex flex-col items-center justify-center text-center -mt-8">
-                        <h1 id="cover-preview-cliente" class="text-4xl font-bold text-black border-b-2 border-black pb-2">CLIENTE</h1>
-                        <h2 id="cover-preview-local" class="text-3xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
-                        <p class="mt-8 text-xl">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
-                        <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-6 max-w-sm w-full h-auto object-cover rounded-md shadow-lg">
+                    <main class="flex-grow flex flex-col items-center justify-start text-center pt-8">
+                        <div class="w-full">
+                            <h1 id="cover-preview-cliente" class="text-3xl font-bold text-black">CLIENTE</h1>
+                            <h2 id="cover-preview-local" class="text-2xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
+                        </div>
+                        <div class="w-full mt-4 pt-4 border-t-2 border-black">
+                            <p class="mt-2 text-lg">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
+                            <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-4 max-w-md w-full h-auto object-cover rounded-md shadow-lg mx-auto">
+                        </div>
                     </main>
                     <footer class="mt-auto pt-4">
-                        <div id="cover-preview-rep-logos" class="flex justify-center items-center gap-8 mb-4">
-                            <img id="cover-preview-rep-logo1" src="" class="h-12 w-auto object-contain">
-                            <img id="cover-preview-rep-logo2" src="" class="h-12 w-auto object-contain">
+                        <div id="cover-preview-rep-logos" class="flex justify-center items-center gap-8 mb-2">
+                            <img id="cover-preview-rep-logo1" src="" class="h-10 w-auto object-contain">
+                            <img id="cover-preview-rep-logo2" src="" class="h-10 w-auto object-contain">
                         </div>
                         <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
                     </footer>
@@ -1452,59 +1456,60 @@ document.addEventListener('DOMContentLoaded', () => {
                         const img = new Image();
                         img.src = currentCompany.logoDataUrl;
                         await img.decode();
-                        const imgWidth = 30; 
+                        const imgWidth = 35; 
                         const imgHeight = (img.height * imgWidth) / img.width;
-                        doc.addImage(currentCompany.logoDataUrl, 'PNG', margin, margin - 5, imgWidth, imgHeight);
+                        doc.addImage(currentCompany.logoDataUrl, 'PNG', margin, margin - 10, imgWidth, imgHeight);
                     } catch (e) { console.error("Erro ao adicionar logo da empresa:", e); }
                 }
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'bold');
                 doc.text(currentCompany.name || '', pageWidth - margin, margin, { align: 'right' });
                 doc.setFont('helvetica', 'normal');
                 doc.text(currentCompany.address || '', pageWidth - margin, margin + 4, { align: 'right' });
                 doc.text(currentCompany.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
                 doc.text(currentCompany.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
+                doc.setLineWidth(0.5);
+                doc.line(margin, margin + 14, pageWidth - margin, margin + 14);
             }
 
             // Títulos Centrais
             const clienteText = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
             const localText = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
             
-            doc.setFontSize(28);
+            doc.setFontSize(26);
             doc.setFont('helvetica', 'bold');
-            doc.text(clienteText, pageWidth / 2, 100, { align: 'center' });
+            doc.text(clienteText, pageWidth / 2, 65, { align: 'center' });
+            doc.text(localText, pageWidth / 2, 77, { align: 'center' });
             
-            // Linha abaixo do título
-            const textWidth = doc.getTextWidth(clienteText);
+            const titleWidth = Math.max(doc.getTextWidth(clienteText), doc.getTextWidth(localText));
+            const lineX1 = (pageWidth - titleWidth) / 2;
+            const lineX2 = (pageWidth + titleWidth) / 2;
             doc.setLineWidth(0.5);
-            doc.line((pageWidth - textWidth) / 2, 102, (pageWidth + textWidth) / 2, 102);
+            doc.line(lineX1, 82, lineX2, 82);
 
-            doc.setFontSize(22);
-            doc.text(localText, pageWidth / 2, 112, { align: 'center' });
-
-            doc.setFontSize(12);
+            doc.setFontSize(14);
             doc.setFont('helvetica', 'normal');
             const subTitle = 'Relatório técnico de medição de resistência de isolamento elétrico (Megagem)';
-            doc.text(subTitle, pageWidth / 2, 130, { align: 'center' });
+            doc.text(subTitle, pageWidth / 2, 95, { align: 'center' });
             
             // Imagem da Embarcação
             if (coverImageDataUrl && !coverImageDataUrl.startsWith('data:image/svg+xml')) { // Não tenta adicionar o placeholder
                 try {
-                    const imgWidth = 80;
-                    const imgHeight = 60;
+                    const imgWidth = 120;
+                    const imgHeight = 90;
                     const imgX = (pageWidth - imgWidth) / 2;
-                    const imgY = 140;
+                    const imgY = 110;
                     doc.addImage(coverImageDataUrl, 'PNG', imgX, imgY, imgWidth, imgHeight);
                 } catch (e) {
                     console.error("Erro ao adicionar imagem da capa:", e);
                     doc.setDrawColor(150);
-                    doc.rect((pageWidth - 80) / 2, 140, 80, 60);
-                    doc.text('Imagem indisponível', pageWidth / 2, 170, { align: 'center' });
+                    doc.rect((pageWidth - 120) / 2, 110, 120, 90);
+                    doc.text('Imagem indisponível', pageWidth / 2, 155, { align: 'center' });
                 }
             } else {
                  doc.setDrawColor(150);
-                 doc.rect((pageWidth - 80) / 2, 140, 80, 60);
-                 doc.text('Imagem não carregada', pageWidth / 2, 170, { align: 'center' });
+                 doc.rect((pageWidth - 120) / 2, 110, 120, 90);
+                 doc.text('Imagem não carregada', pageWidth / 2, 155, { align: 'center' });
             }
 
             // Rodapé
@@ -1515,18 +1520,24 @@ document.addEventListener('DOMContentLoaded', () => {
             // Logos de Representantes
             const repLogos = [currentCompany.repLogo1DataUrl, currentCompany.repLogo2DataUrl].filter(Boolean);
             if (repLogos.length > 0) {
-                const totalLogoWidth = 30 * repLogos.length;
-                const spacing = 10;
+                const maxImgHeight = 12;
+                const logoWidths = [];
+                for(const logoUrl of repLogos) {
+                    const img = new Image();
+                    img.src = logoUrl;
+                    await img.decode();
+                    logoWidths.push((img.width * maxImgHeight) / img.height);
+                }
+
+                const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0);
+                const spacing = 15;
                 let startX = (pageWidth - totalLogoWidth - (spacing * (repLogos.length - 1))) / 2;
                 
-                for (const logoUrl of repLogos) {
+                for (let i = 0; i < repLogos.length; i++) {
+                    const logoUrl = repLogos[i];
+                    const imgWidth = logoWidths[i];
                     try {
-                        const img = new Image();
-                        img.src = logoUrl;
-                        await img.decode();
-                        const imgWidth = 30;
-                        const imgHeight = (img.height * imgWidth) / img.width;
-                        doc.addImage(logoUrl, 'PNG', startX, pageHeight - 35, imgWidth, imgHeight);
+                        doc.addImage(logoUrl, 'PNG', startX, pageHeight - 35, imgWidth, maxImgHeight);
                         startX += imgWidth + spacing;
                     } catch(e) { console.error("Erro ao adicionar logo de representante", e); }
                 }
