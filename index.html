@@ -871,13 +871,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function deleteSavedFullReport(reportId) {
         if (!currentUserId) return;
-        try {
-            await deleteDoc(doc(db, "users", currentUserId, "reports", reportId));
-            showToast('Relatório apagado.', 'success');
-            showSavedReportsScreen();
-        } catch (error) {
-            console.error("Erro ao apagar relatório: ", error);
-            showToast(`Erro ao apagar: ${error.message}`, 'error');
+        if (confirm('Tem certeza que deseja apagar este relatório salvo? Esta ação é permanente.')) {
+            try {
+                await deleteDoc(doc(db, "users", currentUserId, "reports", reportId));
+                showToast('Relatório apagado.', 'success');
+                await showSavedReportsScreen();
+            } catch (error) {
+                console.error("Erro ao apagar relatório: ", error);
+                showToast(`Erro ao apagar: ${error.message}`, 'error');
+            }
         }
     }
 
@@ -1307,6 +1309,38 @@ document.addEventListener('DOMContentLoaded', () => {
         loginFormContainer.classList.remove('hidden');
     });
 
+    document.getElementById('saved-reports-list').addEventListener('click', async (e) => {
+        const loadButton = e.target.closest('[data-load-id]');
+        const deleteButton = e.target.closest('[data-delete-id]');
+
+        if (loadButton) {
+            e.preventDefault();
+            await loadFullReport(loadButton.dataset.loadId);
+        }
+        if (deleteButton) {
+            e.preventDefault();
+            await deleteSavedFullReport(deleteButton.dataset.deleteId);
+        }
+    });
+
+    document.getElementById('index-content-list').addEventListener('click', (e) => {
+        const reportLink = e.target.closest('[data-report-index]');
+        const deleteButton = e.target.closest('[data-delete-index]');
+
+        if (reportLink) {
+            e.preventDefault();
+            editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10));
+        }
+        if (deleteButton) {
+            e.preventDefault();
+            if (confirm('Tem certeza que deseja remover esta planilha do relatório atual?')) {
+                const indexToRemove = parseInt(deleteButton.dataset.deleteIndex, 10);
+                localReportsCache.splice(indexToRemove, 1);
+                showToast('Planilha removida do relatório.', 'info');
+                updateIndexPage();
+            }
+        }
+    });
 });
 </script>
 </body>
