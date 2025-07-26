@@ -291,7 +291,8 @@
                 </div>
 
                 <div id="cover-preview" class="report-page">
-                    <header class="flex justify-end items-start">
+                    <header class="flex justify-between items-start">
+                        <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
                         <div class="text-right text-xs">
                             <p class="font-bold" id="cover-preview-company-name"></p>
                             <p id="cover-preview-company-address"></p>
@@ -324,7 +325,8 @@
                 </div>
 
                 <div id="index-page" class="report-page">
-                    <header class="flex justify-end items-start">
+                    <header class="flex justify-between items-start">
+                        <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
                         <div class="text-right text-xs">
                             <p class="font-bold" id="index-company-name"></p>
                             <p id="index-company-address"></p>
@@ -382,6 +384,14 @@
                             <div>
                                 <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
                                 <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Logo da Empresa</label>
+                                <input type="file" id="company-logo-upload" class="hidden" accept="image/*">
+                                <label for="company-logo-upload" class="mt-1 w-full inline-block text-center bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition cursor-pointer">
+                                    CARREGAR LOGO
+                                </label>
+                                <img id="company-logo-preview" src="" alt="Preview da Logo" class="mt-2 h-16 w-auto mx-auto hidden">
                             </div>
                             <div class="flex gap-4">
                                 <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
@@ -859,6 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let companyList = [];
     let currentCompany = null;
     let currentUserId = null; // Guardará o ID do usuário logado
+    let temporaryCompanyLogo = null; // Para guardar a logo no formulário antes de salvar
 
     // --- LÓGICA DE CÁLCULO E CONFIGURAÇÕES DAS PLANILHAS ---
     const getKtInsulation = (temp, targetTemp) => Math.pow(2, (targetTemp - temp) / 10);
@@ -998,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return docSnap.data().list;
         } else {
             const defaultCompanies = [
-                { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184' }
+                { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184', logoDataUrl: null }
             ];
             await saveCompanies(defaultCompanies);
             return defaultCompanies;
@@ -1044,9 +1055,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'flex items-center justify-between p-3 rounded-lg border';
             div.innerHTML = `
-                <div>
-                    <p class="font-semibold">${company.name}</p>
-                    <p class="text-xs text-gray-500">${company.address || 'Sem endereço'}</p>
+                <div class="flex items-center gap-4">
+                    <img src="${company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo'}" class="h-10 w-auto object-contain bg-gray-100 p-1 rounded">
+                    <div>
+                        <p class="font-semibold">${company.name}</p>
+                        <p class="text-xs text-gray-500">${company.address || 'Sem endereço'}</p>
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <button data-edit-id="${company.id}" class="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded">Editar</button>
@@ -1064,6 +1078,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('company-form-title').textContent = 'Adicionar Nova Empresa';
         document.getElementById('company-form-submit-btn').textContent = 'Adicionar Empresa';
         document.getElementById('company-form-cancel-btn').classList.add('hidden');
+        const logoPreview = document.getElementById('company-logo-preview');
+        logoPreview.src = '';
+        logoPreview.classList.add('hidden');
+        temporaryCompanyLogo = null;
     }
     
     async function getSavedFullReports() {
@@ -1396,8 +1414,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageWidth = doc.internal.pageSize.getWidth();
             const margin = 20;
 
-            // Cabeçalho da Empresa
+            // Cabeçalho da Empresa com Logo
             if (currentCompany) {
+                if (currentCompany.logoDataUrl) {
+                    try {
+                        const img = new Image();
+                        img.src = currentCompany.logoDataUrl;
+                        await img.decode();
+                        const imgWidth = 30; 
+                        const imgHeight = (img.height * imgWidth) / img.width;
+                        doc.addImage(currentCompany.logoDataUrl, 'PNG', margin, margin - 5, imgWidth, imgHeight);
+                    } catch (e) { console.error("Erro ao adicionar logo da empresa:", e); }
+                }
                 doc.setFontSize(8);
                 doc.setFont('helvetica', 'bold');
                 doc.text(currentCompany.name || '', pageWidth - margin, margin, { align: 'right' });
@@ -1516,13 +1544,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCompanyInfoOnPages() {
         if (!currentCompany) return;
 
+        const logoUrl = currentCompany.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
         // Cover Preview
+        document.getElementById('cover-preview-company-logo').src = logoUrl;
         document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
         document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
         document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
         document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
 
         // Index Preview
+        document.getElementById('index-company-logo').src = logoUrl;
         document.getElementById('index-company-name').textContent = currentCompany.name || '';
         document.getElementById('index-company-address').textContent = currentCompany.address || '';
         document.getElementById('index-company-phones').textContent = currentCompany.phones || '';
@@ -1545,12 +1576,17 @@ document.addEventListener('DOMContentLoaded', () => {
             name: companyName,
             address: document.getElementById('company-address').value,
             phones: document.getElementById('company-phones').value,
-            phone2: document.getElementById('company-phone2').value
+            phone2: document.getElementById('company-phone2').value,
+            logoDataUrl: temporaryCompanyLogo
         };
 
         if (companyId) {
             const companyIndex = companyList.findIndex(c => c.id === companyId);
             if (companyIndex > -1) {
+                // Mantém a logo antiga se nenhuma nova for carregada
+                if (!newCompanyData.logoDataUrl) {
+                    newCompanyData.logoDataUrl = companyList[companyIndex].logoDataUrl;
+                }
                 companyList[companyIndex] = { ...companyList[companyIndex], ...newCompanyData };
                 showToast('Empresa atualizada com sucesso!', 'success');
             }
@@ -1579,6 +1615,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-phones').value = companyToEdit.phones || '';
                 document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
                 
+                const logoPreview = document.getElementById('company-logo-preview');
+                if (companyToEdit.logoDataUrl) {
+                    logoPreview.src = companyToEdit.logoDataUrl;
+                    logoPreview.classList.remove('hidden');
+                } else {
+                    logoPreview.src = '';
+                    logoPreview.classList.add('hidden');
+                }
+                
                 document.getElementById('company-form-title').textContent = 'Editar Empresa';
                 document.getElementById('company-form-submit-btn').textContent = 'Salvar Alterações';
                 document.getElementById('company-form-cancel-btn').classList.remove('hidden');
@@ -1599,6 +1644,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
     
+    document.getElementById('company-logo-upload').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Por favor, selecione um arquivo de imagem (PNG, JPG, etc).', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const MAX_WIDTH = 200; // Largura máxima para a logo
+                const MAX_HEIGHT = 80; // Altura máxima para a logo
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/png');
+
+                if (dataUrl.length > 500000) { // Limite de ~500KB
+                   showToast('A imagem é muito grande. Tente uma imagem menor.', 'error');
+                   return;
+                }
+                
+                temporaryCompanyLogo = dataUrl;
+                const logoPreview = document.getElementById('company-logo-preview');
+                logoPreview.src = temporaryCompanyLogo;
+                logoPreview.classList.remove('hidden');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
     document.getElementById('company-select').addEventListener('change', (e) => {
         const selectedCompanyId = e.target.value;
         currentCompany = companyList.find(c => c.id === selectedCompanyId);
