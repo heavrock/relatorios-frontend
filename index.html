@@ -124,373 +124,448 @@
     <!-- Área para notificações -->
     <div id="notification-area"></div>
 
-    <!-- TELA DO MENU PRINCIPAL -->
-    <div id="menu-screen">
+    <!-- TELA DE AUTENTICAÇÃO -->
+    <div id="auth-screen">
         <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
-            <h1 class="text-4xl font-bold text-white mb-8">Painel de Controle</h1>
+            <h1 class="text-4xl font-bold text-white mb-8">Relatórios Técnicos</h1>
             
-            <div class="mb-8 w-full max-w-sm">
-                <label for="company-select" class="block text-center text-lg text-indigo-300 mb-2">Selecione a Empresa</label>
-                <select id="company-select" class="w-full p-3 text-center rounded-lg border-2 border-indigo-400 bg-gray-700 text-white focus:outline-none focus:border-indigo-200">
-                    <!-- Opções de empresa carregadas dinamicamente -->
-                </select>
-            </div>
-
-            <div class="w-full max-w-xl">
-                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
-                    <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
-                    <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
-                    <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
-                    <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TELA DE SELEÇÃO DE EQUIPAMENTOS (NOVA) -->
-    <div id="equipamentos-screen" class="hidden">
-        <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
-            <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
-            <div class="w-full max-w-4xl">
-                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
-                    <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
-                    <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
-                    <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
-                    <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
-                    <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
-                </div>
-            </div>
-            <div class="mt-8">
-                <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TELA DA CAPA DO RELATÓRIO -->
-    <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
-            
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
-                <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
-                <button id="cover-save-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-            </div>
-
-            <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
-                <h2 class="text-lg font-semibold mb-4 border-b pb-2">Informações da Capa</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="cover-cliente" class="block text-sm font-medium text-gray-700 mb-1">Empresa (Cliente)</label>
-                        <input type="text" id="cover-cliente" placeholder="Ex: OCEANPACT" class="p-2 border rounded w-full">
-                    </div>
-                    <div>
-                        <label for="cover-local" class="block text-sm font-medium text-gray-700 mb-1">Embarcação</label>
-                        <input type="text" id="cover-local" placeholder="Ex: SEWARD JOHNSON" class="p-2 border rounded w-full">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Equipamento</label>
-                        <input type="file" id="cover-image-upload" class="hidden" accept="image/*">
-                        <label for="cover-image-upload" class="w-full inline-block text-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition cursor-pointer">
-                            CARREGAR IMAGEM DO NAVIO
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div id="cover-preview" class="report-page">
-                <header class="flex justify-end items-start">
-                    <div class="text-right text-xs">
-                        <p class="font-bold" id="cover-preview-company-name"></p>
-                        <p id="cover-preview-company-address"></p>
-                        <p id="cover-preview-company-phones"></p>
-                        <p id="cover-preview-company-phone2"></p>
-                    </div>
-                </header>
-                <main class="flex-grow flex flex-col items-center justify-center text-center -mt-8">
-                    <h1 id="cover-preview-cliente" class="text-4xl font-bold text-black border-b-2 border-black pb-2">CLIENTE</h1>
-                    <h2 id="cover-preview-local" class="text-3xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
-                    <p class="mt-8 text-xl">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
-                    <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-6 max-w-sm w-full h-auto object-cover rounded-md shadow-lg">
-                </main>
-                <footer class="text-center text-xs text-gray-600 mt-auto pt-4">
-                    <p>Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
-                </footer>
-            </div>
-        </div>
-    </div>
-
-    <!-- TELA DO ÍNDICE -->
-    <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
-
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
-                <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-                <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
-            </div>
-
-            <div id="index-page" class="report-page">
-                <header class="flex justify-end items-start">
-                    <div class="text-right text-xs">
-                        <p class="font-bold" id="index-company-name"></p>
-                        <p id="index-company-address"></p>
-                        <p id="index-company-phones"></p>
-                        <p id="index-company-phone2"></p>
-                    </div>
-                </header>
-                <main id="index-content-list" class="flex-grow p-4">
-                    <!-- Conteúdo do índice será carregado -->
-                </main>
-                <footer class="text-center text-xs text-gray-600 mt-auto pt-4">
-                    <p>Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
-                </footer>
-            </div>
-        </div>
-    </div>
-
-    <!-- TELA DE RELATÓRIOS SALVOS -->
-    <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos Localmente</h1>
-            <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-                <div id="saved-reports-list" class="space-y-3">
-                    <!-- A lista de relatórios salvos será inserida aqui -->
-                </div>
-            </div>
-            <div class="flex justify-center mt-6">
-                <button id="saved-reports-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TELA DE GERENCIAMENTO DE EMPRESAS -->
-    <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Formulário de Adicionar/Editar -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
-                    <form id="company-form" class="space-y-4">
-                        <input type="hidden" id="company-id">
-                        <div>
-                            <label for="company-name" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
-                            <input type="text" id="company-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <!-- Formulário de Login -->
+            <div id="login-form-container" class="w-full max-w-sm">
+                <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-white text-center mb-6">Acessar Conta</h2>
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label for="login-email" class="block text-indigo-300 mb-2">Email</label>
+                            <input type="email" id="login-email" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
                         </div>
-                        <div>
-                            <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
-                            <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Rua, Número, Bairro, Cidade, Estado">
+                        <div class="mb-6">
+                            <label for="login-password" class="block text-indigo-300 mb-2">Senha</label>
+                            <input type="password" id="login-password" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
                         </div>
-                        <div>
-                            <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
-                            <input type="text" id="company-phones" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
-                            <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                        <div class="flex gap-4">
-                            <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
-                            <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
-                        </div>
+                        <button type="submit" class="w-full menu-button text-white font-bold py-3 px-6 rounded-xl text-lg">Entrar</button>
                     </form>
+                    <p class="text-center text-gray-400 mt-6">
+                        Não tem uma conta? <a href="#" id="show-register-link" class="text-indigo-300 hover:underline">Crie uma agora</a>
+                    </p>
                 </div>
-                <!-- Lista de Empresas -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
-                    <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto">
-                        <!-- Lista de empresas será renderizada aqui -->
+            </div>
+
+            <!-- Formulário de Cadastro -->
+            <div id="register-form-container" class="w-full max-w-sm hidden">
+                <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-white text-center mb-6">Criar Nova Conta</h2>
+                    <form id="register-form">
+                        <div class="mb-4">
+                            <label for="register-email" class="block text-indigo-300 mb-2">Email</label>
+                            <input type="email" id="register-email" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
+                        </div>
+                        <div class="mb-6">
+                            <label for="register-password" class="block text-indigo-300 mb-2">Senha</label>
+                            <input type="password" id="register-password" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
+                        </div>
+                        <button type="submit" class="w-full menu-button text-white font-bold py-3 px-6 rounded-xl text-lg">Criar Conta</button>
+                    </form>
+                    <p class="text-center text-gray-400 mt-6">
+                        Já tem uma conta? <a href="#" id="show-login-link" class="text-indigo-300 hover:underline">Faça o login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICATIVO PRINCIPAL (INICIALMENTE ESCONDIDO) -->
+    <div id="main-app-wrapper" class="hidden">
+        <!-- TELA DO MENU PRINCIPAL -->
+        <div id="menu-screen">
+            <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
+                <h1 class="text-4xl font-bold text-white mb-8">Painel de Controle</h1>
+                
+                <div class="mb-8 w-full max-w-sm">
+                    <label for="company-select" class="block text-center text-lg text-indigo-300 mb-2">Selecione a Empresa</label>
+                    <select id="company-select" class="w-full p-3 text-center rounded-lg border-2 border-indigo-400 bg-gray-700 text-white focus:outline-none focus:border-indigo-200">
+                        <!-- Opções de empresa carregadas dinamicamente -->
+                    </select>
+                </div>
+
+                <div class="w-full max-w-xl">
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
+                        <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
+                        <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
+                        <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
+                        <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
                     </div>
                 </div>
-            </div>
-            <div class="flex justify-center mt-8">
-                <button id="company-management-back-to-cover-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar para a Capa</button>
+                <div class="mt-8">
+                    <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition">Sair</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- TELA DA PLANILHA DO GERADOR -->
-    <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
-            <header class="border-b-2 border-gray-200 pb-6 mb-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h1 id="gen-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+        <!-- TELA DE SELEÇÃO DE EQUIPAMENTOS (NOVA) -->
+        <div id="equipamentos-screen" class="hidden">
+            <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
+                <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
+                <div class="w-full max-w-4xl">
+                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+                        <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
+                        <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
+                        <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
                     </div>
-                    <div id="gen-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-                    <div class="header-info"><label>CLIENTE:</label> <input type="text" id="gen-cliente" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>TÉCNICO:</label> <input type="text" id="gen-tecnico" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>EQUIP.:</label> <input type="text" id="gen-equipamento" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="gen-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>LOCAL:</label> <input type="text" id="gen-local" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>AVR:</label> <input type="text" id="gen-avr" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>TENSÃO:</label> <input type="text" id="gen-tensao" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="gen-potencia" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info sm:col-span-2 lg:col-span-1"><label>DATA:</label> <input type="date" id="gen-data" class="border rounded px-2 py-1 w-full"></div>
-                </div>
-            </header>
-
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
-                <button id="gen-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="gen-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
-                <button id="gen-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="gen-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
-                <div class="flex items-center gap-2">
-                    <label for="gen-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
-                    <input type="number" id="gen-tempAmbiente" class="input-yellow w-full">
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="gen-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
-                    <input type="number" id="gen-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
-                </div>
-                <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
-                    <label for="gen-umidadeRelativa" class="font-semibold">Umidade (%):</label>
-                    <input type="number" id="gen-umidadeRelativa" class="input-yellow w-full">
+                <div class="mt-8">
+                    <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
                 </div>
             </div>
-            
-            <div id="gen-main-sections-container"></div>
-            <div class="text-center my-4">
-                <button id="gen-togglePmg" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Seção PMG</button>
-            </div>
-            <div id="gen-pmg-section-container" class="hidden"></div>
-            <div id="gen-extra-sections-container"></div>
         </div>
-    </div>
-    
-    <!-- TELA DA PLANILHA DO MOTOR -->
-    <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div id="motor-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
-            <header class="border-b-2 border-gray-200 pb-6 mb-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h1 id="motor-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+
+        <!-- TELA DA CAPA DO RELATÓRIO -->
+        <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
+                
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                    <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
+                    <button id="cover-save-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
+                </div>
+
+                <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">Informações da Capa</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="cover-cliente" class="block text-sm font-medium text-gray-700 mb-1">Empresa (Cliente)</label>
+                            <input type="text" id="cover-cliente" placeholder="Ex: OCEANPACT" class="p-2 border rounded w-full">
+                        </div>
+                        <div>
+                            <label for="cover-local" class="block text-sm font-medium text-gray-700 mb-1">Embarcação</label>
+                            <input type="text" id="cover-local" placeholder="Ex: SEWARD JOHNSON" class="p-2 border rounded w-full">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Equipamento</label>
+                            <input type="file" id="cover-image-upload" class="hidden" accept="image/*">
+                            <label for="cover-image-upload" class="w-full inline-block text-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+                                CARREGAR IMAGEM DO NAVIO
+                            </label>
+                        </div>
                     </div>
-                    <div id="motor-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-                    <div class="header-info"><label>CLIENTE:</label> <input type="text" id="motor-cliente" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>LOCAL:</label> <input type="text" id="motor-local" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>DATA:</label> <input type="date" id="motor-data" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>EQUIP.:</label> <input type="text" id="motor-equipamento" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="motor-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="motor-fabricante" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>TENSÃO:</label> <input type="text" id="motor-tensao" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="motor-potencia" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>ROTAÇÃO:</label> <input type="text" id="motor-rotacao" class="border rounded px-2 py-1 w-full"></div>
-                </div>
-            </header>
 
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
-                <button id="motor-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="motor-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
-                <button id="motor-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="motor-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
-                <div class="flex items-center gap-2">
-                    <label for="motor-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
-                    <input type="number" id="motor-tempAmbiente" class="input-yellow w-full">
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="motor-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
-                    <input type="number" id="motor-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
-                </div>
-                <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
-                    <label for="motor-umidadeRelativa" class="font-semibold">Umidade (%):</label>
-                    <input type="number" id="motor-umidadeRelativa" class="input-yellow w-full">
+                <div id="cover-preview" class="report-page">
+                    <header class="flex justify-end items-start">
+                        <div class="text-right text-xs">
+                            <p class="font-bold" id="cover-preview-company-name"></p>
+                            <p id="cover-preview-company-address"></p>
+                            <p id="cover-preview-company-phones"></p>
+                            <p id="cover-preview-company-phone2"></p>
+                        </div>
+                    </header>
+                    <main class="flex-grow flex flex-col items-center justify-center text-center -mt-8">
+                        <h1 id="cover-preview-cliente" class="text-4xl font-bold text-black border-b-2 border-black pb-2">CLIENTE</h1>
+                        <h2 id="cover-preview-local" class="text-3xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
+                        <p class="mt-8 text-xl">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
+                        <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-6 max-w-sm w-full h-auto object-cover rounded-md shadow-lg">
+                    </main>
+                    <footer class="text-center text-xs text-gray-600 mt-auto pt-4">
+                        <p>Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
+                    </footer>
                 </div>
             </div>
-            
-            <div id="motor-sections-container"></div>
         </div>
-    </div>
 
-    <!-- TELA DA PLANILHA DO TRANSFORMADOR X3 -->
-    <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-        <div id="transformer-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
-            <header class="border-b-2 border-gray-200 pb-6 mb-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h1 id="transformer-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+        <!-- TELA DO ÍNDICE -->
+        <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                    <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
+                    <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
+                </div>
+
+                <div id="index-page" class="report-page">
+                    <header class="flex justify-end items-start">
+                        <div class="text-right text-xs">
+                            <p class="font-bold" id="index-company-name"></p>
+                            <p id="index-company-address"></p>
+                            <p id="index-company-phones"></p>
+                            <p id="index-company-phone2"></p>
+                        </div>
+                    </header>
+                    <main id="index-content-list" class="flex-grow p-4">
+                        <!-- Conteúdo do índice será carregado -->
+                    </main>
+                    <footer class="text-center text-xs text-gray-600 mt-auto pt-4">
+                        <p>Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DE RELATÓRIOS SALVOS -->
+        <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos Localmente</h1>
+                <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                    <div id="saved-reports-list" class="space-y-3">
+                        <!-- A lista de relatórios salvos será inserida aqui -->
                     </div>
-                    <div id="transformer-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-                    <div class="header-info"><label>CLIENTE:</label> <input type="text" id="transformer-cliente" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>LOCAL:</label> <input type="text" id="transformer-local" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>DATA:</label> <input type="date" id="transformer-data" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>EQUIP.:</label> <input type="text" id="transformer-equipamento" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="transformer-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="transformer-fabricante" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>TENSÃO:</label> <input type="text" id="transformer-tensao" class="border rounded px-2 py-1 w-full"></div>
-                    <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="transformer-potencia" class="border rounded px-2 py-1 w-full"></div>
-                </div>
-            </header>
-
-            <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
-                <button id="transformer-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                <button id="transformer-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
-                <button id="transformer-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                <button id="transformer-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
-                <div class="flex items-center gap-2">
-                    <label for="transformer-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
-                    <input type="number" id="transformer-tempAmbiente" class="input-yellow w-full">
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="transformer-tempTrafo" class="font-semibold">Temp. no Trafo (°C):</label>
-                    <input type="number" id="transformer-tempTrafo" class="input-yellow w-full" placeholder="Essencial">
-                </div>
-                <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
-                    <label for="transformer-umidadeRelativa" class="font-semibold">Umidade (%):</label>
-                    <input type="number" id="transformer-umidadeRelativa" class="input-yellow w-full">
+                <div class="flex justify-center mt-6">
+                    <button id="saved-reports-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
                 </div>
             </div>
-            
-            <div id="transformer-sections-container"></div>
+        </div>
+
+        <!-- TELA DE GERENCIAMENTO DE EMPRESAS -->
+        <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Formulário de Adicionar/Editar -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
+                        <form id="company-form" class="space-y-4">
+                            <input type="hidden" id="company-id">
+                            <div>
+                                <label for="company-name" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
+                                <input type="text" id="company-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
+                                <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Rua, Número, Bairro, Cidade, Estado">
+                            </div>
+                            <div>
+                                <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
+                                <input type="text" id="company-phones" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
+                                <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
+                                <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Lista de Empresas -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
+                        <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Lista de empresas será renderizada aqui -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button id="company-management-back-to-cover-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar para a Capa</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DA PLANILHA DO GERADOR -->
+        <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="gen-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                        <div id="gen-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="gen-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TÉCNICO:</label> <input type="text" id="gen-tecnico" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="gen-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="gen-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="gen-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>AVR:</label> <input type="text" id="gen-avr" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="gen-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="gen-potencia" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info sm:col-span-2 lg:col-span-1"><label>DATA:</label> <input type="date" id="gen-data" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="gen-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="gen-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="gen-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="gen-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="gen-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="gen-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="gen-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
+                        <input type="number" id="gen-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="gen-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="gen-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="gen-main-sections-container"></div>
+                <div class="text-center my-4">
+                    <button id="gen-togglePmg" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Seção PMG</button>
+                </div>
+                <div id="gen-pmg-section-container" class="hidden"></div>
+                <div id="gen-extra-sections-container"></div>
+            </div>
+        </div>
+        
+        <!-- TELA DA PLANILHA DO MOTOR -->
+        <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="motor-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="motor-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                        <div id="motor-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="motor-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="motor-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>DATA:</label> <input type="date" id="motor-data" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="motor-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="motor-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="motor-fabricante" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="motor-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="motor-potencia" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>ROTAÇÃO:</label> <input type="text" id="motor-rotacao" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="motor-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="motor-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="motor-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="motor-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="motor-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="motor-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="motor-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
+                        <input type="number" id="motor-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="motor-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="motor-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="motor-sections-container"></div>
+            </div>
+        </div>
+
+        <!-- TELA DA PLANILHA DO TRANSFORMADOR X3 -->
+        <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="transformer-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="transformer-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                        <div id="transformer-usage-counter" class="text-sm font-semibold p-2 rounded-md transition-colors duration-300"></div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="transformer-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="transformer-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>DATA:</label> <input type="date" id="transformer-data" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="transformer-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="transformer-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="transformer-fabricante" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="transformer-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="transformer-potencia" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="transformer-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="transformer-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="transformer-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="transformer-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="transformer-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="transformer-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="transformer-tempTrafo" class="font-semibold">Temp. no Trafo (°C):</label>
+                        <input type="number" id="transformer-tempTrafo" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="transformer-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="transformer-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="transformer-sections-container"></div>
+            </div>
+        </div>
+
+        <!-- Overlay de Limite de Uso e Modal de WIP -->
+        <div id="usage-limit-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 hidden items-center justify-center text-center text-white p-8 z-[100]">
+            <div>
+                <h2 class="text-3xl font-bold text-red-500 mb-4">Limite de Uso Atingido</h2>
+                <p class="text-xl">Para continuar utilizando esta ferramenta, por favor, entre em contato com o Técnico Roosevelt Santos.</p>
+            </div>
+        </div>
+        <div id="wip-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Em Desenvolvimento</h3>
+                <p class="text-gray-700 mb-6">Esta funcionalidade estará disponível em breve!</p>
+                <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
+            </div>
+        </div>
+        <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[200]">
+            <div>
+                <svg class="animate-spin h-10 w-10 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <h2 class="text-2xl font-bold">Gerando Relatório em PDF...</h2>
+                <p class="text-lg mt-2">Isso pode levar alguns segundos. Por favor, aguarde.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Overlay de Limite de Uso e Modal de WIP -->
-    <div id="usage-limit-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 hidden items-center justify-center text-center text-white p-8 z-[100]">
-        <div>
-            <h2 class="text-3xl font-bold text-red-500 mb-4">Limite de Uso Atingido</h2>
-            <p class="text-xl">Para continuar utilizando esta ferramenta, por favor, entre em contato com o Técnico Roosevelt Santos.</p>
-        </div>
-    </div>
-    <div id="wip-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
-            <h3 class="text-xl font-bold text-blue-800 mb-4">Em Desenvolvimento</h3>
-            <p class="text-gray-700 mb-6">Esta funcionalidade estará disponível em breve!</p>
-            <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
-        </div>
-    </div>
-    <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[200]">
-        <div>
-            <svg class="animate-spin h-10 w-10 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <h2 class="text-2xl font-bold">Gerando Relatório em PDF...</h2>
-            <p class="text-lg mt-2">Isso pode levar alguns segundos. Por favor, aguarde.</p>
-        </div>
-    </div>
+<script type="module">
+    // Importações do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-<script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB33aPQE8hRp_tAj1s1LF7seNgTivdhn_A",
+      authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+      projectId: "relatorios-tecnicos-app",
+      storageBucket: "relatorios-tecnicos-app.appspot.com",
+      messagingSenderId: "280958854421",
+      appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
 document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
-    // --- V10 - REVISÃO DE FUNÇÕES E CONFIRMAÇÃO DE SAÍDA ---
+    // --- V11 - LÓGICA DE AUTENTICAÇÃO ---
     // ==================================================================================
 
     // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
@@ -887,7 +962,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!screenName) return;
 
         Object.values(screens).forEach(screen => { 
-            if (screen) screen.classList.add('hidden'); 
+            if (screen && screen.id !== 'main-app-wrapper' && screen.id !== 'auth-screen') {
+                screen.classList.add('hidden');
+            }
         }); 
         if (screenElement) screenElement.classList.remove('hidden');
 
@@ -1154,11 +1231,77 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.wip-btn').forEach(btn => btn.addEventListener('click', () => { wipModal.classList.remove('hidden'); wipModal.classList.add('flex'); }));
     document.getElementById('close-wip-modal').addEventListener('click', () => { wipModal.classList.add('hidden'); wipModal.classList.remove('flex'); });
     
-    // Define o estado inicial da aplicação
-    const initialScreen = window.location.hash.substring(1) || 'menu';
-    const screenElement = screens[initialScreen] || screens.menu;
-    showScreen(screenElement, false);
-    history.replaceState({ screen: initialScreen }, '', `#${initialScreen}`);
+    // --- LÓGICA DE AUTENTICAÇÃO ---
+    const authScreen = document.getElementById('auth-screen');
+    const mainAppWrapper = document.getElementById('main-app-wrapper');
+    const loginFormContainer = document.getElementById('login-form-container');
+    const registerFormContainer = document.getElementById('register-form-container');
+    
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Usuário está logado
+            authScreen.classList.add('hidden');
+            mainAppWrapper.classList.remove('hidden');
+            // Define a tela inicial após o login
+            const initialScreen = window.location.hash.substring(1) || 'menu';
+            const screenElement = screens[initialScreen] || screens.menu;
+            showScreen(screenElement, false);
+            history.replaceState({ screen: initialScreen }, '', `#${initialScreen}`);
+        } else {
+            // Usuário está deslogado
+            authScreen.classList.remove('hidden');
+            mainAppWrapper.classList.add('hidden');
+            showScreen(null, false); // Esconde todas as telas do app principal
+        }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                showToast('Login bem-sucedido!', 'success');
+            })
+            .catch((error) => {
+                showToast(`Erro no login: ${error.message}`, 'error');
+            });
+    });
+
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                showToast('Conta criada com sucesso! Você já está logado.', 'success');
+            })
+            .catch((error) => {
+                showToast(`Erro ao criar conta: ${error.message}`, 'error');
+            });
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+            showToast('Você saiu da sua conta.', 'info');
+            // O onAuthStateChanged vai cuidar de mostrar a tela de login
+        }).catch((error) => {
+            showToast(`Erro ao sair: ${error.message}`, 'error');
+        });
+    });
+
+    document.getElementById('show-register-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        loginFormContainer.classList.add('hidden');
+        registerFormContainer.classList.remove('hidden');
+    });
+
+    document.getElementById('show-login-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        registerFormContainer.classList.add('hidden');
+        loginFormContainer.classList.remove('hidden');
+    });
+
 });
 </script>
 </body>
