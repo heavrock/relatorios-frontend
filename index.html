@@ -6,7 +6,6 @@
     <title>Painel de Controle - Relatórios Técnicos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- CORREÇÃO DE SEGURANÇA: Adicionado hash de integridade (SRI) para garantir que o script não seja adulterado. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
@@ -132,7 +131,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* CORREÇÃO DE SEGURANÇA: Modal customizado para confirmação, substituindo o confirm() nativo */
+        /* Modal customizado para confirmação */
         .confirm-modal-overlay {
             position: fixed;
             inset: 0;
@@ -682,7 +681,7 @@
         init: function() {
             // CORREÇÃO: As credenciais fornecidas pelo usuário foram implementadas.
             const firebaseConfig = {
-              apiKey: "AIzaSyB33aPQE8hRp_tAj1s1LF7seNgTivdhn_A",
+              apiKey: "AIzaSyBSoJz6nQz4FN6-CR07C4FKl6Jgh1OIWkU",
               authDomain: "relatorios-tecnicos-app.firebaseapp.com",
               projectId: "relatorios-tecnicos-app",
               storageBucket: "relatorios-tecnicos-app.appspot.com",
@@ -690,18 +689,12 @@
               appId: "1:280958854421:web:90e4b288f3c57592d9351c"
             };
 
-            // Adiciona uma verificação para garantir que as chaves não são placeholders
-            if (firebaseConfig.apiKey.startsWith("SUA_")) {
-                console.error("CONFIGURAÇÃO DO FIREBASE INCOMPLETA. Substitua os placeholders pelas suas credenciais reais.");
-                return; // Retorna sem inicializar, deixando this.auth e this.db como null
-            }
-
             const app = initializeApp(firebaseConfig);
             this.auth = getAuth(app);
             this.db = getFirestore(app);
         },
-        getAuth: function() { return this.auth; }, // Não inicializa mais aqui
-        getDb: function() { return this.db; }   // Não inicializa mais aqui
+        getAuth: function() { return this.auth; },
+        getDb: function() { return this.db; }
     };
     
     // Objeto de Estado Centralizado
@@ -716,7 +709,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     firebaseService.init();
 
-    // CORREÇÃO DE ERRO: Adiciona uma verificação para parar a execução se o Firebase não for inicializado.
     if (!firebaseService.auth) {
         const authScreen = document.getElementById('auth-screen');
         if (authScreen) {
@@ -728,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             authScreen.style.display = 'block';
         }
-        return; // Para a execução do script aqui para prevenir mais erros.
+        return;
     }
 
     // ==================================================================================
@@ -812,7 +804,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => { toast.remove(); }, 500);
             }, 3000);
         },
-        // CORREÇÃO DE SEGURANÇA: Substituído o `confirm()` nativo por um modal customizado.
         showConfirm: function(message) {
             return new Promise(resolve => {
                 const overlay = document.createElement('div');
@@ -880,7 +871,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     appState.user.displayName = userData.displayName || '';
                     appState.user.email = userData.email || '';
                     
-                    // CORREÇÃO DE XSS: Usar `textContent` em vez de `innerHTML` para prevenir injeção de script.
                     userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
 
                     authScreen.classList.add('hidden');
@@ -944,7 +934,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showAuthForm('pending');
             await signOut(firebaseService.getAuth());
         } catch (error) {
-            // CORREÇÃO DE SEGURANÇA: Evita vazar mensagens de erro detalhadas.
             let msg = "Ocorreu um erro ao criar a conta.";
             if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
             else if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mínimo 6 caracteres).";
@@ -959,7 +948,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadAdminPanelData();
     });
 
-    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
     async function loadAdminPanelData() {
         const pendingListEl = document.getElementById('pending-users-list');
         const activeListEl = document.getElementById('active-users-list');
@@ -977,16 +965,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const strong = document.createElement('strong');
             strong.className = 'block';
-            strong.textContent = user.displayName || ''; // Seguro
+            strong.textContent = user.displayName || '';
             userInfo.appendChild(strong);
-            userInfo.append(document.createTextNode(user.email)); // Seguro
+            userInfo.append(document.createTextNode(user.email));
 
             userInfoContainer.appendChild(userInfo);
 
             if (!isPending) {
                 const roleBadge = document.createElement('span');
                 roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
-                roleBadge.textContent = user.role; // Seguro
+                roleBadge.textContent = user.role;
                 userInfoContainer.appendChild(roleBadge);
             }
 
