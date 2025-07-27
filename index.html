@@ -121,12 +121,15 @@
 </head>
 <body class="bg-gray-100">
 
+    <!-- Área para notificações -->
     <div id="notification-area"></div>
 
+    <!-- TELA DE AUTENTICAÇÃO -->
     <div id="auth-screen">
         <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
             <h1 class="text-4xl font-bold text-white mb-8">Relatórios Técnicos</h1>
             
+            <!-- Formulário de Login -->
             <div id="login-form-container" class="w-full max-w-sm">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-white text-center mb-6">Acessar Conta</h2>
@@ -147,16 +150,11 @@
                 </div>
             </div>
 
+            <!-- Formulário de Cadastro -->
             <div id="register-form-container" class="w-full max-w-sm hidden">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-white text-center mb-6">Criar Nova Conta</h2>
                     <form id="register-form">
-                        
-                        <div class="mb-4">
-                            <label for="register-name" class="block text-indigo-300 mb-2">Nome Completo</label>
-                            <input type="text" id="register-name" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
-                        </div>
-
                         <div class="mb-4">
                             <label for="register-email" class="block text-indigo-300 mb-2">Email</label>
                             <input type="email" id="register-email" required class="w-full p-3 rounded-lg border-2 border-indigo-400 bg-gray-600 text-white focus:outline-none focus:border-indigo-200">
@@ -173,6 +171,7 @@
                 </div>
             </div>
 
+            <!-- Tela de Aguardando Aprovação -->
             <div id="pending-approval-container" class="w-full max-w-sm hidden">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg text-center">
                     <h2 class="text-2xl font-bold text-white mb-4">Aguardando Aprovação</h2>
@@ -183,7 +182,9 @@
         </div>
     </div>
 
+    <!-- APLICATIVO PRINCIPAL (INICIALMENTE ESCONDIDO) -->
     <div id="main-app-wrapper" class="hidden">
+        <!-- TELA DO MENU PRINCIPAL -->
         <div id="menu-screen">
             <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
                 <h1 class="text-4xl font-bold text-white mb-8">Painel de Controle</h1>
@@ -191,44 +192,44 @@
                 <div class="mb-8 w-full max-w-sm">
                     <label for="company-select" class="block text-center text-lg text-indigo-300 mb-2">Selecione a Empresa</label>
                     <select id="company-select" class="w-full p-3 text-center rounded-lg border-2 border-indigo-400 bg-gray-700 text-white focus:outline-none focus:border-indigo-200">
-                        </select>
+                        <!-- Opções de empresa carregadas dinamicamente -->
+                    </select>
                 </div>
 
                 <div class="w-full max-w-xl">
                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
-                          <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
-                          <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
-                          <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
-                          <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
-                          <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg sm:col-span-2 hidden">PAINEL ADMIN</button>
+                         <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
+                         <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
+                         <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
+                         <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
+                         <!-- O botão do painel admin será exibido aqui se o usuário for admin -->
+                         <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg sm:col-span-2 hidden">PAINEL ADMIN</button>
                      </div>
                 </div>
-                
-                <div class="mt-8 text-center">
-                    
-                    <div id="user-info-display" class="mb-4">
-                        <p id="display-user-name" class="text-white font-semibold"></p>
-                        <p id="display-user-email" class="text-indigo-300 text-sm"></p>
-                    </div>
-
+                <div class="mt-8">
                     <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition">Sair</button>
                 </div>
             </div>
         </div>
         
+        <!-- TELA DO PAINEL ADMIN -->
         <div id="admin-panel-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
                 <h1 class="text-3xl font-bold text-center text-blue-800 mb-6">Painel de Administração</h1>
                 <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Usuários Pendentes -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h2 class="text-xl font-semibold mb-4 text-yellow-600">Usuários Pendentes</h2>
                         <div id="pending-users-list" class="space-y-3 max-h-96 overflow-y-auto">
-                            </div>
+                            <!-- Lista de usuários pendentes será inserida aqui pelo JS -->
+                        </div>
                     </div>
+                    <!-- Usuários Ativos -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h2 class="text-xl font-semibold mb-4 text-green-600">Usuários Ativos</h2>
                         <div id="active-users-list" class="space-y-3 max-h-96 overflow-y-auto">
-                            </div>
+                            <!-- Lista de usuários ativos será inserida aqui pelo JS -->
+                        </div>
                     </div>
                 </div>
                 <div class="flex justify-center mt-8">
@@ -238,16 +239,17 @@
         </div>
 
 
+        <!-- TELA DE SELEÇÃO DE EQUIPAMENTOS (NOVA) -->
         <div id="equipamentos-screen" class="hidden">
             <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
                 <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
                 <div class="w-full max-w-4xl">
                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
-                          <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
-                          <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
-                          <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
-                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
-                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
+                         <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
+                         <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
+                         <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                         <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                         <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
                      </div>
                 </div>
                 <div class="mt-8">
@@ -256,6 +258,7 @@
             </div>
         </div>
 
+        <!-- TELA DA CAPA DO RELATÓRIO -->
         <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
                 <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
@@ -318,6 +321,7 @@
             </div>
         </div>
 
+        <!-- TELA DO ÍNDICE -->
         <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
                 <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
@@ -339,11 +343,12 @@
                         </div>
                     </header>
                     <main id="index-content-list" class="flex-grow p-4">
-                        </main>
+                        <!-- Conteúdo do índice será carregado -->
+                    </main>
                      <footer class="mt-auto pt-4">
                         <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
-                              <img id="index-rep-logo1" src="" class="h-12 w-auto object-contain">
-                              <img id="index-rep-logo2" src="" class="h-12 w-auto object-contain">
+                             <img id="index-rep-logo1" src="" class="h-12 w-auto object-contain">
+                             <img id="index-rep-logo2" src="" class="h-12 w-auto object-contain">
                         </div>
                         <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
                     </footer>
@@ -351,12 +356,14 @@
             </div>
         </div>
 
+        <!-- TELA DE RELATÓRIOS SALVOS -->
         <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
                 <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos</h1>
                 <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
                     <div id="saved-reports-list" class="space-y-3">
-                        </div>
+                        <!-- A lista de relatórios salvos será inserida aqui -->
+                    </div>
                 </div>
                 <div class="flex justify-center mt-6">
                     <button id="saved-reports-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
@@ -364,10 +371,12 @@
             </div>
         </div>
 
+        <!-- TELA DE GERENCIAMENTO DE EMPRESAS -->
         <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div class="container mx-auto">
                 <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
                 <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Formulário de Adicionar/Editar -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
                         <form id="company-form" class="space-y-4">
@@ -416,10 +425,12 @@
                             </div>
                         </form>
                     </div>
+                    <!-- Lista de Empresas -->
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
                         <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto">
-                            </div>
+                            <!-- Lista de empresas será renderizada aqui -->
+                        </div>
                     </div>
                 </div>
                 <div class="flex justify-center mt-8">
@@ -428,6 +439,7 @@
             </div>
         </div>
 
+        <!-- TELA DA PLANILHA DO GERADOR -->
         <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
                 <header class="border-b-2 border-gray-200 pb-6 mb-6">
@@ -481,6 +493,7 @@
             </div>
         </div>
         
+        <!-- TELA DA PLANILHA DO MOTOR -->
         <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div id="motor-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
                 <header class="border-b-2 border-gray-200 pb-6 mb-6">
@@ -529,6 +542,7 @@
             </div>
         </div>
 
+        <!-- TELA DA PLANILHA DO TRANSFORMADOR X3 -->
         <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
             <div id="transformer-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
                 <header class="border-b-2 border-gray-200 pb-6 mb-6">
@@ -576,6 +590,7 @@
             </div>
         </div>
 
+        <!-- Overlay de Limite de Uso e Modal de WIP -->
         <div id="usage-limit-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 hidden items-center justify-center text-center text-white p-8 z-[100]">
             <div>
                 <h2 class="text-3xl font-bold text-red-500 mb-4">Limite de Uso Atingido</h2>
@@ -624,7 +639,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
-    // --- LÓGICA DE AUTENTICAÇÃO E ADMINISTRAÇÃO (ATUALIZADA) ---
+    // --- LÓGICA DE AUTENTICAÇÃO E ADMINISTRAÇÃO ---
     // ==================================================================================
 
     // --- Elementos da UI de Autenticação ---
@@ -635,12 +650,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const pendingApprovalContainer = document.getElementById('pending-approval-container');
     const adminPanelBtn = document.getElementById('admin-panel-btn');
 
-    // --- Lógica de estado da autenticação (ATUALIZADA) ---
+    // --- Lógica de estado da autenticação ---
     onAuthStateChanged(auth, async (user) => {
-        // Pegando as referências dos novos elementos de exibição
-        const displayNameEl = document.getElementById('display-user-name');
-        const displayEmailEl = document.getElementById('display-user-email');
-
         if (user) {
             // Usuário está autenticado, agora precisamos verificar seu status no Firestore
             const userDocRef = doc(db, "users", user.uid);
@@ -655,17 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     authScreen.classList.add('hidden');
                     mainAppWrapper.classList.remove('hidden');
                     
-                    // ATUALIZAÇÃO PARA EXIBIR NOME E E-MAIL
-                    if (displayNameEl && userData.name) {
-                        displayNameEl.textContent = userData.name;
-                    } else if (displayNameEl) {
-                        // Caso um usuário antigo não tenha nome, não exibe nada
-                        displayNameEl.textContent = ''; 
-                    }
-                    if (displayEmailEl) {
-                        displayEmailEl.textContent = user.email;
-                    }
-
                     // Mostra o botão de admin se o usuário tiver a role
                     if (userData.role === 'admin') {
                         adminPanelBtn.classList.remove('hidden');
@@ -700,6 +700,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 // Documento do usuário não existe no Firestore (pode ser um erro ou um usuário órfão)
+                // Para novos cadastros, isso é resolvido no fluxo de registro.
+                // Para logins, isso significa que o usuário não pode acessar.
                 showToast('Seus dados não foram encontrados. Por favor, cadastre-se novamente ou contate o suporte.', 'error');
                 await signOut(auth);
                 showAuthForm('login');
@@ -711,14 +713,10 @@ document.addEventListener('DOMContentLoaded', () => {
             mainAppWrapper.classList.add('hidden');
             showAuthForm('login'); // Mostra o formulário de login por padrão
             showScreen(null, false);
-
-            // LIMPA AS INFORMAÇÕES QUANDO O USUÁRIO SAI
-            if (displayNameEl) displayNameEl.textContent = '';
-            if (displayEmailEl) displayEmailEl.textContent = '';
         }
     });
 
-    // --- Manipulador do formulário de Login ---
+    // --- Manipulador do formulário de Login (ATUALIZADO) ---
     document.getElementById('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -736,14 +734,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Manipulador do formulário de Cadastro (ATUALIZADO) ---
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('register-name').value.trim(); // Captura o nome
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
-
-        if (!name) {
-            showToast('Por favor, preencha seu nome completo.', 'error');
-            return;
-        }
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -753,10 +745,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const userDocRef = doc(db, "users", user.uid);
             await setDoc(userDocRef, {
                 uid: user.uid,
-                name: name, // Salva o nome no banco de dados
                 email: user.email,
-                role: 'user', 
-                status: 'pending', 
+                role: 'user', // Todos os novos usuários são 'user' por padrão
+                status: 'pending', // Todos os novos usuários precisam de aprovação
                 createdAt: new Date().toISOString()
             });
 
@@ -843,7 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Delegação de eventos para os botões do painel de admin
+    // Delegação de eventos para os botões do painel de admin (ATUALIZADO)
     document.getElementById('admin-panel-screen').addEventListener('click', async (e) => {
         const target = e.target;
         if (target.tagName === 'BUTTON' && target.dataset.uid) {
@@ -894,8 +885,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ==================================================================================
-    // --- LÓGICA PRINCIPAL DO APLICATIVO (SEM ALTERAÇÕES)---
+    // --- LÓGICA PRINCIPAL DO APLICATIVO ---
     // ==================================================================================
+
+    // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
     let localReportsCache = []; 
     let currentlyEditingIndex = null;
     let coverImageDataUrl = null; 
@@ -905,6 +898,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let temporaryCompanyLogo = null; // Para guardar a logo no formulário antes de salvar
     let temporaryRepLogo1 = null;
     let temporaryRepLogo2 = null;
+
+    // --- LÓGICA DE CÁLCULO E CONFIGURAÇÕES DAS PLANILHAS ---
     const getKtInsulation = (temp, targetTemp) => Math.pow(2, (targetTemp - temp) / 10);
     const getKtOhmic = (temp, targetTemp) => (234.5 + targetTemp) / (234.5 + temp);
     const statusColors = { 'Perigoso': '#ef4444', 'Pobre': '#f97316', 'Questionável': '#facc15', 'Confiável': '#a3e635', 'Bom': '#4ade80', 'Excelente': '#16a34a', '': '#FFFFFF' };
@@ -912,84 +907,92 @@ document.addEventListener('DOMContentLoaded', () => {
     const evaluateIndex = (value, thresholds) => { if (isNaN(value) || value === null) return { status: '', color: statusColors[''] }; for (const t of thresholds) { if (value < t.limit) return { status: t.status, color: statusColors[t.status] }; } return { status: 'Excelente', color: statusColors['Excelente'] }; };
     const evaluateIA = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.1, status: 'Pobre' }, { limit: 1.25, status: 'Questionável' }, { limit: 1.4, status: 'Confiável' }, { limit: 1.6, status: 'Bom' }]);
     const evaluateIP = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.5, status: 'Pobre' }, { limit: 2, status: 'Questionável' }, { limit: 3, status: 'Confiável' }, { limit: 4, status: 'Bom' }]);
+    
     const reportSheetHandlers = {
-      init: (container, recalc, getEl, clearForm, collectSheetData, config) => {
-          const addSheetBtn = getEl('add-sheet-btn');
-          const fillTestDataBtn = getEl('fillTestData');
-          const clearFormBtn = getEl('clearForm');
-          if (fillTestDataBtn) {
-              fillTestDataBtn.addEventListener('click', () => {
-                  if (!config.testData) { console.error(`Dados de teste não encontrados para ${config.appName}`); return; }
-                      Object.entries(config.testData.header).forEach(([key, value]) => {
-                          const el = getEl(key);
-                          if(el) el.value = value;
-                      });
-                      config.sections.forEach(section => {
-                          section.rows.forEach(row => {
-                              const data = config.testData.sections[section.name]?.[row.id];
-                              if (data === undefined) return;
-                              if (section.type === 'insulation') {
-                                   const reg30sInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg30s"]`); if(reg30sInput) reg30sInput.value = data[0];
-                                   const reg1minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg1min"]`); if(reg1minInput) reg1minInput.value = data[1];
-                                   const reg10minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg10min"]`); if(reg10minInput) reg10minInput.value = data[2];
-                              } else if (section.type === 'diodes') {
-                                  if (data.d1_d6) { data.d1_d6.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 1}"]`); if (input) input.value = val; }); }
-                                  if (data.d7_d12) { data.d7_d12.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 7}"]`); if (input) input.value = val; }); }
-                              } else {
-                                  const regInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`);
-                                  if (regInput) {
-                                      regInput.value = (typeof data === 'object' && data !== null && data.reg !== undefined) ? data.reg : data;
-                                  }
-                              }
-                          });
-                      });
-                  recalc();
-              });
-          }
-          clearFormBtn.addEventListener('click', () => {
-              if (isFormDirty(container)) {
-                  if (!confirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.')) {
-                      return;
-                  }
-              }
-              clearForm(config);
-          });
-          if (!addSheetBtn) return;
-          const headerInputs = [getEl('equipamento')];
-          function validateHeader() {
-              addSheetBtn.disabled = !headerInputs.every(input => input && input.value.trim() !== '');
-          }
-          headerInputs.forEach(input => { if (input) input.addEventListener('input', validateHeader); });
-          addSheetBtn.addEventListener('click', () => {
-              const sheetData = collectSheetData(container, config);
-              
-              if (currentlyEditingIndex !== null) {
-                  localReportsCache[currentlyEditingIndex] = sheetData;
-                  showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
-                  currentlyEditingIndex = null;
-              } else {
-                  localReportsCache.push(sheetData);
-                  showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
-              }
-              
-              clearForm(config, true); 
-              ['equipamento', 'numeroSerie', 'avr', 'tensao', 'potencia', 'tecnico', 'responsavelTecnico', 'rotacao', 'fabricante'].forEach(id => { 
-                  const el = getEl(id); 
-                  if(el) el.value = ''; 
-              });
-              
-              addSheetBtn.textContent = 'Adicionar ao Relatório';
-              validateHeader();
-              
-              showScreen(screens.index);
-              updateIndexPage();
-          });
-          validateHeader();
-      }
+        init: (container, recalc, getEl, clearForm, collectSheetData, config) => {
+            const addSheetBtn = getEl('add-sheet-btn');
+            const fillTestDataBtn = getEl('fillTestData');
+            const clearFormBtn = getEl('clearForm');
+
+            if (fillTestDataBtn) {
+                fillTestDataBtn.addEventListener('click', () => {
+                    if (!config.testData) { console.error(`Dados de teste não encontrados para ${config.appName}`); return; }
+                        Object.entries(config.testData.header).forEach(([key, value]) => {
+                            const el = getEl(key);
+                            if(el) el.value = value;
+                        });
+                        config.sections.forEach(section => {
+                            section.rows.forEach(row => {
+                                const data = config.testData.sections[section.name]?.[row.id];
+                                if (data === undefined) return;
+                                if (section.type === 'insulation') {
+                                        const reg30sInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg30s"]`); if(reg30sInput) reg30sInput.value = data[0];
+                                        const reg1minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg1min"]`); if(reg1minInput) reg1minInput.value = data[1];
+                                        const reg10minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg10min"]`); if(reg10minInput) reg10minInput.value = data[2];
+                                } else if (section.type === 'diodes') {
+                                    if (data.d1_d6) { data.d1_d6.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 1}"]`); if (input) input.value = val; }); }
+                                    if (data.d7_d12) { data.d7_d12.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 7}"]`); if (input) input.value = val; }); }
+                                } else {
+                                    const regInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`);
+                                    if (regInput) {
+                                        regInput.value = (typeof data === 'object' && data !== null && data.reg !== undefined) ? data.reg : data;
+                                    }
+                                }
+                            });
+                        });
+                        recalc();
+                });
+            }
+            
+            clearFormBtn.addEventListener('click', () => {
+                if (isFormDirty(container)) {
+                    if (!confirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.')) {
+                        return;
+                    }
+                }
+                clearForm(config);
+            });
+
+            if (!addSheetBtn) return;
+            const headerInputs = [getEl('equipamento')];
+            function validateHeader() {
+                addSheetBtn.disabled = !headerInputs.every(input => input && input.value.trim() !== '');
+            }
+            headerInputs.forEach(input => { if (input) input.addEventListener('input', validateHeader); });
+
+            addSheetBtn.addEventListener('click', () => {
+                const sheetData = collectSheetData(container, config);
+                
+                if (currentlyEditingIndex !== null) {
+                    localReportsCache[currentlyEditingIndex] = sheetData;
+                    showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
+                    currentlyEditingIndex = null;
+                } else {
+                    localReportsCache.push(sheetData);
+                    showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
+                }
+                
+                clearForm(config, true); 
+                ['equipamento', 'numeroSerie', 'avr', 'tensao', 'potencia', 'tecnico', 'responsavelTecnico', 'rotacao', 'fabricante'].forEach(id => { 
+                    const el = getEl(id); 
+                    if(el) el.value = ''; 
+                });
+                
+                addSheetBtn.textContent = 'Adicionar ao Relatório';
+                validateHeader();
+                
+                showScreen(screens.index);
+                updateIndexPage();
+            });
+            validateHeader();
+        }
     };
+
     const motorConfig = { prefix: 'motor', appName: 'Motor', containerId: 'motor-app-container', containerIds: [{ id: 'motor-sections-container', type: 'main' }], usageKey: 'unitechMotorAppUsageCount_v2', usageLimit: 20, tempInputId: 'tempEnrolamento', insulation: { targetTemp: 40 }, ohmic: { targetTemp: 25 }, layout: 'table', specialHandlers: reportSheetHandlers, sections: [ { name: 'ESTATOR PRINCIPAL', type: 'insulation', rows: [ { id: 'motor-uxmassa', label: 'U x Massa' }, { id: 'motor-vxmassa', label: 'V x Massa' }, { id: 'motor-wxmassa', label: 'W x Massa' }, { id: 'motor-uxv', label: 'U x V' }, { id: 'motor-vxw', label: 'V x W' }, { id: 'motor-wxu', label: 'W x U' }, ]}, { name: 'RESISTÊNCIA AQUECIMENTO', type: 'heating', rows: [{ id: 'motor-heating-massa', label: 'Massa' }] }, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA', type: 'ohmic', rows: [ { id: 'motor-ohm-u', label: 'Fase U' }, { id: 'motor-ohm-v', label: 'Fase V' }, { id: 'motor-ohm-w', label: 'Fase W' }, ]} ], htmlTemplates: { 'heating': (s) => `<thead><tr><th>CONEXÃO</th><th>Resist. aquec. (MΩ)</th></tr></thead><tbody>${s.rows.map(r => `<tr><td class="label-cell">${r.label}</td><td><input type="number" step="any" data-row="${r.id}" data-col="reg" class="input-yellow"></td></tr>`).join('')}</tbody>`, 'ohmic': (s) => `<thead><tr><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th></tr></thead><tbody>${s.rows.map(r => `<tr><td class="label-cell"><div class="flex items-center justify-between"><span>${r.label}</span><select data-row="${r.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${r.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>` }, testData: { header: { cliente: 'Cliente Motor Exemplo', local: 'Oficina Central', data: new Date().toISOString().split('T')[0], equipamento: 'Motor Bomba Principal', numeroSerie: 'SN-MTR-1234', fabricante: 'WEG / W22', tensao: '440V', potencia: '150 CV', rotacao: '1750 RPM', tempAmbiente: 28, tempEnrolamento: 45, umidadeRelativa: 65 }, sections: { 'ESTATOR PRINCIPAL': { 'motor-uxmassa': [1500, 1800, 2500], 'motor-vxmassa': [1600, 1900, 2600], 'motor-wxmassa': [1550, 1850, 2550], 'motor-uxv': [2000, 2200, 3000], 'motor-vxw': [2100, 2300, 3100], 'motor-wxu': [2050, 2250, 3050] }, 'RESISTÊNCIA AQUECIMENTO': { 'motor-heating-massa': 2.5 }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA': { 'motor-ohm-u': 0.05, 'motor-ohm-v': 0.05, 'motor-ohm-w': 0.05 } } } };
     const transformerConfig = { prefix: 'transformer', appName: 'Transformador', containerId: 'transformer-app-container', containerIds: [{ id: 'transformer-sections-container', type: 'main' }], usageKey: 'unitechTrafoAppUsageCount_v2', usageLimit: 20, tempInputId: 'tempTrafo', insulation: { targetTemp: 75 }, ohmic: { targetTemp: 25 }, layout: 'grid', specialHandlers: reportSheetHandlers, sections: [ { name: 'MEDIÇÕES REALIZADAS', type: 'insulation', rows: [ { id: 'h1h2-low-gnd', title: 'Alta(H1/H2) para Terra com Baixa(X1/X2) em Guard' }, { id: 'x1x2-high-gnd', title: 'Baixa(X1/X2) para Terra com Alta(H1/H2) em Guard' }, { id: 'h1h2-x1x2-gnd', title: 'Alta(H1/H2) para Baixa(X1/X2) com Terra em Guard' }, { id: 'h2h3-low-gnd', title: 'Alta(H2/H3) para Terra com Baixa(X2/X3) em Guard' }, { id: 'x2x3-high-gnd', title: 'Baixa(X2/X3) para Terra com Alta(H2/H3) em Guard' }, { id: 'h2h3-x2x3-gnd', title: 'Alta(H2/H3) para Baixa(X2/X3) com Terra em Guard' }, { id: 'h1h3-low-gnd', title: 'Alta(H1/H3) para Terra com Baixa(X1/X3) em Guard' }, { id: 'x1x3-high-gnd', title: 'Baixa(X1/X3) para Terra com Alta(H1/H3)em Guard' }, { id: 'h1h3-x1x3-gnd', title: 'Alta(H1/H3) para Baixa(X1/X3) com Terra em Guard' }, ]}, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)', type: 'ohmic', rows: [ { id: 'x1-x2', label: 'X1-X2' }, { id: 'x1-x1', label: 'X1-X1' }, { id: 'x2-x3', label: 'X2-X3' }, { id: 'x2-x2', label: 'X2-X2' }, { id: 'x1-x3', label: 'X1-X3' }, { id: 'x3-x3', label: 'X3-X3' }, { id: 'h1-h2', label: 'H1-H2' }, { id: 'h1-h1', label: 'H1-H1' }, { id: 'h2-h3', label: 'H2-H3' }, { id: 'h2-h2', label: 'H2-H2' }, { id: 'h1-h3', label: 'H1-H3' }, { id: 'h3-h3', label: 'H3-H3' }, ]} ], htmlTemplates: { 'ohmic': (s) => { let body = ''; for (let i = 0; i < 6; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r1.label}</td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r2.label}</td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } return `<thead><tr><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; } }, testData: { header: { cliente: 'OCEANPACT', local: 'MAC LAREN', data: '2025-01-04', equipamento: 'TRANSFORMADOR-BOW THRUSTER', numeroSerie: '155544KW', fabricante: 'WEG', tensao: 'Primário 440V / Secundário 440V', potencia: '50KVA', tempAmbiente: 33.7, tempTrafo: 40.7, umidadeRelativa: 50 }, sections: { 'MEDIÇÕES REALIZADAS': { 'h1h2-low-gnd': [22000, 22000, 22000], 'x1x2-high-gnd': [22000, 22000, 22000], 'h1h2-x1x2-gnd': [22000, 22000, 22000], 'h2h3-low-gnd': [22000, 22000, 22000], 'x2x3-high-gnd': [22000, 22000, 22000], 'h2h3-x2x3-gnd': [22000, 22000, 22000], 'h1h3-low-gnd': [22000, 22000, 22000], 'x1x3-high-gnd': [22000, 22000, 22000], 'h1h3-x1x3-gnd': [22000, 22000, 22000] }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)': { 'x1-x2': 0.35, 'x1-x1': 0.32, 'x2-x3': 0.34, 'x2-x2': 0.33, 'x1-x3': 0.36, 'x3-x3': 0.31, 'h1-h2': 0.45, 'h1-h1': 0.42, 'h2-h3': 0.44, 'h2-h2': 0.43, 'h1-h3': 0.46, 'h3-h3': 0.41 } } } };
     const generatorConfig = { prefix: 'gen', appName: 'Gerador', containerId: 'gen-app-container', containerIds: [ { id: 'gen-main-sections-container', type: 'main' }, { id: 'gen-pmg-section-container', type: 'pmg' }, { id: 'gen-extra-sections-container', type: 'extra' }, ], usageKey: 'unitechGenAppUsageCount_v2', usageLimit: 20, tempInputId: 'tempEnrolamento', insulation: { targetTemp: 40 }, ohmic: { targetTemp: 25 }, layout: 'table', specialHandlers: { init: (container, recalc, getEl, clearForm, collectSheetData) => { reportSheetHandlers.init(container, recalc, getEl, clearForm, collectSheetData, generatorConfig); const pmgBtn = getEl('togglePmg'); const pmgSection = getEl('pmg-section-container'); const pmgOhmicRow = document.getElementById('gen-pmg-ohmic-row'); if(pmgBtn) { pmgBtn.addEventListener('click', () => { const isHidden = pmgSection.classList.contains('hidden'); pmgSection.classList.toggle('hidden'); if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden'); pmgBtn.textContent = isHidden ? 'Desativar Seção PMG' : 'Ativar Seção PMG'; pmgBtn.classList.toggle('bg-gray-200'); pmgBtn.classList.toggle('bg-yellow-400'); if (!isHidden) { pmgSection.querySelectorAll('input').forEach(i => i.value = ''); if (pmgOhmicRow) pmgOhmicRow.querySelectorAll('input').forEach(i => i.value = ''); recalc(); } }); } const diodesBtn = getEl('toggleDiodes'); const diodesHeader = document.getElementById('gen-diodes-d7d12-header'); const diodesBody = document.getElementById('gen-diodes-d7d12-body'); if (diodesBtn && diodesHeader && diodesBody) { diodesBtn.addEventListener('click', () => { const isHidden = diodesHeader.classList.contains('hidden'); diodesHeader.classList.toggle('hidden'); diodesBody.classList.toggle('hidden'); diodesBtn.textContent = isHidden ? 'Desativar Diodos D7-D12' : 'Ativar Diodos D7-D12'; diodesBtn.classList.toggle('bg-gray-200'); diodesBtn.classList.toggle('bg-red-400'); if (!isHidden) { diodesBody.querySelectorAll('input').forEach(i => { i.value = i.type === 'text' ? 'OL' : ''; }); recalc(); } }); } }, onClear: (container, getEl) => { const pmgBtn = getEl('togglePmg'); if (pmgBtn && pmgBtn.textContent.includes('Desativar')) { pmgBtn.click(); } const diodesBtn = getEl('toggleDiodes'); if (diodesBtn && diodesBtn.textContent.includes('Desativar')) { diodesBtn.click(); } } }, sections: [ { name: 'ESTATOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [ { id: 'gen-estator-uxmassa', label: 'U x Massa' }, { id: 'gen-estator-vxmassa', label: 'V x Massa' }, { id: 'gen-estator-wxmassa', label: 'W x Massa' }, { id: 'gen-estator-uxv', label: 'U x V' }, { id: 'gen-estator-uxw', label: 'U x W' }, { id: 'gen-estator-wxv', label: 'W x V' }, ]}, { name: 'ROTOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-rotor-principal', label: 'Rotor x Massa' }] }, { name: 'EXCITATRIZ MOTRIZ', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-excitatriz-estator', label: 'Estator x Massa' }, { id: 'gen-excitatriz-rotor', label: 'Rotor x Massa' }] }, { name: 'EXCITAÇÃO AUXILIAR (PMG)', type: 'insulation', containerType: 'pmg', rows: [{ id: 'gen-pmg-estator', label: 'Estator x Massa' }] }, { name: 'RESISTÊNCIA AQUECIMENTO', type: 'heating', containerType: 'extra', rows: [{ id: 'gen-heating-massa', label: 'Massa' }] }, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA', type: 'ohmic', containerType: 'extra', rows: [ { id: 'gen-ohm-uxu', label: 'Fase U x U (V)' }, { id: 'gen-ohm-rotorp', label: 'Rotor Principal' }, { id: 'gen-ohm-vxv', label: 'Fase V x V (W)' }, { id: 'gen-ohm-rotore', label: 'Rotor Excitatriz' }, { id: 'gen-ohm-wxw', label: 'Fase W x W (U)' }, { id: 'gen-ohm-estatore', label: 'Estator Ex. Motriz' }, { id: 'gen-ohm-pmg', label: 'PMG', isPmg: true }, ]}, { name: 'DIODOS ROTATIVOS', type: 'diodes', containerType: 'extra', rows: [{ id: 'gen-diodes-dir' }, { id: 'gen-diodes-rev' }] } ], htmlTemplates: { ...motorConfig.htmlTemplates, 'ohmic': (s) => { let body = ''; for (let i = 0; i < 3; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td class="label-cell">${r1.label}</td><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td class="label-cell"><div class="flex items-center justify-between"><span>${r2.label}</span><select data-row="${r2.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } const pmgRow = s.rows.find(r => r.isPmg); if (pmgRow) { body += `<tr id="gen-pmg-ohmic-row" class="hidden"><td class="label-cell"><div class="flex items-center justify-between"><span>${pmgRow.label}</span><select data-row="${pmgRow.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${pmgRow.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${pmgRow.id}" data-col="corr" class="output-span output-blue"></span></td><td colspan="3"></td></tr>`; } return `<thead><tr><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; }, 'diodes': (s) => { const body1 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+1}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+1}" class="input-yellow"></td>`).join('')}</tr>`; const body2 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+7}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+7}" class="input-yellow"></td>`).join('')}</tr>`; return `<thead><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+1}</th>`).join('')}</tr></thead><tbody>${body1}</tbody><thead id="gen-diodes-d7d12-header" class="hidden"><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+7}</th>`).join('')}</tr></thead><tbody id="gen-diodes-d7d12-body" class="hidden">${body2}</tbody>`; } }, testData: { header: { cliente: 'Estaleiro Naval', local: 'Navio Exemplo', data: new Date().toISOString().split('T')[0], tecnico: 'Téc. Exemplo', equipamento: 'Gerador Principal #1', numeroSerie: 'SN-5678', avr: 'AVR-123', tensao: '440V', potencia: '550 kVA', tempAmbiente: 25, tempEnrolamento: 50, umidadeRelativa: 70 }, sections: { 'ESTATOR PRINCIPAL': { 'gen-estator-uxmassa': [1200, 1500, 2000], 'gen-estator-vxmassa': [1300, 1600, 2100], 'gen-estator-wxmassa': [1250, 1550, 2050], 'gen-estator-uxv': [3000, 4000, 5000], 'gen-estator-uxw': [3100, 4100, 5100], 'gen-estator-wxv': [3050, 4050, 5050] }, 'ROTOR PRINCIPAL': { 'gen-rotor-principal': [500, 600, 800] }, 'EXCITATRIZ MOTRIZ': { 'gen-excitatriz-estator': [800, 900, 1100], 'gen-excitatriz-rotor': [700, 850, 1000] }, 'EXCITAÇÃO AUXILIAR (PMG)': { 'gen-pmg-estator': [1000, 1200, 1500] }, 'RESISTÊNCIA AQUECIMENTO': { 'gen-heating-massa': 1.5 }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA': { 'gen-ohm-uxu': 1.1, 'gen-ohm-rotorp': 2.2, 'gen-ohm-vxv': 1.2, 'gen-ohm-rotore': 3.3, 'gen-ohm-wxw': 1.1, 'gen-ohm-estatore': 4.4, 'gen-ohm-pmg': 5.5 }, 'DIODOS ROTATIVOS': { 'gen-diodes-dir': { d1_d6: [0.432, 0.438, 0.441, 0.429, 0.435, 0.440], d7_d12: [0.425, 0.431, 0.428, 0.433, 0.439, 0.427] } } } } };
+
+    // --- SISTEMA DE NAVEGAÇÃO E TELAS ---
     const screens = { 
         menu: document.getElementById('menu-screen'), 
         cover: document.getElementById('cover-screen'), 
@@ -1003,15 +1006,20 @@ document.addEventListener('DOMContentLoaded', () => {
         adminPanel: document.getElementById('admin-panel-screen'),
     };
     const wipModal = document.getElementById('wip-modal');
+    
+    // --- DECLARAÇÃO DE FUNÇÕES ---
+
     function showToast(message, type = 'info') {
         const notificationArea = document.getElementById('notification-area');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = message;
         notificationArea.appendChild(toast);
+
         setTimeout(() => {
             toast.classList.add('show');
         }, 10);
+
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => {
@@ -1019,10 +1027,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }, 3000);
     }
+
     async function getCompanies() {
         if (!currentUserId) return [];
         const docRef = doc(db, "users", currentUserId, "data", "companies");
         const docSnap = await getDoc(docRef);
+
         if (docSnap.exists() && docSnap.data().list) {
             return docSnap.data().list;
         } else {
@@ -1033,11 +1043,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return defaultCompanies;
         }
     }
+
     async function saveCompanies(companies) {
         if (!currentUserId) return;
         const docRef = doc(db, "users", currentUserId, "data", "companies");
         await setDoc(docRef, { list: companies });
     }
+
     function populateCompanyDropdown() {
         const companySelect = document.getElementById('company-select');
         const originalValue = companySelect.value;
@@ -1052,12 +1064,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (companyList.some(c => c.id === originalValue)) {
             companySelect.value = originalValue;
         }
+
         const selectedCompany = companyList.find(c => c.id === companySelect.value);
         currentCompany = selectedCompany || companyList[0];
         if (currentCompany) {
             updateCompanyInfoOnPages();
         }
     }
+
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
@@ -1084,6 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.appendChild(div);
         });
     }
+
     function resetCompanyForm() {
         const form = document.getElementById('company-form');
         form.reset();
@@ -1111,6 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reportList = reportSnapshot.docs.map(doc => ({...doc.data(), firestoreId: doc.id}));
         return reportList;
     }
+
     function resetCurrentReport() {
         localReportsCache = [];
         document.getElementById('cover-cliente').value = '';
@@ -1118,18 +1134,22 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeCoverApp(); 
         updateIndexPage(); 
     }
+
     async function saveFullReport() {
         if (!currentUserId) {
             showToast('Você precisa estar logado para salvar.', 'error');
             return;
         }
+
         const cliente = document.getElementById('cover-cliente').value.trim();
         const local = document.getElementById('cover-local').value.trim();
+
         if (!cliente || !local) {
             showToast('Preencha "Cliente" e "Embarcação" na capa antes de salvar.', 'error');
             showScreen(screens.cover);
             return;
         }
+
         if (localReportsCache.length === 0) {
             showToast('Não há nenhuma planilha para salvar no relatório.', 'error');
             return;
@@ -1143,6 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reportSheets: JSON.parse(JSON.stringify(localReportsCache)),
             savedAt: new Date().toISOString()
         };
+
         try {
             const reportsCol = collection(db, "users", currentUserId, "reports");
             await addDoc(reportsCol, fullReport);
@@ -1154,24 +1175,32 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Erro ao salvar: ${error.message}`, 'error');
         }
     }
+
     async function loadFullReport(reportId) {
         const savedReports = await getSavedFullReports();
         const reportToLoad = savedReports.find(r => r.firestoreId === reportId);
+
         if (!reportToLoad) {
             showToast("Erro: Relatório não encontrado.", 'error');
             return;
         }
+
         resetCurrentReport();
+
         document.getElementById('cover-cliente').value = reportToLoad.cliente;
         document.getElementById('cover-local').value = reportToLoad.local;
         
         coverImageDataUrl = reportToLoad.imageDataUrl;
         document.getElementById('cover-preview-image').src = coverImageDataUrl;
+
         document.getElementById('company-select').value = reportToLoad.companyKey || 'unitech';
         document.getElementById('company-select').dispatchEvent(new Event('change'));
+
         localReportsCache = reportToLoad.reportSheets;
+
         initializeCoverApp();
         updateIndexPage();
+
         showToast(`Relatório para "${reportToLoad.cliente}" carregado!`, 'info');
         showScreen(screens.menu);
     }
@@ -1187,17 +1216,21 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Erro ao apagar: ${error.message}`, 'error');
         }
     }
+
     function updateIndexPage() {
         const indexList = document.getElementById('index-content-list');
         indexList.innerHTML = ''; 
+
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
         
         updateCompanyInfoOnPages();
+
         if (!localReportsCache || localReportsCache.length === 0) {
             indexList.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma planilha de equipamento foi adicionada a este relatório ainda.</p>';
             return;
         }
+
         let html = '<h2 class="text-xl font-bold mb-4">Equipamentos Analisados:</h2><ul class="list-none space-y-2">';
         localReportsCache.forEach((report, index) => {
              html += `
@@ -1230,6 +1263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         showScreen(screens.savedReports);
     }
+
     function editSheetFromIndex(index) {
         const sheetData = localReportsCache[index];
         if (!sheetData) {
@@ -1257,12 +1291,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const screenName = Object.keys(screens).find(key => screens[key] === screenElement);
         
         if (!screenName && screenElement) return;
+
         Object.values(screens).forEach(screen => { 
             if (screen && screen.id !== 'main-app-wrapper' && screen.id !== 'auth-screen') {
                 screen.classList.add('hidden');
             }
         }); 
         if (screenElement) screenElement.classList.remove('hidden');
+
         if (updateHistory && screenName && history.state?.screen !== screenName) {
             history.pushState({ screen: screenName }, '', `#${screenName}`);
         }
@@ -1282,6 +1318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(text, width / 2, height / 2);
         return canvas.toDataURL();
     }
+
     function initializeCoverApp() { 
         const inputs = { 
             cliente: document.getElementById('cover-cliente'), 
@@ -1302,10 +1339,12 @@ document.addEventListener('DOMContentLoaded', () => {
         imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
+
             if (!file.type.startsWith('image/')) {
                 showToast('Por favor, selecione um arquivo de imagem.', 'error');
                 return;
             }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -1316,6 +1355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const MAX_HEIGHT = 600;
                     let width = img.width;
                     let height = img.height;
+
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -1331,10 +1371,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
                     if (dataUrl.length > 1048487) {
                        showToast('A imagem é muito grande mesmo após a compressão. Tente uma imagem menor.', 'error');
                        return;
                     }
+
                     coverImageDataUrl = dataUrl;
                     previews.image.src = coverImageDataUrl;
                     showToast('Imagem carregada e otimizada!', 'success');
@@ -1354,8 +1396,10 @@ document.addEventListener('DOMContentLoaded', () => {
             coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
             previews.image.src = coverImageDataUrl;
         }
+
         updatePreviewText(); 
     }
+
     const createApp = (config) => { 
         const appContainer = document.getElementById(config.containerId); 
         if (!appContainer) return; 
@@ -1378,16 +1422,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(inputs).some(input => {
             const id = input.id || '';
             const value = input.value.trim();
+            // Ignora campos de cabeçalho pré-preenchidos e campos com valor padrão "OL"
             if (id.includes('-cliente') || id.includes('-local') || value === 'OL') {
                 return false;
             }
             return value !== '';
         });
     }
+
+    // --- FUNÇÃO PARA EXPORTAR PDF (ATUALIZADA) ---
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         loader.classList.remove('hidden');
         loader.classList.add('flex');
+
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
@@ -1395,9 +1443,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 unit: 'mm',
                 format: 'a4'
             });
+
+            // --- 1. GERAR CAPA (Usando jsPDF diretamente para maior qualidade) ---
             const pageHeight = doc.internal.pageSize.getHeight();
             const pageWidth = doc.internal.pageSize.getWidth();
             const margin = 20;
+
+            // Cabeçalho da Empresa com Logo
             if (currentCompany) {
                 if (currentCompany.logoDataUrl) {
                     try {
@@ -1417,8 +1469,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text(currentCompany.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
                 doc.text(currentCompany.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
                 doc.setLineWidth(0.5);
-                doc.line(margin, margin + 25, pageWidth - margin, margin + 25);
+                doc.line(margin, margin + 25, pageWidth - margin, margin + 25); // Linha superior ajustada
             }
+
+            // Títulos Centrais
             const clienteText = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
             const localText = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
             
@@ -1432,12 +1486,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const lineX2 = (pageWidth + titleWidth) / 2;
             doc.setLineWidth(0.5);
             doc.line(lineX1, 110, lineX2, 110);
+
             doc.setFontSize(14);
             doc.setFont('helvetica', 'normal');
             const subTitle = 'Relatório técnico de medição de resistência de isolamento elétrico (Megagem)';
             doc.text(subTitle, pageWidth / 2, 125, { align: 'center' });
             
-            if (coverImageDataUrl && !coverImageDataUrl.startsWith('data:image/svg+xml')) {
+            // Imagem da Embarcação
+            if (coverImageDataUrl && !coverImageDataUrl.startsWith('data:image/svg+xml')) { // Não tenta adicionar o placeholder
                 try {
                     const imgWidth = 120;
                     const imgHeight = 90;
@@ -1455,10 +1511,13 @@ document.addEventListener('DOMContentLoaded', () => {
                  doc.rect((pageWidth - 120) / 2, 135, 120, 90);
                  doc.text('Imagem não carregada', pageWidth / 2, 180, { align: 'center' });
             }
+
+            // Rodapé
             const footerText = 'Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4';
             doc.setFontSize(8);
             doc.text(footerText, pageWidth / 2, pageHeight - 15, { align: 'center' });
             
+            // Logos de Representantes
             const repLogos = [currentCompany.repLogo1DataUrl, currentCompany.repLogo2DataUrl].filter(Boolean);
             if (repLogos.length > 0) {
                 const maxImgHeight = 12;
@@ -1469,6 +1528,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await img.decode();
                     logoWidths.push((img.width * maxImgHeight) / img.height);
                 }
+
                 const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0);
                 const spacing = 15;
                 let startX = (pageWidth - totalLogoWidth - (spacing * (repLogos.length - 1))) / 2;
@@ -1482,6 +1542,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch(e) { console.error("Erro ao adicionar logo de representante", e); }
                 }
             }
+
+
+            // --- 2. GERAR ÍNDICE (Usando html2canvas) ---
             if (localReportsCache && localReportsCache.length > 0) {
                 doc.addPage();
                 const indexPage = document.getElementById('index-page');
@@ -1489,6 +1552,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imgDataIndex = canvasIndex.toDataURL('image/png');
                 doc.addImage(imgDataIndex, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             }
+
+            // --- 3. GERAR PLANILHAS (Usando html2canvas) ---
             for (const reportSheet of localReportsCache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
@@ -1501,6 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Object.values(screens).forEach(s => {
                     if (s && s.id.includes('-app-screen')) s.classList.add('hidden');
                 });
+
                 const screenToShow = screens[config.prefix]; 
                 if (!screenToShow) { 
                     console.error(`Could not find screen element for prefix: ${config.prefix}`);
@@ -1509,35 +1575,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 screenToShow.classList.remove('hidden');
                 populateSheetFromData(sheetContainer, reportSheet, config);
                 
+                // Oculta os botões antes de gerar o PDF
                 const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
                 elementsToHide.forEach(el => el.style.display = 'none');
                 
                 await new Promise(resolve => setTimeout(resolve, 100));
+
                 const canvasSheet = await html2canvas(appContainer, { scale: 2 });
                 const imgDataSheet = canvasSheet.toDataURL('image/png');
                 doc.addImage(imgDataSheet, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
                 
+                // Mostra os botões novamente
                 elementsToHide.forEach(el => el.style.display = 'flex');
                 
                 screenToShow.classList.add('hidden');
                 if(originalScreen) originalScreen.classList.remove('hidden');
             }
+
             doc.save(`Relatorio_${clienteText.replace(/ /g,"_")}.pdf`);
+
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
             showToast('Ocorreu um erro ao gerar o PDF.', 'error');
         } finally {
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            showScreen(screens.index, false);
+            showScreen(screens.index, false); // Garante que a tela de índice seja reexibida
         }
     }
     
     function updateCompanyInfoOnPages() {
         if (!currentCompany) return;
+
         const logoUrl = currentCompany.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
         const repLogo1Url = currentCompany.repLogo1DataUrl;
         const repLogo2Url = currentCompany.repLogo2DataUrl;
+
+        // Cover Preview
         document.getElementById('cover-preview-company-logo').src = logoUrl;
         document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
         document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
@@ -1547,6 +1621,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cover-preview-rep-logo1').style.display = repLogo1Url ? 'block' : 'none';
         document.getElementById('cover-preview-rep-logo2').src = repLogo2Url || '';
         document.getElementById('cover-preview-rep-logo2').style.display = repLogo2Url ? 'block' : 'none';
+
+        // Index Preview
         document.getElementById('index-company-logo').src = logoUrl;
         document.getElementById('index-company-name').textContent = currentCompany.name || '';
         document.getElementById('index-company-address').textContent = currentCompany.address || '';
@@ -1557,6 +1633,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('index-rep-logo2').src = repLogo2Url || '';
         document.getElementById('index-rep-logo2').style.display = repLogo2Url ? 'block' : 'none';
     }
+
+    // --- INICIALIZAÇÃO E EVENT LISTENERS ---
+    
     document.getElementById('company-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const companyId = document.getElementById('company-id').value;
@@ -1566,6 +1645,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('O nome da empresa é obrigatório.', 'error');
             return;
         }
+
         const newCompanyData = {
             name: companyName,
             address: document.getElementById('company-address').value,
@@ -1575,12 +1655,15 @@ document.addEventListener('DOMContentLoaded', () => {
             repLogo1DataUrl: temporaryRepLogo1,
             repLogo2DataUrl: temporaryRepLogo2
         };
+
         if (companyId) {
             const companyIndex = companyList.findIndex(c => c.id === companyId);
             if (companyIndex > -1) {
+                // Mantém as logos antigas se nenhuma nova for carregada
                 if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = companyList[companyIndex].logoDataUrl;
                 if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = companyList[companyIndex].repLogo1DataUrl;
                 if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = companyList[companyIndex].repLogo2DataUrl;
+
                 companyList[companyIndex] = { ...companyList[companyIndex], ...newCompanyData };
                 showToast('Empresa atualizada com sucesso!', 'success');
             }
@@ -1589,14 +1672,17 @@ document.addEventListener('DOMContentLoaded', () => {
             companyList.push(newCompanyData);
             showToast('Empresa adicionada com sucesso!', 'success');
         }
+
         await saveCompanies(companyList);
         renderCompanyList();
         populateCompanyDropdown();
         resetCompanyForm();
     });
+
     document.getElementById('company-list').addEventListener('click', async (e) => {
         const editId = e.target.dataset.editId;
         const deleteId = e.target.dataset.deleteId;
+
         if (editId) {
             const companyToEdit = companyList.find(c => c.id === editId);
             if (companyToEdit) {
@@ -1614,6 +1700,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     logoPreview.src = '';
                     logoPreview.classList.add('hidden');
                 }
+
                 const repLogo1Preview = document.getElementById('company-rep-logo1-preview');
                  if (companyToEdit.repLogo1DataUrl) {
                     repLogo1Preview.src = companyToEdit.repLogo1DataUrl;
@@ -1622,6 +1709,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     repLogo1Preview.src = '';
                     repLogo1Preview.classList.add('hidden');
                 }
+
                 const repLogo2Preview = document.getElementById('company-rep-logo2-preview');
                  if (companyToEdit.repLogo2DataUrl) {
                     repLogo2Preview.src = companyToEdit.repLogo2DataUrl;
@@ -1636,6 +1724,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-form-cancel-btn').classList.remove('hidden');
             }
         }
+
         if (deleteId) {
             if (confirm('Tem certeza que deseja apagar esta empresa?')) {
                 companyList = companyList.filter(c => c.id !== deleteId);
@@ -1647,6 +1736,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
     document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
     
     function processLogoUpload(file, previewElement, tempVariableSetter) {
@@ -1655,6 +1745,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Por favor, selecione um arquivo de imagem (PNG, JPG, etc).', 'error');
             return;
         }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
@@ -1665,6 +1756,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const MAX_HEIGHT = 80;
                 let width = img.width;
                 let height = img.height;
+
                 if (width > height) {
                     if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 } else {
@@ -1674,6 +1766,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
                 const dataUrl = canvas.toDataURL('image/png');
+
                 if (dataUrl.length > 500000) {
                    showToast('A imagem é muito grande. Tente uma imagem menor.', 'error');
                    return;
@@ -1687,32 +1780,40 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsDataURL(file);
     }
+
     document.getElementById('company-logo-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-logo-preview'), (data) => temporaryCompanyLogo = data));
     document.getElementById('company-rep-logo1-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo1-preview'), (data) => temporaryRepLogo1 = data));
     document.getElementById('company-rep-logo2-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo2-preview'), (data) => temporaryRepLogo2 = data));
+
     document.getElementById('company-select').addEventListener('change', (e) => {
         const selectedCompanyId = e.target.value;
         currentCompany = companyList.find(c => c.id === selectedCompanyId);
         updateCompanyInfoOnPages();
     });
+
     const setupSheetScreen = (prefix) => {
         const btn = document.getElementById(`${prefix}-btn`);
         const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
         const config = configMap[prefix];
+
         if (!btn || !config) {
             console.error(`Botão ou configuração para '${prefix}' não encontrado.`);
             return;
         }
+
         btn.addEventListener('click', () => {
             const usageCount = parseInt(localStorage.getItem(config.usageKey) || '0');
+
             if (usageCount >= config.usageLimit) {
                 const usageLimitOverlay = document.getElementById('usage-limit-overlay');
                 usageLimitOverlay.classList.remove('hidden');
                 usageLimitOverlay.classList.add('flex');
                 return;
             }
+
             const newUsageCount = usageCount + 1;
             localStorage.setItem(config.usageKey, newUsageCount.toString());
+
             const remainingUses = config.usageLimit - newUsageCount;
             const counterEl = document.getElementById(`${prefix}-usage-counter`);
             if (counterEl) {
@@ -1725,6 +1826,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     counterEl.classList.remove('text-red-700', 'bg-red-100');
                 }
             }
+
             currentlyEditingIndex = null; 
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
             if(addBtn) {
@@ -1740,6 +1842,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
+    // --- CHAMADAS DE INICIALIZAÇÃO ---
     createApp(motorConfig);
     createApp(transformerConfig);
     createApp(generatorConfig);
@@ -1756,6 +1859,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showScreen(screens.menu, false);
         }
     });
+
     document.getElementById('cover-btn').addEventListener('click', () => { 
         updateCompanyInfoOnPages();
         showScreen(screens.cover); 
@@ -1790,6 +1894,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('saved-reports-list').addEventListener('click', async (e) => {
         const loadButton = e.target.closest('[data-load-id]');
         const deleteButton = e.target.closest('[data-delete-id]');
+
         if (loadButton) {
             e.preventDefault();
             await loadFullReport(loadButton.dataset.loadId);
@@ -1801,9 +1906,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
     document.getElementById('index-content-list').addEventListener('click', (e) => {
         const reportLink = e.target.closest('[data-report-index]');
         const deleteButton = e.target.closest('[data-delete-index]');
+
         if (reportLink) {
             e.preventDefault();
             editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10));
@@ -1819,6 +1926,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Event listener para o novo botão de exportação
     document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
 });
 </script>
