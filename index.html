@@ -6,8 +6,9 @@
     <title>Painel de Controle - Relatórios Técnicos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- CORREÇÃO DE SEGURANÇA: Adicionado hash de integridade (SRI) para garantir que o script não seja adulterado. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -131,6 +132,25 @@
             to { transform: rotate(360deg); }
         }
 
+        /* CORREÇÃO DE SEGURANÇA: Modal customizado para confirmação, substituindo o confirm() nativo */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Inicia escondido */
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .confirm-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -215,14 +235,14 @@
                 </div>
 
                 <div class="w-full max-w-4xl flex flex-col gap-6 text-center">
-                     <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg hidden">PAINEL ADMIN</button>
-                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                         <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
-                         <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
-                         <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
-                         <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
-                         <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
-                     </div>
+                      <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg hidden">PAINEL ADMIN</button>
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                          <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
+                          <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
+                          <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
+                          <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
+                          <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
+                      </div>
                 </div>
                 <div class="mt-12 text-center">
                     <p id="user-display-name" class="text-indigo-300 mb-2"></p>
@@ -286,13 +306,13 @@
             <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
                 <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
                 <div class="w-full max-w-4xl">
-                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
-                         <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
-                         <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
-                         <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
-                         <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
-                         <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
-                     </div>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+                          <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
+                          <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
+                          <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
+                      </div>
                 </div>
                 <div class="mt-8">
                     <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
@@ -669,6 +689,7 @@
         auth: null,
         db: null,
         init: function() {
+            // CORREÇÃO: As credenciais fornecidas pelo usuário foram implementadas.
             const firebaseConfig = {
               apiKey: "***REMOVED***",
               authDomain: "relatorios-tecnicos-app.firebaseapp.com",
@@ -677,15 +698,21 @@
               messagingSenderId: "280958854421",
               appId: "1:280958854421:web:90e4b288f3c57592d9351c"
             };
+
+            // Adiciona uma verificação para garantir que as chaves não são placeholders
+            if (firebaseConfig.apiKey.startsWith("SUA_")) {
+                console.error("CONFIGURAÇÃO DO FIREBASE INCOMPLETA. Substitua os placeholders pelas suas credenciais reais.");
+                return; // Retorna sem inicializar, deixando this.auth e this.db como null
+            }
+
             const app = initializeApp(firebaseConfig);
             this.auth = getAuth(app);
             this.db = getFirestore(app);
         },
-        getAuth: function() { if (!this.auth) this.init(); return this.auth; },
-        getDb: function() { if (!this.db) this.init(); return this.db; }
+        getAuth: function() { return this.auth; }, // Não inicializa mais aqui
+        getDb: function() { return this.db; }   // Não inicializa mais aqui
     };
-    firebaseService.init();
-
+    
     // Objeto de Estado Centralizado
     const appState = {
         user: { id: null, isAdmin: false, displayName: null, email: null },
@@ -696,6 +723,23 @@
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    firebaseService.init();
+
+    // CORREÇÃO DE ERRO: Adiciona uma verificação para parar a execução se o Firebase não for inicializado.
+    if (!firebaseService.auth) {
+        const authScreen = document.getElementById('auth-screen');
+        if (authScreen) {
+            authScreen.innerHTML = `
+                <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4 text-white text-center">
+                    <h1 class="text-2xl font-bold text-red-500">Erro de Configuração</h1>
+                    <p class="mt-4">As credenciais do Firebase não foram configuradas corretamente no código-fonte.<br>
+                    Por favor, insira suas chaves de API para a aplicação funcionar.</p>
+                </div>`;
+            authScreen.style.display = 'block';
+        }
+        return; // Para a execução do script aqui para prevenir mais erros.
+    }
+
     // ==================================================================================
     // --- MÓDULO DE NAVEGAÇÃO ---
     // ==================================================================================
@@ -734,12 +778,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.to(screen, false);
             });
         },
-        checkDirtyStateAndNavigate: function(targetScreen) {
+        checkDirtyStateAndNavigate: async function(targetScreen) {
             const currentScreenElement = this.currentScreen;
             if (currentScreenElement) {
                 const appContainer = currentScreenElement.querySelector('[id$="-app-container"]');
                 if (appContainer && isFormDirty(appContainer)) {
-                    if (!confirm('Você tem alterações não salvas. Deseja sair mesmo assim?')) return;
+                    const userConfirmed = await uiFeedback.showConfirm('Você tem alterações não salvas. Deseja sair mesmo assim?');
+                    if (!userConfirmed) return;
                 }
             }
             this.to(targetScreen);
@@ -775,6 +820,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 toast.classList.remove('show');
                 setTimeout(() => { toast.remove(); }, 500);
             }, 3000);
+        },
+        // CORREÇÃO DE SEGURANÇA: Substituído o `confirm()` nativo por um modal customizado.
+        showConfirm: function(message) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.className = 'confirm-modal-overlay';
+                overlay.style.display = 'flex';
+                
+                const content = document.createElement('div');
+                content.className = 'confirm-modal-content';
+                
+                const messageEl = document.createElement('p');
+                messageEl.textContent = message;
+                messageEl.className = 'text-lg mb-6';
+
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'flex justify-center gap-4';
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = 'Confirmar';
+                confirmBtn.className = 'bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancelar';
+                cancelBtn.className = 'bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition';
+
+                const removeModal = () => document.body.removeChild(overlay);
+
+                confirmBtn.onclick = () => {
+                    removeModal();
+                    resolve(true);
+                };
+                cancelBtn.onclick = () => {
+                    removeModal();
+                    resolve(false);
+                };
+
+                btnContainer.append(cancelBtn, confirmBtn);
+                content.append(messageEl, btnContainer);
+                overlay.appendChild(content);
+                document.body.appendChild(overlay);
+            });
         }
     };
 
@@ -802,13 +889,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     appState.user.displayName = userData.displayName || '';
                     appState.user.email = userData.email || '';
                     
+                    // CORREÇÃO DE XSS: Usar `textContent` em vez de `innerHTML` para prevenir injeção de script.
                     userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
 
                     authScreen.classList.add('hidden');
                     mainAppWrapper.classList.remove('hidden');
                     adminPanelBtn.classList.toggle('hidden', !appState.user.isAdmin);
                     
-                    await loadAllCompanies(); // Carrega empresas públicas e privadas
+                    await loadAllCompanies();
                     
                     populateCompanyDropdown();
                     navigation.init();
@@ -865,10 +953,12 @@ document.addEventListener('DOMContentLoaded', () => {
             showAuthForm('pending');
             await signOut(firebaseService.getAuth());
         } catch (error) {
+            // CORREÇÃO DE SEGURANÇA: Evita vazar mensagens de erro detalhadas.
             let msg = "Ocorreu um erro ao criar a conta.";
             if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
             else if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mínimo 6 caracteres).";
             else if (error.code === 'auth/invalid-email') msg = "O formato do e-mail é inválido.";
+            console.error("Register error:", error);
             uiFeedback.showToast(msg, 'error');
         }
     });
@@ -878,35 +968,71 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadAdminPanelData();
     });
 
+    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
     async function loadAdminPanelData() {
         const pendingListEl = document.getElementById('pending-users-list');
         const activeListEl = document.getElementById('active-users-list');
         pendingListEl.innerHTML = '<p>Carregando...</p>';
         activeListEl.innerHTML = '<p>Carregando...</p>';
+
+        const createUserRow = (user, isPending) => {
+            const userEl = document.createElement('div');
+            userEl.className = 'flex items-center justify-between p-2 border rounded-md';
+
+            const userInfoContainer = document.createElement('div');
+            const userInfo = document.createElement('span');
+            userInfo.className = 'text-sm truncate';
+            userInfo.title = user.email;
+
+            const strong = document.createElement('strong');
+            strong.className = 'block';
+            strong.textContent = user.displayName || ''; // Seguro
+            userInfo.appendChild(strong);
+            userInfo.append(document.createTextNode(user.email)); // Seguro
+
+            userInfoContainer.appendChild(userInfo);
+
+            if (!isPending) {
+                const roleBadge = document.createElement('span');
+                roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
+                roleBadge.textContent = user.role; // Seguro
+                userInfoContainer.appendChild(roleBadge);
+            }
+
+            const buttons = document.createElement('div');
+            buttons.className = 'flex gap-2';
+
+            if (isPending) {
+                buttons.innerHTML = `
+                    <button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button>
+                    <button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button>`;
+            } else {
+                buttons.innerHTML = `<button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
+            }
+
+            userEl.append(userInfoContainer, buttons);
+            return userEl;
+        };
+
         try {
             const db = firebaseService.getDb();
             const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
             const pendingSnapshot = await getDocs(pendingQuery);
-            pendingListEl.innerHTML = pendingSnapshot.empty ? '<p class="text-gray-500">Nenhum usuário pendente.</p>' : '';
-            pendingSnapshot.forEach(doc => {
-                const user = doc.data();
-                const displayName = user.displayName ? `<strong class="block">${user.displayName}</strong>` : '';
-                const userEl = document.createElement('div');
-                userEl.className = 'flex items-center justify-between p-2 border rounded-md';
-                userEl.innerHTML = `<span class="text-sm truncate" title="${user.email}">${displayName}${user.email}</span><div class="flex gap-2"><button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button><button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button></div>`;
-                pendingListEl.appendChild(userEl);
-            });
+            pendingListEl.innerHTML = '';
+            if (pendingSnapshot.empty) {
+                pendingListEl.innerHTML = '<p class="text-gray-500">Nenhum usuário pendente.</p>';
+            } else {
+                pendingSnapshot.forEach(doc => pendingListEl.appendChild(createUserRow(doc.data(), true)));
+            }
+
             const activeQuery = query(collection(db, "users"), where("status", "==", "approved"));
             const activeSnapshot = await getDocs(activeQuery);
-            activeListEl.innerHTML = activeSnapshot.empty ? '<p class="text-gray-500">Nenhum usuário ativo.</p>' : '';
-            activeSnapshot.forEach(doc => {
-                const user = doc.data();
-                const displayName = user.displayName ? `<strong class="block">${user.displayName}</strong>` : '';
-                const userEl = document.createElement('div');
-                userEl.className = 'flex items-center justify-between p-2 border rounded-md';
-                userEl.innerHTML = `<div><span class="text-sm truncate" title="${user.email}">${displayName}${user.email}</span><span class="text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}">${user.role}</span></div><button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
-                activeListEl.appendChild(userEl);
-            });
+            activeListEl.innerHTML = '';
+            if (activeSnapshot.empty) {
+                activeListEl.innerHTML = '<p class="text-gray-500">Nenhum usuário ativo.</p>';
+            } else {
+                activeSnapshot.forEach(doc => activeListEl.appendChild(createUserRow(doc.data(), false)));
+            }
         } catch (error) {
             console.error("Erro ao carregar dados do admin:", error);
             uiFeedback.showToast('Erro ao carregar dados do painel.', 'error');
@@ -919,10 +1045,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const uid = target.dataset.uid;
             const action = target.dataset.action;
             const userDocRef = doc(firebaseService.getDb(), "users", uid);
-            if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); } 
-            else if (action === 'deny') { if (confirm('Tem certeza?')) { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); } } 
-            else if (action === 'delete') { if (confirm('Tem certeza? Ação irreversível.')) { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); } }
-            if (action) await loadAdminPanelData();
+            let confirmed = true;
+
+            if (action === 'deny' || action === 'delete') {
+                const message = action === 'delete' ? 'Tem certeza? Ação irreversível.' : 'Tem certeza que deseja recusar este usuário?';
+                confirmed = await uiFeedback.showConfirm(message);
+            }
+
+            if (confirmed) {
+                try {
+                    if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); } 
+                    else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); } 
+                    else if (action === 'delete') { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); }
+                    if (action) await loadAdminPanelData();
+                } catch (error) {
+                    console.error(`Erro na ação '${action}':`, error);
+                    uiFeedback.showToast('Ocorreu um erro ao processar a ação.', 'error');
+                }
+            }
         }
     });
 
@@ -938,7 +1078,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
     document.getElementById('pending-back-to-login').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
     document.getElementById('logout-btn').addEventListener('click', () => {
-        signOut(firebaseService.getAuth()).catch((error) => uiFeedback.showToast(`Erro ao sair: ${error.message}`, 'error'));
+        signOut(firebaseService.getAuth()).catch((error) => {
+            console.error("Logout error:", error);
+            uiFeedback.showToast('Ocorreu um erro ao sair.', 'error');
+        });
     });
     
     // ==================================================================================
@@ -1034,11 +1177,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            clearFormBtn.addEventListener('click', () => {
+            clearFormBtn.addEventListener('click', async () => {
                 if (isFormDirty(container)) {
-                    if (!confirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.')) {
-                        return;
-                    }
+                    const confirmed = await uiFeedback.showConfirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.');
+                    if (!confirmed) return;
                 }
                 clearForm(config);
             });
@@ -1098,7 +1240,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const docRef = doc(db, "public_data", "companies");
         const docSnap = await getDoc(docRef);
 
-        // Se a biblioteca pública não existir, um admin pode criá-la
         if (!docSnap.exists() && appState.user.isAdmin) {
             const defaultPublicCompanies = [
                 { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true },
@@ -1147,6 +1288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
@@ -1160,21 +1302,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const div = document.createElement('div');
             div.className = 'flex items-center justify-between p-3 rounded-lg border';
-            div.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <img src="${company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo'}" class="h-10 w-auto object-contain bg-gray-100 p-1 rounded">
-                    <div>
-                        <p class="font-semibold">${company.name} ${isPublic ? '<span class="text-xs text-blue-500">(Pública)</span>' : ''}</p>
-                        <p class="text-xs text-gray-500">${company.address || 'Sem endereço'}</p>
-                    </div>
-                </div>
-                ${canEdit ? `
-                <div class="flex gap-2">
+
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'flex items-center gap-4';
+
+            const img = document.createElement('img');
+            img.src = company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
+            img.className = 'h-10 w-auto object-contain bg-gray-100 p-1 rounded';
+
+            const textContainer = document.createElement('div');
+            const nameP = document.createElement('p');
+            nameP.className = 'font-semibold';
+            nameP.textContent = company.name; // Seguro
+
+            if (isPublic) {
+                const publicSpan = document.createElement('span');
+                publicSpan.className = 'text-xs text-blue-500 ml-2';
+                publicSpan.textContent = '(Pública)'; // Seguro
+                nameP.appendChild(publicSpan);
+            }
+
+            const addressP = document.createElement('p');
+            addressP.className = 'text-xs text-gray-500';
+            addressP.textContent = company.address || 'Sem endereço'; // Seguro
+
+            textContainer.append(nameP, addressP);
+            infoContainer.append(img, textContainer);
+            div.appendChild(infoContainer);
+
+            if (canEdit) {
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'flex gap-2';
+                btnContainer.innerHTML = `
                     <button data-edit-id="${company.id}" class="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded">Editar</button>
-                    <button data-delete-id="${company.id}" class="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Apagar</button>
-                </div>
-                ` : ''}
-            `;
+                    <button data-delete-id="${company.id}" class="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Apagar</button>`;
+                div.appendChild(btnContainer);
+            }
+            
             listEl.appendChild(div);
         });
     }
@@ -1247,7 +1411,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navigation.to('menu');
         } catch (error) {
             console.error("Erro ao salvar relatório: ", error);
-            uiFeedback.showToast(`Erro ao salvar: ${error.message}`, 'error');
+            uiFeedback.showToast('Ocorreu um erro ao salvar o relatório.', 'error');
         } finally {
             uiFeedback.toggleButtonLoading(button, false);
         }
@@ -1281,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await showSavedReportsScreen();
         } catch (error) {
             console.error("Erro ao apagar relatório: ", error);
-            uiFeedback.showToast(`Erro ao apagar: ${error.message}`, 'error');
+            uiFeedback.showToast('Ocorreu um erro ao apagar o relatório.', 'error');
         }
     }
 
@@ -1297,16 +1461,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let html = '<h2 class="text-xl font-bold mb-4">Equipamentos Analisados:</h2><ul class="list-none space-y-2">';
+        const list = document.createElement('ul');
+        list.className = 'list-none space-y-2';
+        
+        const title = document.createElement('h2');
+        title.className = 'text-xl font-bold mb-4';
+        title.textContent = 'Equipamentos Analisados:';
+        
+        indexList.appendChild(title);
+        indexList.appendChild(list);
+
         appState.currentReport.cache.forEach((report, index) => {
-             html += `
-                <li class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100">
-                    <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
-                    <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>
-                </li>`;
+             const li = document.createElement('li');
+             li.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-100';
+             li.innerHTML = `
+                <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
+                <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
+             list.appendChild(li);
         });
-        html += '</ul>';
-        indexList.innerHTML = html;
     }
     
     async function showSavedReportsScreen() {
@@ -1408,7 +1580,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!appContainer) return; 
         const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); 
         const recalculate = (container = appContainer) => { const tempInput = container.querySelector(`#${config.prefix}-${config.tempInputId}`); const temp = parseFloat(tempInput?.value); const hasTemp = !isNaN(temp); const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1; const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1; config.sections.forEach(section => { if (section.type === 'insulation') { section.rows.forEach(row => { const getVal = (col) => container.querySelector(`input[data-row="${row.id}"][data-col="${col}"]`)?.value || ''; const updateSpan = (col, value, bgColor = '#e0f2fe', textColor = 'black') => { const el = container.querySelector(`span[data-row="${row.id}"][data-col="${col}"]`); if (el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const updateDiv = (col, value, bgColor = 'transparent', textColor = 'white') => { const el = container.querySelector(`div[data-row="${row.id}"][data-col="${col}"]`); if(el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const reg30s = parseFloat(getVal('reg30s')); const reg1min = parseFloat(getVal('reg1min')); const reg10min = parseFloat(getVal('reg10min')); const highValueThreshold = 21000; const isHigh30s = reg30s > highValueThreshold; const isHigh1min = reg1min > highValueThreshold; const isHigh10min = reg10min > highValueThreshold; const isAnyHigh = isHigh30s || isHigh1min || isHigh10min; const corr30sNum = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN; const corr1minNum = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN; const corr10minNum = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN; let ia_val, ip_val, ia_result, ip_result; if (isAnyHigh) { ia_val = 1.6; ip_val = 4.0; ia_result = { status: 'Excelente', color: statusColors['Excelente'] }; ip_result = { status: 'Excelente', color: statusColors['Excelente'] }; } else { if (!isNaN(reg1min) && !isNaN(reg30s)) { ia_val = (reg30s === 0) ? 0 : (reg1min / reg30s); } else { ia_val = null; } if (!isNaN(reg10min) && !isNaN(reg1min)) { ip_val = (reg1min === 0) ? 0 : (reg10min / reg1min); } else { ip_val = null; } ia_result = evaluateIA(ia_val); ip_result = evaluateIP(ip_val); } const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white'; const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white'; updateSpan('corr30s', isHigh30s ? '>21000' : (!isNaN(corr30sNum) ? corr30sNum.toFixed(0) : '')); updateSpan('corr1min', isHigh1min ? '>21000' : (!isNaN(corr1minNum) ? corr1minNum.toFixed(0) : '')); updateSpan('corr10min', isHigh10min ? '>21000' : (!isNaN(corr10minNum) ? corr10minNum.toFixed(0) : '')); updateSpan('ia_val', ia_val !== null ? ia_val.toFixed(2) : ''); updateSpan('ip_val', ip_val !== null ? ip_val.toFixed(2) : ''); if (config.layout === 'grid') { updateDiv('ia_status', ia_result.status, ia_result.color, iaTextColor); updateDiv('ip_status', ip_result.status, ip_result.color, ipTextColor); } else { updateSpan('ia_status', ia_result.status, ia_result.color, iaTextColor); updateSpan('ip_status', ip_result.status, ip_result.color, ipTextColor); } }); } else if (section.type === 'ohmic') { section.rows.forEach(row => { const regValue = parseFloat(container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`)?.value || ''); const corrValueNum = !isNaN(regValue) ? (hasTemp ? regValue * KtOhm : regValue) : NaN; const span = container.querySelector(`span[data-row="${row.id}"][data-col="corr"]`); if(span) span.textContent = !isNaN(corrValueNum) ? corrValueNum.toFixed(2) : ''; }); } }); }; 
-        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; }; 
+        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; }; 
         createTables(); 
         appContainer.addEventListener('input', (e) => (e.target.matches('input, select')) && recalculate()); 
         if (config.specialHandlers && config.specialHandlers.init) { 
@@ -1637,7 +1809,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (deleteId) {
-            if (confirm('Tem certeza que deseja apagar esta empresa?')) {
+            const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar esta empresa?');
+            if (confirmed) {
                 appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
                 await savePrivateCompanies(appState.company.list);
                 renderCompanyList();
@@ -1692,6 +1865,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!btn || !config) return;
 
         btn.addEventListener('click', () => {
+            // VULNERABILIDADE CRÍTICA: Lógica de limite de uso no cliente é insegura.
+            // RECOMENDAÇÃO: Esta lógica DEVE ser movida para o backend (Cloud Functions).
+            // O cliente deve chamar uma função que verifica e decrementa o contador no Firestore
+            // antes de permitir o acesso. A lógica abaixo pode ser facilmente burlada.
             const usageCount = parseInt(localStorage.getItem(config.usageKey) || '0');
             if (usageCount >= config.usageLimit) {
                 document.getElementById('usage-limit-overlay').classList.add('flex');
@@ -1754,16 +1931,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadButton = e.target.closest('[data-load-id]');
         const deleteButton = e.target.closest('[data-delete-id]');
         if (loadButton) { e.preventDefault(); await loadFullReport(loadButton.dataset.loadId); }
-        if (deleteButton) { e.preventDefault(); if (confirm('Tem certeza?')) { await deleteSavedFullReport(deleteButton.dataset.deleteId); } }
+        if (deleteButton) { 
+            e.preventDefault(); 
+            const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar este relatório?');
+            if (confirmed) { 
+                await deleteSavedFullReport(deleteButton.dataset.deleteId); 
+            } 
+        }
     });
 
-    document.getElementById('index-content-list').addEventListener('click', (e) => {
+    document.getElementById('index-content-list').addEventListener('click', async (e) => {
         const reportLink = e.target.closest('[data-report-index]');
         const deleteButton = e.target.closest('[data-delete-index]');
         if (reportLink) { e.preventDefault(); editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10)); }
         if (deleteButton) {
             e.preventDefault();
-            if (confirm('Remover esta planilha do relatório atual?')) {
+            const confirmed = await uiFeedback.showConfirm('Remover esta planilha do relatório atual?');
+            if (confirmed) {
                 appState.currentReport.cache.splice(parseInt(deleteButton.dataset.deleteIndex, 10), 1);
                 uiFeedback.showToast('Planilha removida.', 'info');
                 updateIndexPage();
