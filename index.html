@@ -117,6 +117,20 @@
         .toast.error { background-color: #dc3545; }
         .toast.info { background-color: #17a2b8; }
 
+        /* Spinner para botões */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -617,170 +631,206 @@
     </div>
 
 <script type="module">
-    // Importações do Firebase - Mantidas como na v9 para compatibilidade com seu código
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    // Importações dos módulos do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Sua configuração do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyB33aPQE8hRp_tAj1s1LF7seNgTivdhn_A",
-      authDomain: "relatorios-tecnicos-app.firebaseapp.com",
-      projectId: "relatorios-tecnicos-app",
-      storageBucket: "relatorios-tecnicos-app.appspot.com",
-      messagingSenderId: "280958854421",
-      appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+    // Módulo de serviço do Firebase
+    const firebaseService = {
+        auth: null,
+        db: null,
+        init: function() {
+            const firebaseConfig = {
+              apiKey: "AIzaSyB33aPQE8hRp_tAj1s1LF7seNgTivdhn_A",
+              authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+              projectId: "relatorios-tecnicos-app",
+              storageBucket: "relatorios-tecnicos-app.appspot.com",
+              messagingSenderId: "280958854421",
+              appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+            };
+            const app = initializeApp(firebaseConfig);
+            this.auth = getAuth(app);
+            this.db = getFirestore(app);
+        },
+        getAuth: function() { if (!this.auth) this.init(); return this.auth; },
+        getDb: function() { if (!this.db) this.init(); return this.db; }
+    };
+    firebaseService.init();
+
+    // Objeto de Estado Centralizado
+    const appState = {
+        user: { id: null, isAdmin: false },
+        company: { list: [], selected: null },
+        currentReport: { cache: [], editingIndex: null, coverImage: null },
+        ui: { temporaryCompanyLogo: null, temporaryRepLogo1: null, temporaryRepLogo2: null }
     };
 
-    // Inicializa o Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ==================================================================================
+    // --- MÓDULO DE NAVEGAÇÃO ---
+    // ==================================================================================
+    
+    const navigation = {
+        screens: { 
+            menu: document.getElementById('menu-screen'), 
+            cover: document.getElementById('cover-screen'), 
+            index: document.getElementById('index-screen'), 
+            savedReports: document.getElementById('saved-reports-screen'),
+            companyManagement: document.getElementById('company-management-screen'),
+            equipamentos: document.getElementById('equipamentos-screen'),
+            gen: document.getElementById('generator-app-screen'), 
+            motor: document.getElementById('motor-app-screen'), 
+            transformer: document.getElementById('transformer-app-screen'), 
+            adminPanel: document.getElementById('admin-panel-screen'),
+        },
+        currentScreen: null,
+        to: function(screenName, updateHistory = true) {
+            const newScreenElement = this.screens[screenName];
+            if (!newScreenElement || newScreenElement === this.currentScreen) return;
+            Object.values(this.screens).forEach(screen => { if (screen) screen.classList.add('hidden'); });
+            newScreenElement.classList.remove('hidden');
+            this.currentScreen = newScreenElement;
+            if (updateHistory && history.state?.screen !== screenName) {
+                history.pushState({ screen: screenName }, '', `#${screenName}`);
+            }
+        },
+        init: function() {
+            const initialScreenName = window.location.hash.substring(1) || 'menu';
+            this.to(initialScreenName, false);
+            history.replaceState({ screen: initialScreenName }, '', `#${initialScreenName}`);
+            window.addEventListener('popstate', (event) => {
+                const screen = event.state ? event.state.screen : 'menu';
+                this.to(screen, false);
+            });
+        },
+        checkDirtyStateAndNavigate: function(targetScreen) {
+            const currentScreenElement = this.currentScreen;
+            if (currentScreenElement) {
+                const appContainer = currentScreenElement.querySelector('[id$="-app-container"]');
+                if (appContainer && isFormDirty(appContainer)) {
+                    if (!confirm('Você tem alterações não salvas. Deseja sair mesmo assim?')) return;
+                }
+            }
+            this.to(targetScreen);
+        }
+    };
+
+    // ==================================================================================
+    // --- MÓDULO DE UI E FEEDBACK ---
+    // ==================================================================================
+
+    // ATUALIZAÇÃO 5: Feedback de Carregamento
+    // Funções centralizadas para feedback visual ao usuário.
+    const uiFeedback = {
+        // Controla o estado de carregamento de um botão
+        toggleButtonLoading: function(button, isLoading) {
+            if (!button) return;
+            if (isLoading) {
+                button.disabled = true;
+                button.dataset.originalContent = button.innerHTML;
+                button.innerHTML = '<div class="spinner mx-auto"></div>';
+            } else {
+                button.disabled = false;
+                if (button.dataset.originalContent) {
+                    button.innerHTML = button.dataset.originalContent;
+                }
+            }
+        },
+        // Mostra uma notificação "toast"
+        showToast: function(message, type = 'info') {
+            const notificationArea = document.getElementById('notification-area');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            notificationArea.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.remove(); }, 500);
+            }, 3000);
+        }
+    };
+
+
     // ==================================================================================
     // --- LÓGICA DE AUTENTICAÇÃO E ADMINISTRAÇÃO ---
     // ==================================================================================
 
-    // --- Elementos da UI de Autenticação ---
     const authScreen = document.getElementById('auth-screen');
     const mainAppWrapper = document.getElementById('main-app-wrapper');
-    const loginFormContainer = document.getElementById('login-form-container');
-    const registerFormContainer = document.getElementById('register-form-container');
-    const pendingApprovalContainer = document.getElementById('pending-approval-container');
     const adminPanelBtn = document.getElementById('admin-panel-btn');
 
-    // --- Lógica de estado da autenticação ---
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(firebaseService.getAuth(), async (user) => {
         if (user) {
-            // Usuário está autenticado, agora precisamos verificar seu status no Firestore
-            const userDocRef = doc(db, "users", user.uid);
+            const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
             const userDocSnap = await getDoc(userDocRef);
 
             if (userDocSnap.exists()) {
                 const userData = userDocSnap.data();
                 
                 if (userData.status === 'approved') {
-                    // ACESSO PERMITIDO
-                    currentUserId = user.uid;
+                    appState.user.id = user.uid;
+                    appState.user.isAdmin = userData.role === 'admin';
                     authScreen.classList.add('hidden');
                     mainAppWrapper.classList.remove('hidden');
-                    
-                    // Mostra o botão de admin se o usuário tiver a role
-                    if (userData.role === 'admin') {
-                        adminPanelBtn.classList.remove('hidden');
-                    } else {
-                        adminPanelBtn.classList.add('hidden');
-                    }
-                    
-                    // Carrega os dados do usuário do Firestore
-                    companyList = await getCompanies();
+                    adminPanelBtn.classList.toggle('hidden', !appState.user.isAdmin);
+                    appState.company.list = await getCompanies();
                     populateCompanyDropdown();
-
-                    const initialScreen = window.location.hash.substring(1) || 'menu';
-                    const screenElement = screens[initialScreen] || screens.menu;
-                    showScreen(screenElement, false);
-                    history.replaceState({ screen: initialScreen }, '', `#${initialScreen}`);
-
-                } else if (userData.status === 'pending') {
-                    // CONTA PENDENTE
-                    showToast('Sua conta está aguardando aprovação.', 'info');
-                    showAuthForm('pending');
-                    await signOut(auth); // Desloga o usuário para que ele não fique "preso"
-                } else if (userData.status === 'denied') {
-                    // CONTA RECUSADA
-                    showToast('Seu acesso foi recusado pelo administrador.', 'error');
-                    showAuthForm('login');
-                    await signOut(auth);
+                    navigation.init();
                 } else {
-                    // Status desconhecido, trata como pendente por segurança
-                    showToast('O status da sua conta é indefinido. Contate o suporte.', 'error');
-                    showAuthForm('login');
-                    await signOut(auth);
+                    const message = userData.status === 'pending' ? 'Sua conta está aguardando aprovação.' : 'Seu acesso foi recusado.';
+                    uiFeedback.showToast(message, 'info');
+                    showAuthForm(userData.status === 'pending' ? 'pending' : 'login');
+                    await signOut(firebaseService.getAuth());
                 }
             } else {
-                // Documento do usuário não existe no Firestore (pode ser um erro ou um usuário órfão)
-                // Para novos cadastros, isso é resolvido no fluxo de registro.
-                // Para logins, isso significa que o usuário não pode acessar.
-                showToast('Seus dados não foram encontrados. Por favor, cadastre-se novamente ou contate o suporte.', 'error');
-                await signOut(auth);
+                uiFeedback.showToast('Seus dados não foram encontrados. Cadastre-se novamente.', 'error');
+                await signOut(firebaseService.getAuth());
                 showAuthForm('login');
             }
         } else {
-            // Usuário está deslogado
-            currentUserId = null;
+            appState.user.id = null;
+            appState.user.isAdmin = false;
             authScreen.classList.remove('hidden');
             mainAppWrapper.classList.add('hidden');
-            showAuthForm('login'); // Mostra o formulário de login por padrão
-            showScreen(null, false);
+            showAuthForm('login');
+            navigation.currentScreen = null;
         }
     });
 
-    // --- Manipulador do formulário de Login (ATUALIZADO) ---
     document.getElementById('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                showToast('Login bem-sucedido! Verificando acesso...', 'success');
-            })
-            .catch((error) => {
-                console.error("Login error:", error.code);
-                showToast('E-mail ou senha inválidos. Verifique seus dados.', 'error');
-            });
+        signInWithEmailAndPassword(firebaseService.getAuth(), email, password)
+            .then(() => uiFeedback.showToast('Login bem-sucedido! Verificando acesso...', 'success'))
+            .catch(() => uiFeedback.showToast('E-mail ou senha inválidos.', 'error'));
     });
 
-    // --- Manipulador do formulário de Cadastro (ATUALIZADO) ---
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
-
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(firebaseService.getAuth(), email, password);
             const user = userCredential.user;
-
-            // Cria o documento do usuário no Firestore com status 'pending'
-            const userDocRef = doc(db, "users", user.uid);
-            await setDoc(userDocRef, {
-                uid: user.uid,
-                email: user.email,
-                role: 'user', // Todos os novos usuários são 'user' por padrão
-                status: 'pending', // Todos os novos usuários precisam de aprovação
-                createdAt: new Date().toISOString()
-            });
-
-            // Mostra a tela de "Aguardando Aprovação"
+            const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
+            await setDoc(userDocRef, { uid: user.uid, email: user.email, role: 'user', status: 'pending', createdAt: new Date().toISOString() });
             showAuthForm('pending');
-            
-            // Desloga o usuário para que o onAuthStateChanged não o autorize indevidamente
-            await signOut(auth);
-
+            await signOut(firebaseService.getAuth());
         } catch (error) {
-            console.error("Register error:", error.code);
-            let errorMessage = "Ocorreu um erro ao criar a conta.";
-            switch (error.code) {
-                case 'auth/email-already-in-use':
-                    errorMessage = "Este e-mail já está em uso. Tente fazer login ou aguarde a aprovação.";
-                    break;
-                case 'auth/weak-password':
-                    errorMessage = "Senha muito fraca. A senha deve ter pelo menos 6 caracteres.";
-                    break;
-                case 'auth/invalid-email':
-                    errorMessage = "O formato do e-mail é inválido.";
-                    break;
-                default:
-                    errorMessage = "Não foi possível criar a conta. Tente novamente mais tarde.";
-                    break;
-            }
-            showToast(errorMessage, 'error');
+            let msg = "Ocorreu um erro ao criar a conta.";
+            if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
+            else if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mínimo 6 caracteres).";
+            else if (error.code === 'auth/invalid-email') msg = "O formato do e-mail é inválido.";
+            uiFeedback.showToast(msg, 'error');
         }
     });
     
-    // --- Lógica do Painel de Admin ---
     adminPanelBtn.addEventListener('click', async () => {
-        showScreen(screens.adminPanel);
+        navigation.to('adminPanel');
         await loadAdminPanelData();
     });
 
@@ -789,9 +839,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeListEl = document.getElementById('active-users-list');
         pendingListEl.innerHTML = '<p>Carregando...</p>';
         activeListEl.innerHTML = '<p>Carregando...</p>';
-
         try {
-            // Busca usuários pendentes
+            const db = firebaseService.getDb();
             const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
             const pendingSnapshot = await getDocs(pendingQuery);
             pendingListEl.innerHTML = pendingSnapshot.empty ? '<p class="text-gray-500">Nenhum usuário pendente.</p>' : '';
@@ -799,17 +848,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = doc.data();
                 const userEl = document.createElement('div');
                 userEl.className = 'flex items-center justify-between p-2 border rounded-md';
-                userEl.innerHTML = `
-                    <span class="text-sm truncate" title="${user.email}">${user.email}</span>
-                    <div class="flex gap-2">
-                        <button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button>
-                        <button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button>
-                    </div>
-                `;
+                userEl.innerHTML = `<span class="text-sm truncate" title="${user.email}">${user.email}</span><div class="flex gap-2"><button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button><button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button></div>`;
                 pendingListEl.appendChild(userEl);
             });
-
-            // Busca usuários ativos
             const activeQuery = query(collection(db, "users"), where("status", "==", "approved"));
             const activeSnapshot = await getDocs(activeQuery);
             activeListEl.innerHTML = activeSnapshot.empty ? '<p class="text-gray-500">Nenhum usuário ativo.</p>' : '';
@@ -817,89 +858,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = doc.data();
                 const userEl = document.createElement('div');
                 userEl.className = 'flex items-center justify-between p-2 border rounded-md';
-                userEl.innerHTML = `
-                    <div>
-                        <span class="text-sm truncate" title="${user.email}">${user.email}</span>
-                        <span class="text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}">${user.role}</span>
-                    </div>
-                    <button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>
-                `;
+                userEl.innerHTML = `<div><span class="text-sm truncate" title="${user.email}">${user.email}</span><span class="text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}">${user.role}</span></div><button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
                 activeListEl.appendChild(userEl);
             });
         } catch (error) {
             console.error("Erro ao carregar dados do admin:", error);
-            showToast('Erro ao carregar dados do painel.', 'error');
-            pendingListEl.innerHTML = '<p class="text-red-500">Erro ao carregar.</p>';
-            activeListEl.innerHTML = '<p class="text-red-500">Erro ao carregar.</p>';
+            uiFeedback.showToast('Erro ao carregar dados do painel.', 'error');
         }
     }
 
-    // Delegação de eventos para os botões do painel de admin (ATUALIZADO)
     document.getElementById('admin-panel-screen').addEventListener('click', async (e) => {
         const target = e.target;
         if (target.tagName === 'BUTTON' && target.dataset.uid) {
             const uid = target.dataset.uid;
             const action = target.dataset.action;
-            const userDocRef = doc(db, "users", uid);
-
-            if (action === 'approve') {
-                await updateDoc(userDocRef, { status: 'approved' });
-                showToast('Usuário aprovado!', 'success');
-            } else if (action === 'deny') {
-                if (confirm('Tem certeza que deseja recusar este usuário? Ele não poderá mais acessar ou se cadastrar com este e-mail.')) {
-                    await updateDoc(userDocRef, { status: 'denied' });
-                    showToast('Usuário recusado.', 'info');
-                }
-            } else if (action === 'delete') {
-                if (confirm('Tem certeza que deseja EXCLUIR PERMANENTEMENTE este usuário do banco de dados?')) {
-                    await deleteDoc(userDocRef);
-                    showToast('Registro do usuário excluído.', 'info');
-                }
-            }
-            
-            // Recarrega os dados do painel após a ação
+            const userDocRef = doc(firebaseService.getDb(), "users", uid);
+            if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); } 
+            else if (action === 'deny') { if (confirm('Tem certeza?')) { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); } } 
+            else if (action === 'delete') { if (confirm('Tem certeza? Ação irreversível.')) { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); } }
             if (action) await loadAdminPanelData();
         }
     });
 
-    // --- Funções de controle da UI de autenticação ---
     function showAuthForm(formName) {
-        loginFormContainer.classList.add('hidden');
-        registerFormContainer.classList.add('hidden');
-        pendingApprovalContainer.classList.add('hidden');
-
-        if (formName === 'login') {
-            loginFormContainer.classList.remove('hidden');
-        } else if (formName === 'register') {
-            registerFormContainer.classList.remove('hidden');
-        } else if (formName === 'pending') {
-            pendingApprovalContainer.classList.remove('hidden');
-        }
+        document.getElementById('login-form-container').classList.add('hidden');
+        document.getElementById('register-form-container').classList.add('hidden');
+        document.getElementById('pending-approval-container').classList.add('hidden');
+        const el = document.getElementById(`${formName}-form-container`) || document.getElementById(`${formName}-container`);
+        if(el) el.classList.remove('hidden');
     }
     
     document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('register'); });
     document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
     document.getElementById('pending-back-to-login').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
     document.getElementById('logout-btn').addEventListener('click', () => {
-        signOut(auth).catch((error) => showToast(`Erro ao sair: ${error.message}`, 'error'));
+        signOut(firebaseService.getAuth()).catch((error) => uiFeedback.showToast(`Erro ao sair: ${error.message}`, 'error'));
     });
     
     // ==================================================================================
     // --- LÓGICA PRINCIPAL DO APLICATIVO ---
     // ==================================================================================
 
-    // --- DADOS GLOBAIS E CONFIGURAÇÃO ---
-    let localReportsCache = []; 
-    let currentlyEditingIndex = null;
-    let coverImageDataUrl = null; 
-    let companyList = [];
-    let currentCompany = null;
-    let currentUserId = null; // Guardará o ID do usuário logado
-    let temporaryCompanyLogo = null; // Para guardar a logo no formulário antes de salvar
-    let temporaryRepLogo1 = null;
-    let temporaryRepLogo2 = null;
-
-    // --- LÓGICA DE CÁLCULO E CONFIGURAÇÕES DAS PLANILHAS ---
+    const wipModal = document.getElementById('wip-modal');
     const getKtInsulation = (temp, targetTemp) => Math.pow(2, (targetTemp - temp) / 10);
     const getKtOhmic = (temp, targetTemp) => (234.5 + targetTemp) / (234.5 + temp);
     const statusColors = { 'Perigoso': '#ef4444', 'Pobre': '#f97316', 'Questionável': '#facc15', 'Confiável': '#a3e635', 'Bom': '#4ade80', 'Excelente': '#16a34a', '': '#FFFFFF' };
@@ -963,13 +963,13 @@ document.addEventListener('DOMContentLoaded', () => {
             addSheetBtn.addEventListener('click', () => {
                 const sheetData = collectSheetData(container, config);
                 
-                if (currentlyEditingIndex !== null) {
-                    localReportsCache[currentlyEditingIndex] = sheetData;
-                    showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
-                    currentlyEditingIndex = null;
+                if (appState.currentReport.editingIndex !== null) {
+                    appState.currentReport.cache[appState.currentReport.editingIndex] = sheetData;
+                    uiFeedback.showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
+                    appState.currentReport.editingIndex = null;
                 } else {
-                    localReportsCache.push(sheetData);
-                    showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
+                    appState.currentReport.cache.push(sheetData);
+                    uiFeedback.showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
                 }
                 
                 clearForm(config, true); 
@@ -981,7 +981,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addSheetBtn.textContent = 'Adicionar ao Relatório';
                 validateHeader();
                 
-                showScreen(screens.index);
+                navigation.to('index');
                 updateIndexPage();
             });
             validateHeader();
@@ -992,45 +992,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const transformerConfig = { prefix: 'transformer', appName: 'Transformador', containerId: 'transformer-app-container', containerIds: [{ id: 'transformer-sections-container', type: 'main' }], usageKey: 'unitechTrafoAppUsageCount_v2', usageLimit: 20, tempInputId: 'tempTrafo', insulation: { targetTemp: 75 }, ohmic: { targetTemp: 25 }, layout: 'grid', specialHandlers: reportSheetHandlers, sections: [ { name: 'MEDIÇÕES REALIZADAS', type: 'insulation', rows: [ { id: 'h1h2-low-gnd', title: 'Alta(H1/H2) para Terra com Baixa(X1/X2) em Guard' }, { id: 'x1x2-high-gnd', title: 'Baixa(X1/X2) para Terra com Alta(H1/H2) em Guard' }, { id: 'h1h2-x1x2-gnd', title: 'Alta(H1/H2) para Baixa(X1/X2) com Terra em Guard' }, { id: 'h2h3-low-gnd', title: 'Alta(H2/H3) para Terra com Baixa(X2/X3) em Guard' }, { id: 'x2x3-high-gnd', title: 'Baixa(X2/X3) para Terra com Alta(H2/H3) em Guard' }, { id: 'h2h3-x2x3-gnd', title: 'Alta(H2/H3) para Baixa(X2/X3) com Terra em Guard' }, { id: 'h1h3-low-gnd', title: 'Alta(H1/H3) para Terra com Baixa(X1/X3) em Guard' }, { id: 'x1x3-high-gnd', title: 'Baixa(X1/X3) para Terra com Alta(H1/H3)em Guard' }, { id: 'h1h3-x1x3-gnd', title: 'Alta(H1/H3) para Baixa(X1/X3) com Terra em Guard' }, ]}, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)', type: 'ohmic', rows: [ { id: 'x1-x2', label: 'X1-X2' }, { id: 'x1-x1', label: 'X1-X1' }, { id: 'x2-x3', label: 'X2-X3' }, { id: 'x2-x2', label: 'X2-X2' }, { id: 'x1-x3', label: 'X1-X3' }, { id: 'x3-x3', label: 'X3-X3' }, { id: 'h1-h2', label: 'H1-H2' }, { id: 'h1-h1', label: 'H1-H1' }, { id: 'h2-h3', label: 'H2-H3' }, { id: 'h2-h2', label: 'H2-H2' }, { id: 'h1-h3', label: 'H1-H3' }, { id: 'h3-h3', label: 'H3-H3' }, ]} ], htmlTemplates: { 'ohmic': (s) => { let body = ''; for (let i = 0; i < 6; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r1.label}</td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r2.label}</td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } return `<thead><tr><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; } }, testData: { header: { cliente: 'OCEANPACT', local: 'MAC LAREN', data: '2025-01-04', equipamento: 'TRANSFORMADOR-BOW THRUSTER', numeroSerie: '155544KW', fabricante: 'WEG', tensao: 'Primário 440V / Secundário 440V', potencia: '50KVA', tempAmbiente: 33.7, tempTrafo: 40.7, umidadeRelativa: 50 }, sections: { 'MEDIÇÕES REALIZADAS': { 'h1h2-low-gnd': [22000, 22000, 22000], 'x1x2-high-gnd': [22000, 22000, 22000], 'h1h2-x1x2-gnd': [22000, 22000, 22000], 'h2h3-low-gnd': [22000, 22000, 22000], 'x2x3-high-gnd': [22000, 22000, 22000], 'h2h3-x2x3-gnd': [22000, 22000, 22000], 'h1h3-low-gnd': [22000, 22000, 22000], 'x1x3-high-gnd': [22000, 22000, 22000], 'h1h3-x1x3-gnd': [22000, 22000, 22000] }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)': { 'x1-x2': 0.35, 'x1-x1': 0.32, 'x2-x3': 0.34, 'x2-x2': 0.33, 'x1-x3': 0.36, 'x3-x3': 0.31, 'h1-h2': 0.45, 'h1-h1': 0.42, 'h2-h3': 0.44, 'h2-h2': 0.43, 'h1-h3': 0.46, 'h3-h3': 0.41 } } } };
     const generatorConfig = { prefix: 'gen', appName: 'Gerador', containerId: 'gen-app-container', containerIds: [ { id: 'gen-main-sections-container', type: 'main' }, { id: 'gen-pmg-section-container', type: 'pmg' }, { id: 'gen-extra-sections-container', type: 'extra' }, ], usageKey: 'unitechGenAppUsageCount_v2', usageLimit: 20, tempInputId: 'tempEnrolamento', insulation: { targetTemp: 40 }, ohmic: { targetTemp: 25 }, layout: 'table', specialHandlers: { init: (container, recalc, getEl, clearForm, collectSheetData) => { reportSheetHandlers.init(container, recalc, getEl, clearForm, collectSheetData, generatorConfig); const pmgBtn = getEl('togglePmg'); const pmgSection = getEl('pmg-section-container'); const pmgOhmicRow = document.getElementById('gen-pmg-ohmic-row'); if(pmgBtn) { pmgBtn.addEventListener('click', () => { const isHidden = pmgSection.classList.contains('hidden'); pmgSection.classList.toggle('hidden'); if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden'); pmgBtn.textContent = isHidden ? 'Desativar Seção PMG' : 'Ativar Seção PMG'; pmgBtn.classList.toggle('bg-gray-200'); pmgBtn.classList.toggle('bg-yellow-400'); if (!isHidden) { pmgSection.querySelectorAll('input').forEach(i => i.value = ''); if (pmgOhmicRow) pmgOhmicRow.querySelectorAll('input').forEach(i => i.value = ''); recalc(); } }); } const diodesBtn = getEl('toggleDiodes'); const diodesHeader = document.getElementById('gen-diodes-d7d12-header'); const diodesBody = document.getElementById('gen-diodes-d7d12-body'); if (diodesBtn && diodesHeader && diodesBody) { diodesBtn.addEventListener('click', () => { const isHidden = diodesHeader.classList.contains('hidden'); diodesHeader.classList.toggle('hidden'); diodesBody.classList.toggle('hidden'); diodesBtn.textContent = isHidden ? 'Desativar Diodos D7-D12' : 'Ativar Diodos D7-D12'; diodesBtn.classList.toggle('bg-gray-200'); diodesBtn.classList.toggle('bg-red-400'); if (!isHidden) { diodesBody.querySelectorAll('input').forEach(i => { i.value = i.type === 'text' ? 'OL' : ''; }); recalc(); } }); } }, onClear: (container, getEl) => { const pmgBtn = getEl('togglePmg'); if (pmgBtn && pmgBtn.textContent.includes('Desativar')) { pmgBtn.click(); } const diodesBtn = getEl('toggleDiodes'); if (diodesBtn && diodesBtn.textContent.includes('Desativar')) { diodesBtn.click(); } } }, sections: [ { name: 'ESTATOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [ { id: 'gen-estator-uxmassa', label: 'U x Massa' }, { id: 'gen-estator-vxmassa', label: 'V x Massa' }, { id: 'gen-estator-wxmassa', label: 'W x Massa' }, { id: 'gen-estator-uxv', label: 'U x V' }, { id: 'gen-estator-uxw', label: 'U x W' }, { id: 'gen-estator-wxv', label: 'W x V' }, ]}, { name: 'ROTOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-rotor-principal', label: 'Rotor x Massa' }] }, { name: 'EXCITATRIZ MOTRIZ', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-excitatriz-estator', label: 'Estator x Massa' }, { id: 'gen-excitatriz-rotor', label: 'Rotor x Massa' }] }, { name: 'EXCITAÇÃO AUXILIAR (PMG)', type: 'insulation', containerType: 'pmg', rows: [{ id: 'gen-pmg-estator', label: 'Estator x Massa' }] }, { name: 'RESISTÊNCIA AQUECIMENTO', type: 'heating', containerType: 'extra', rows: [{ id: 'gen-heating-massa', label: 'Massa' }] }, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA', type: 'ohmic', containerType: 'extra', rows: [ { id: 'gen-ohm-uxu', label: 'Fase U x U (V)' }, { id: 'gen-ohm-rotorp', label: 'Rotor Principal' }, { id: 'gen-ohm-vxv', label: 'Fase V x V (W)' }, { id: 'gen-ohm-rotore', label: 'Rotor Excitatriz' }, { id: 'gen-ohm-wxw', label: 'Fase W x W (U)' }, { id: 'gen-ohm-estatore', label: 'Estator Ex. Motriz' }, { id: 'gen-ohm-pmg', label: 'PMG', isPmg: true }, ]}, { name: 'DIODOS ROTATIVOS', type: 'diodes', containerType: 'extra', rows: [{ id: 'gen-diodes-dir' }, { id: 'gen-diodes-rev' }] } ], htmlTemplates: { ...motorConfig.htmlTemplates, 'ohmic': (s) => { let body = ''; for (let i = 0; i < 3; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td class="label-cell">${r1.label}</td><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td class="label-cell"><div class="flex items-center justify-between"><span>${r2.label}</span><select data-row="${r2.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } const pmgRow = s.rows.find(r => r.isPmg); if (pmgRow) { body += `<tr id="gen-pmg-ohmic-row" class="hidden"><td class="label-cell"><div class="flex items-center justify-between"><span>${pmgRow.label}</span><select data-row="${pmgRow.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${pmgRow.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${pmgRow.id}" data-col="corr" class="output-span output-blue"></span></td><td colspan="3"></td></tr>`; } return `<thead><tr><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; }, 'diodes': (s) => { const body1 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+1}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+1}" class="input-yellow"></td>`).join('')}</tr>`; const body2 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+7}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+7}" class="input-yellow"></td>`).join('')}</tr>`; return `<thead><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+1}</th>`).join('')}</tr></thead><tbody>${body1}</tbody><thead id="gen-diodes-d7d12-header" class="hidden"><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+7}</th>`).join('')}</tr></thead><tbody id="gen-diodes-d7d12-body" class="hidden">${body2}</tbody>`; } }, testData: { header: { cliente: 'Estaleiro Naval', local: 'Navio Exemplo', data: new Date().toISOString().split('T')[0], tecnico: 'Téc. Exemplo', equipamento: 'Gerador Principal #1', numeroSerie: 'SN-5678', avr: 'AVR-123', tensao: '440V', potencia: '550 kVA', tempAmbiente: 25, tempEnrolamento: 50, umidadeRelativa: 70 }, sections: { 'ESTATOR PRINCIPAL': { 'gen-estator-uxmassa': [1200, 1500, 2000], 'gen-estator-vxmassa': [1300, 1600, 2100], 'gen-estator-wxmassa': [1250, 1550, 2050], 'gen-estator-uxv': [3000, 4000, 5000], 'gen-estator-uxw': [3100, 4100, 5100], 'gen-estator-wxv': [3050, 4050, 5050] }, 'ROTOR PRINCIPAL': { 'gen-rotor-principal': [500, 600, 800] }, 'EXCITATRIZ MOTRIZ': { 'gen-excitatriz-estator': [800, 900, 1100], 'gen-excitatriz-rotor': [700, 850, 1000] }, 'EXCITAÇÃO AUXILIAR (PMG)': { 'gen-pmg-estator': [1000, 1200, 1500] }, 'RESISTÊNCIA AQUECIMENTO': { 'gen-heating-massa': 1.5 }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA': { 'gen-ohm-uxu': 1.1, 'gen-ohm-rotorp': 2.2, 'gen-ohm-vxv': 1.2, 'gen-ohm-rotore': 3.3, 'gen-ohm-wxw': 1.1, 'gen-ohm-estatore': 4.4, 'gen-ohm-pmg': 5.5 }, 'DIODOS ROTATIVOS': { 'gen-diodes-dir': { d1_d6: [0.432, 0.438, 0.441, 0.429, 0.435, 0.440], d7_d12: [0.425, 0.431, 0.428, 0.433, 0.439, 0.427] } } } } };
 
-    // --- SISTEMA DE NAVEGAÇÃO E TELAS ---
-    const screens = { 
-        menu: document.getElementById('menu-screen'), 
-        cover: document.getElementById('cover-screen'), 
-        index: document.getElementById('index-screen'), 
-        savedReports: document.getElementById('saved-reports-screen'),
-        companyManagement: document.getElementById('company-management-screen'),
-        equipamentos: document.getElementById('equipamentos-screen'),
-        gen: document.getElementById('generator-app-screen'), 
-        motor: document.getElementById('motor-app-screen'), 
-        transformer: document.getElementById('transformer-app-screen'), 
-        adminPanel: document.getElementById('admin-panel-screen'),
-    };
-    const wipModal = document.getElementById('wip-modal');
     
     // --- DECLARAÇÃO DE FUNÇÕES ---
 
-    function showToast(message, type = 'info') {
-        const notificationArea = document.getElementById('notification-area');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        notificationArea.appendChild(toast);
-
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                toast.remove();
-            }, 500);
-        }, 3000);
-    }
-
     async function getCompanies() {
-        if (!currentUserId) return [];
-        const docRef = doc(db, "users", currentUserId, "data", "companies");
+        if (!appState.user.id) return [];
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "users", appState.user.id, "data", "companies");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists() && docSnap.data().list) {
@@ -1045,8 +1013,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveCompanies(companies) {
-        if (!currentUserId) return;
-        const docRef = doc(db, "users", currentUserId, "data", "companies");
+        if (!appState.user.id) return;
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "users", appState.user.id, "data", "companies");
         await setDoc(docRef, { list: companies });
     }
 
@@ -1054,20 +1023,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const companySelect = document.getElementById('company-select');
         const originalValue = companySelect.value;
         companySelect.innerHTML = '';
-        companyList.forEach(company => {
+        appState.company.list.forEach(company => {
             const option = document.createElement('option');
             option.value = company.id;
             option.textContent = company.name;
             companySelect.appendChild(option);
         });
         
-        if (companyList.some(c => c.id === originalValue)) {
+        if (appState.company.list.some(c => c.id === originalValue)) {
             companySelect.value = originalValue;
         }
 
-        const selectedCompany = companyList.find(c => c.id === companySelect.value);
-        currentCompany = selectedCompany || companyList[0];
-        if (currentCompany) {
+        const selectedCompany = appState.company.list.find(c => c.id === companySelect.value);
+        appState.company.selected = selectedCompany || appState.company.list[0];
+        if (appState.company.selected) {
             updateCompanyInfoOnPages();
         }
     }
@@ -1075,11 +1044,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
-        if (companyList.length === 0) {
+        if (appState.company.list.length === 0) {
             listEl.innerHTML = '<p class="text-gray-500">Nenhuma empresa cadastrada.</p>';
             return;
         }
-        companyList.forEach(company => {
+        appState.company.list.forEach(company => {
             const div = document.createElement('div');
             div.className = 'flex items-center justify-between p-3 rounded-lg border';
             div.innerHTML = `
@@ -1114,125 +1083,111 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('company-rep-logo2-preview').src = '';
         document.getElementById('company-rep-logo2-preview').classList.add('hidden');
         
-        temporaryCompanyLogo = null;
-        temporaryRepLogo1 = null;
-        temporaryRepLogo2 = null;
+        appState.ui.temporaryCompanyLogo = null;
+        appState.ui.temporaryRepLogo1 = null;
+        appState.ui.temporaryRepLogo2 = null;
     }
     
     async function getSavedFullReports() {
-        if (!currentUserId) return [];
-        const reportsCol = collection(db, "users", currentUserId, "reports");
+        if (!appState.user.id) return [];
+        const db = firebaseService.getDb();
+        const reportsCol = collection(db, "users", appState.user.id, "reports");
         const reportSnapshot = await getDocs(reportsCol);
         const reportList = reportSnapshot.docs.map(doc => ({...doc.data(), firestoreId: doc.id}));
         return reportList;
     }
 
     function resetCurrentReport() {
-        localReportsCache = [];
+        appState.currentReport.cache = [];
+        appState.currentReport.editingIndex = null;
         document.getElementById('cover-cliente').value = '';
         document.getElementById('cover-local').value = '';
         initializeCoverApp(); 
         updateIndexPage(); 
     }
 
-    async function saveFullReport() {
-        if (!currentUserId) {
-            showToast('Você precisa estar logado para salvar.', 'error');
-            return;
-        }
+    async function saveFullReport(event) {
+        const button = event.target;
+        if (!appState.user.id) { uiFeedback.showToast('Você precisa estar logado para salvar.', 'error'); return; }
 
         const cliente = document.getElementById('cover-cliente').value.trim();
         const local = document.getElementById('cover-local').value.trim();
 
-        if (!cliente || !local) {
-            showToast('Preencha "Cliente" e "Embarcação" na capa antes de salvar.', 'error');
-            showScreen(screens.cover);
-            return;
-        }
-
-        if (localReportsCache.length === 0) {
-            showToast('Não há nenhuma planilha para salvar no relatório.', 'error');
-            return;
-        }
+        if (!cliente || !local) { uiFeedback.showToast('Preencha "Cliente" e "Embarcação" na capa antes de salvar.', 'error'); navigation.to('cover'); return; }
+        if (appState.currentReport.cache.length === 0) { uiFeedback.showToast('Não há nenhuma planilha para salvar no relatório.', 'error'); return; }
+        
+        uiFeedback.toggleButtonLoading(button, true);
         
         const fullReport = {
             cliente: cliente,
             local: local,
-            imageDataUrl: coverImageDataUrl,
+            imageDataUrl: appState.currentReport.coverImage,
             companyKey: document.getElementById('company-select').value,
-            reportSheets: JSON.parse(JSON.stringify(localReportsCache)),
+            reportSheets: JSON.parse(JSON.stringify(appState.currentReport.cache)),
             savedAt: new Date().toISOString()
         };
 
         try {
-            const reportsCol = collection(db, "users", currentUserId, "reports");
+            const db = firebaseService.getDb();
+            const reportsCol = collection(db, "users", appState.user.id, "reports");
             await addDoc(reportsCol, fullReport);
-            showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
+            uiFeedback.showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
             resetCurrentReport();
-            showScreen(screens.menu);
+            navigation.to('menu');
         } catch (error) {
             console.error("Erro ao salvar relatório: ", error);
-            showToast(`Erro ao salvar: ${error.message}`, 'error');
+            uiFeedback.showToast(`Erro ao salvar: ${error.message}`, 'error');
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
         }
     }
 
     async function loadFullReport(reportId) {
         const savedReports = await getSavedFullReports();
         const reportToLoad = savedReports.find(r => r.firestoreId === reportId);
-
-        if (!reportToLoad) {
-            showToast("Erro: Relatório não encontrado.", 'error');
-            return;
-        }
+        if (!reportToLoad) { uiFeedback.showToast("Erro: Relatório não encontrado.", 'error'); return; }
 
         resetCurrentReport();
-
         document.getElementById('cover-cliente').value = reportToLoad.cliente;
         document.getElementById('cover-local').value = reportToLoad.local;
-        
-        coverImageDataUrl = reportToLoad.imageDataUrl;
-        document.getElementById('cover-preview-image').src = coverImageDataUrl;
-
+        appState.currentReport.coverImage = reportToLoad.imageDataUrl;
+        document.getElementById('cover-preview-image').src = appState.currentReport.coverImage;
         document.getElementById('company-select').value = reportToLoad.companyKey || 'unitech';
         document.getElementById('company-select').dispatchEvent(new Event('change'));
-
-        localReportsCache = reportToLoad.reportSheets;
-
+        appState.currentReport.cache = reportToLoad.reportSheets;
         initializeCoverApp();
         updateIndexPage();
-
-        showToast(`Relatório para "${reportToLoad.cliente}" carregado!`, 'info');
-        showScreen(screens.menu);
+        uiFeedback.showToast(`Relatório para "${reportToLoad.cliente}" carregado!`, 'info');
+        navigation.to('menu');
     }
     
     async function deleteSavedFullReport(reportId) {
-        if (!currentUserId) return;
+        if (!appState.user.id) return;
         try {
-            await deleteDoc(doc(db, "users", currentUserId, "reports", reportId));
-            showToast('Relatório apagado.', 'success');
+            const db = firebaseService.getDb();
+            await deleteDoc(doc(db, "users", appState.user.id, "reports", reportId));
+            uiFeedback.showToast('Relatório apagado.', 'success');
             await showSavedReportsScreen();
         } catch (error) {
             console.error("Erro ao apagar relatório: ", error);
-            showToast(`Erro ao apagar: ${error.message}`, 'error');
+            uiFeedback.showToast(`Erro ao apagar: ${error.message}`, 'error');
         }
     }
 
     function updateIndexPage() {
         const indexList = document.getElementById('index-content-list');
         indexList.innerHTML = ''; 
-
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
-        
         updateCompanyInfoOnPages();
 
-        if (!localReportsCache || localReportsCache.length === 0) {
+        if (!appState.currentReport.cache || appState.currentReport.cache.length === 0) {
             indexList.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma planilha de equipamento foi adicionada a este relatório ainda.</p>';
             return;
         }
 
         let html = '<h2 class="text-xl font-bold mb-4">Equipamentos Analisados:</h2><ul class="list-none space-y-2">';
-        localReportsCache.forEach((report, index) => {
+        appState.currentReport.cache.forEach((report, index) => {
              html += `
                 <li class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100">
                     <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
@@ -1261,24 +1216,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `).join('');
         }
-        showScreen(screens.savedReports);
+        navigation.to('savedReports');
     }
 
     function editSheetFromIndex(index) {
-        const sheetData = localReportsCache[index];
-        if (!sheetData) {
-            console.error("Planilha não encontrada no índice:", index);
-            return;
-        }
+        const sheetData = appState.currentReport.cache[index];
+        if (!sheetData) { console.error("Planilha não encontrada no índice:", index); return; }
         const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
         const config = configMap[sheetData.type];
-        if (!config) {
-            console.error("Configuração não encontrada para o tipo de planilha:", sheetData.type);
-            return;
-        }
-        currentlyEditingIndex = index;
+        if (!config) { console.error("Configuração não encontrada para o tipo de planilha:", sheetData.type); return; }
+        
+        appState.currentReport.editingIndex = index;
         const container = document.getElementById(config.containerId);
-        showScreen(screens[config.prefix]);
+        navigation.to(config.prefix);
         populateSheetFromData(container, sheetData, config);
         const addBtn = document.getElementById(`${config.prefix}-add-sheet-btn`);
         if (addBtn) {
@@ -1287,49 +1237,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    const showScreen = (screenElement, updateHistory = true) => {
-        const screenName = Object.keys(screens).find(key => screens[key] === screenElement);
-        
-        if (!screenName && screenElement) return;
-
-        Object.values(screens).forEach(screen => { 
-            if (screen && screen.id !== 'main-app-wrapper' && screen.id !== 'auth-screen') {
-                screen.classList.add('hidden');
-            }
-        }); 
-        if (screenElement) screenElement.classList.remove('hidden');
-
-        if (updateHistory && screenName && history.state?.screen !== screenName) {
-            history.pushState({ screen: screenName }, '', `#${screenName}`);
-        }
-    };
-    
     function createPlaceholderDataUrl(width, height, text) {
         const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#E2E8F0';
-        ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = '#475569';
-        ctx.font = 'bold 20px Inter';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#E2E8F0'; ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#475569'; ctx.font = 'bold 20px Inter';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(text, width / 2, height / 2);
         return canvas.toDataURL();
     }
 
     function initializeCoverApp() { 
-        const inputs = { 
-            cliente: document.getElementById('cover-cliente'), 
-            local: document.getElementById('cover-local'), 
-        }; 
+        const inputs = { cliente: document.getElementById('cover-cliente'), local: document.getElementById('cover-local') }; 
         const imageUpload = document.getElementById('cover-image-upload'); 
-        const previews = { 
-            cliente: document.getElementById('cover-preview-cliente'), 
-            local: document.getElementById('cover-preview-local'), 
-            image: document.getElementById('cover-preview-image'), 
-        }; 
+        const previews = { cliente: document.getElementById('cover-preview-cliente'), local: document.getElementById('cover-preview-local'), image: document.getElementById('cover-preview-image') }; 
+        
         function updatePreviewText() { 
             previews.cliente.textContent = inputs.cliente.value.toUpperCase() || 'CLIENTE'; 
             previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO'; 
@@ -1338,65 +1261,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (!file) return;
-
-            if (!file.type.startsWith('image/')) {
-                showToast('Por favor, selecione um arquivo de imagem.', 'error');
-                return;
-            }
-
+            if (!file || !file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 600;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
+                    const MAX_WIDTH = 800, MAX_HEIGHT = 600;
+                    let {width, height} = img;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-                    if (dataUrl.length > 1048487) {
-                       showToast('A imagem é muito grande mesmo após a compressão. Tente uma imagem menor.', 'error');
-                       return;
-                    }
-
-                    coverImageDataUrl = dataUrl;
-                    previews.image.src = coverImageDataUrl;
-                    showToast('Imagem carregada e otimizada!', 'success');
-                };
-                img.onerror = () => {
-                    showToast('Não foi possível carregar o arquivo de imagem.', 'error');
+                    if (dataUrl.length > 1048487) { uiFeedback.showToast('Imagem muito grande. Tente uma menor.', 'error'); return; }
+                    appState.currentReport.coverImage = dataUrl;
+                    previews.image.src = appState.currentReport.coverImage;
+                    uiFeedback.showToast('Imagem carregada e otimizada!', 'success');
                 };
                 img.src = e.target.result;
-            };
-            reader.onerror = () => {
-                showToast('Erro ao ler o arquivo.', 'error');
             };
             reader.readAsDataURL(file);
         });
         
         if (!previews.image.src) {
-            coverImageDataUrl = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
-            previews.image.src = coverImageDataUrl;
+            appState.currentReport.coverImage = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
+            previews.image.src = appState.currentReport.coverImage;
         }
-
         updatePreviewText(); 
     }
 
@@ -1422,15 +1314,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(inputs).some(input => {
             const id = input.id || '';
             const value = input.value.trim();
-            // Ignora campos de cabeçalho pré-preenchidos e campos com valor padrão "OL"
-            if (id.includes('-cliente') || id.includes('-local') || value === 'OL') {
-                return false;
-            }
+            if (id.includes('-cliente') || id.includes('-local') || value === 'OL') return false;
             return value !== '';
         });
     }
 
-    // --- FUNÇÃO PARA EXPORTAR PDF (ATUALIZADA) ---
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         loader.classList.remove('hidden');
@@ -1438,245 +1326,174 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'p',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            // --- 1. GERAR CAPA (Usando jsPDF diretamente para maior qualidade) ---
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const pageHeight = doc.internal.pageSize.getHeight();
             const pageWidth = doc.internal.pageSize.getWidth();
             const margin = 20;
 
-            // Cabeçalho da Empresa com Logo
-            if (currentCompany) {
-                if (currentCompany.logoDataUrl) {
+            const company = appState.company.selected;
+            if (company) {
+                if (company.logoDataUrl) {
                     try {
-                        const img = new Image();
-                        img.src = currentCompany.logoDataUrl;
-                        await img.decode();
-                        const imgWidth = 35; 
-                        const imgHeight = (img.height * imgWidth) / img.width;
-                        doc.addImage(currentCompany.logoDataUrl, 'PNG', margin, margin - 10, imgWidth, imgHeight);
+                        const img = new Image(); img.src = company.logoDataUrl; await img.decode();
+                        const imgWidth = 35; const imgHeight = (img.height * imgWidth) / img.width;
+                        doc.addImage(company.logoDataUrl, 'PNG', margin, margin - 10, imgWidth, imgHeight);
                     } catch (e) { console.error("Erro ao adicionar logo da empresa:", e); }
                 }
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'bold');
-                doc.text(currentCompany.name || '', pageWidth - margin, margin, { align: 'right' });
+                doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+                doc.text(company.name || '', pageWidth - margin, margin, { align: 'right' });
                 doc.setFont('helvetica', 'normal');
-                doc.text(currentCompany.address || '', pageWidth - margin, margin + 4, { align: 'right' });
-                doc.text(currentCompany.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
-                doc.text(currentCompany.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
-                doc.setLineWidth(0.5);
-                doc.line(margin, margin + 25, pageWidth - margin, margin + 25); // Linha superior ajustada
+                doc.text(company.address || '', pageWidth - margin, margin + 4, { align: 'right' });
+                doc.text(company.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
+                doc.text(company.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
+                doc.setLineWidth(0.5); doc.line(margin, margin + 25, pageWidth - margin, margin + 25);
             }
 
-            // Títulos Centrais
             const clienteText = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
             const localText = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
-            
-            doc.setFontSize(26);
-            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(26); doc.setFont('helvetica', 'bold');
             doc.text(clienteText, pageWidth / 2, 95, { align: 'center' });
             doc.text(localText, pageWidth / 2, 107, { align: 'center' });
-            
             const titleWidth = Math.max(doc.getTextWidth(clienteText), doc.getTextWidth(localText));
-            const lineX1 = (pageWidth - titleWidth) / 2;
-            const lineX2 = (pageWidth + titleWidth) / 2;
-            doc.setLineWidth(0.5);
-            doc.line(lineX1, 110, lineX2, 110);
-
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'normal');
-            const subTitle = 'Relatório técnico de medição de resistência de isolamento elétrico (Megagem)';
-            doc.text(subTitle, pageWidth / 2, 125, { align: 'center' });
+            doc.setLineWidth(0.5); doc.line((pageWidth - titleWidth) / 2, 110, (pageWidth + titleWidth) / 2, 110);
+            doc.setFontSize(14); doc.setFont('helvetica', 'normal');
+            doc.text('Relatório técnico de medição de resistência de isolamento elétrico (Megagem)', pageWidth / 2, 125, { align: 'center' });
             
-            // Imagem da Embarcação
-            if (coverImageDataUrl && !coverImageDataUrl.startsWith('data:image/svg+xml')) { // Não tenta adicionar o placeholder
+            if (appState.currentReport.coverImage && !appState.currentReport.coverImage.startsWith('data:image/svg+xml')) {
                 try {
-                    const imgWidth = 120;
-                    const imgHeight = 90;
-                    const imgX = (pageWidth - imgWidth) / 2;
-                    const imgY = 135;
-                    doc.addImage(coverImageDataUrl, 'PNG', imgX, imgY, imgWidth, imgHeight);
-                } catch (e) {
-                    console.error("Erro ao adicionar imagem da capa:", e);
-                    doc.setDrawColor(150);
-                    doc.rect((pageWidth - 120) / 2, 135, 120, 90);
-                    doc.text('Imagem indisponível', pageWidth / 2, 180, { align: 'center' });
-                }
+                    doc.addImage(appState.currentReport.coverImage, 'PNG', (pageWidth - 120) / 2, 135, 120, 90);
+                } catch (e) { console.error("Erro ao adicionar imagem da capa:", e); }
             } else {
-                 doc.setDrawColor(150);
-                 doc.rect((pageWidth - 120) / 2, 135, 120, 90);
+                 doc.setDrawColor(150); doc.rect((pageWidth - 120) / 2, 135, 120, 90);
                  doc.text('Imagem não carregada', pageWidth / 2, 180, { align: 'center' });
             }
 
-            // Rodapé
-            const footerText = 'Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4';
-            doc.setFontSize(8);
-            doc.text(footerText, pageWidth / 2, pageHeight - 15, { align: 'center' });
+            doc.setFontSize(8); doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - 15, { align: 'center' });
             
-            // Logos de Representantes
-            const repLogos = [currentCompany.repLogo1DataUrl, currentCompany.repLogo2DataUrl].filter(Boolean);
+            const repLogos = [company?.repLogo1DataUrl, company?.repLogo2DataUrl].filter(Boolean);
             if (repLogos.length > 0) {
-                const maxImgHeight = 12;
-                const logoWidths = [];
-                for(const logoUrl of repLogos) {
-                    const img = new Image();
-                    img.src = logoUrl;
-                    await img.decode();
-                    logoWidths.push((img.width * maxImgHeight) / img.height);
-                }
-
-                const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0);
-                const spacing = 15;
+                const maxImgHeight = 12; const logoWidths = [];
+                for(const logoUrl of repLogos) { const img = new Image(); img.src = logoUrl; await img.decode(); logoWidths.push((img.width * maxImgHeight) / img.height); }
+                const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0); const spacing = 15;
                 let startX = (pageWidth - totalLogoWidth - (spacing * (repLogos.length - 1))) / 2;
-                
                 for (let i = 0; i < repLogos.length; i++) {
-                    const logoUrl = repLogos[i];
-                    const imgWidth = logoWidths[i];
-                    try {
-                        doc.addImage(logoUrl, 'PNG', startX, pageHeight - 35, imgWidth, maxImgHeight);
-                        startX += imgWidth + spacing;
-                    } catch(e) { console.error("Erro ao adicionar logo de representante", e); }
+                    try { doc.addImage(repLogos[i], 'PNG', startX, pageHeight - 35, logoWidths[i], maxImgHeight); startX += logoWidths[i] + spacing; } 
+                    catch(e) { console.error("Erro ao adicionar logo de representante", e); }
                 }
             }
 
-
-            // --- 2. GERAR ÍNDICE (Usando html2canvas) ---
-            if (localReportsCache && localReportsCache.length > 0) {
+            if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
                 const indexPage = document.getElementById('index-page');
                 const canvasIndex = await html2canvas(indexPage, { scale: 2 });
-                const imgDataIndex = canvasIndex.toDataURL('image/png');
-                doc.addImage(imgDataIndex, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+                doc.addImage(canvasIndex.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             }
 
-            // --- 3. GERAR PLANILHAS (Usando html2canvas) ---
-            for (const reportSheet of localReportsCache) {
+            for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 const sheetContainer = document.getElementById(config.containerId);
                 const appContainer = document.getElementById(`${config.prefix}-app-container`);
                 
-                const originalScreen = document.querySelector('[id$="-screen"]:not(.hidden)');
-                
-                Object.values(screens).forEach(s => {
-                    if (s && s.id.includes('-app-screen')) s.classList.add('hidden');
-                });
-
-                const screenToShow = screens[config.prefix]; 
-                if (!screenToShow) { 
-                    console.error(`Could not find screen element for prefix: ${config.prefix}`);
-                    continue; 
-                }
-                screenToShow.classList.remove('hidden');
+                navigation.to(config.prefix, false); // Muda de tela sem afetar o histórico
                 populateSheetFromData(sheetContainer, reportSheet, config);
                 
-                // Oculta os botões antes de gerar o PDF
                 const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
                 elementsToHide.forEach(el => el.style.display = 'none');
-                
                 await new Promise(resolve => setTimeout(resolve, 100));
-
                 const canvasSheet = await html2canvas(appContainer, { scale: 2 });
-                const imgDataSheet = canvasSheet.toDataURL('image/png');
-                doc.addImage(imgDataSheet, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-                
-                // Mostra os botões novamente
+                doc.addImage(canvasSheet.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
                 elementsToHide.forEach(el => el.style.display = 'flex');
-                
-                screenToShow.classList.add('hidden');
-                if(originalScreen) originalScreen.classList.remove('hidden');
             }
 
             doc.save(`Relatorio_${clienteText.replace(/ /g,"_")}.pdf`);
 
         } catch (error) {
             console.error("Erro ao gerar PDF:", error);
-            showToast('Ocorreu um erro ao gerar o PDF.', 'error');
+            uiFeedback.showToast('Ocorreu um erro ao gerar o PDF.', 'error');
         } finally {
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            showScreen(screens.index, false); // Garante que a tela de índice seja reexibida
+            navigation.to('index', false); // Garante que a tela de índice seja reexibida
         }
     }
     
     function updateCompanyInfoOnPages() {
-        if (!currentCompany) return;
+        const company = appState.company.selected;
+        if (!company) return;
 
-        const logoUrl = currentCompany.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
-        const repLogo1Url = currentCompany.repLogo1DataUrl;
-        const repLogo2Url = currentCompany.repLogo2DataUrl;
+        const logoUrl = company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
+        const repLogo1Url = company.repLogo1DataUrl;
+        const repLogo2Url = company.repLogo2DataUrl;
 
-        // Cover Preview
-        document.getElementById('cover-preview-company-logo').src = logoUrl;
-        document.getElementById('cover-preview-company-name').textContent = currentCompany.name || '';
-        document.getElementById('cover-preview-company-address').textContent = currentCompany.address || '';
-        document.getElementById('cover-preview-company-phones').textContent = currentCompany.phones || '';
-        document.getElementById('cover-preview-company-phone2').textContent = currentCompany.phone2 || '';
-        document.getElementById('cover-preview-rep-logo1').src = repLogo1Url || '';
-        document.getElementById('cover-preview-rep-logo1').style.display = repLogo1Url ? 'block' : 'none';
-        document.getElementById('cover-preview-rep-logo2').src = repLogo2Url || '';
-        document.getElementById('cover-preview-rep-logo2').style.display = repLogo2Url ? 'block' : 'none';
+        const setContent = (id, content) => { const el = document.getElementById(id); if (el) el.textContent = content || ''; };
+        const setSrc = (id, src) => { const el = document.getElementById(id); if (el) { el.src = src || ''; if (id.includes('rep-logo')) el.style.display = src ? 'block' : 'none'; } };
 
-        // Index Preview
-        document.getElementById('index-company-logo').src = logoUrl;
-        document.getElementById('index-company-name').textContent = currentCompany.name || '';
-        document.getElementById('index-company-address').textContent = currentCompany.address || '';
-        document.getElementById('index-company-phones').textContent = currentCompany.phones || '';
-        document.getElementById('index-company-phone2').textContent = currentCompany.phone2 || '';
-        document.getElementById('index-rep-logo1').src = repLogo1Url || '';
-        document.getElementById('index-rep-logo1').style.display = repLogo1Url ? 'block' : 'none';
-        document.getElementById('index-rep-logo2').src = repLogo2Url || '';
-        document.getElementById('index-rep-logo2').style.display = repLogo2Url ? 'block' : 'none';
+        setSrc('cover-preview-company-logo', logoUrl);
+        setContent('cover-preview-company-name', company.name);
+        setContent('cover-preview-company-address', company.address);
+        setContent('cover-preview-company-phones', company.phones);
+        setContent('cover-preview-company-phone2', company.phone2);
+        setSrc('cover-preview-rep-logo1', repLogo1Url);
+        setSrc('cover-preview-rep-logo2', repLogo2Url);
+
+        setSrc('index-company-logo', logoUrl);
+        setContent('index-company-name', company.name);
+        setContent('index-company-address', company.address);
+        setContent('index-company-phones', company.phones);
+        setContent('index-company-phone2', company.phone2);
+        setSrc('index-rep-logo1', repLogo1Url);
+        setSrc('index-rep-logo2', repLogo2Url);
     }
 
     // --- INICIALIZAÇÃO E EVENT LISTENERS ---
     
     document.getElementById('company-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
         const companyId = document.getElementById('company-id').value;
         const companyName = document.getElementById('company-name').value;
-        
-        if (!companyName.trim()) {
-            showToast('O nome da empresa é obrigatório.', 'error');
-            return;
-        }
+        if (!companyName.trim()) { uiFeedback.showToast('O nome da empresa é obrigatório.', 'error'); return; }
+
+        uiFeedback.toggleButtonLoading(button, true);
 
         const newCompanyData = {
             name: companyName,
             address: document.getElementById('company-address').value,
             phones: document.getElementById('company-phones').value,
             phone2: document.getElementById('company-phone2').value,
-            logoDataUrl: temporaryCompanyLogo,
-            repLogo1DataUrl: temporaryRepLogo1,
-            repLogo2DataUrl: temporaryRepLogo2
+            logoDataUrl: appState.ui.temporaryCompanyLogo,
+            repLogo1DataUrl: appState.ui.temporaryRepLogo1,
+            repLogo2DataUrl: appState.ui.temporaryRepLogo2
         };
 
-        if (companyId) {
-            const companyIndex = companyList.findIndex(c => c.id === companyId);
-            if (companyIndex > -1) {
-                // Mantém as logos antigas se nenhuma nova for carregada
-                if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = companyList[companyIndex].logoDataUrl;
-                if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = companyList[companyIndex].repLogo1DataUrl;
-                if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = companyList[companyIndex].repLogo2DataUrl;
-
-                companyList[companyIndex] = { ...companyList[companyIndex], ...newCompanyData };
-                showToast('Empresa atualizada com sucesso!', 'success');
+        try {
+            if (companyId) {
+                const companyIndex = appState.company.list.findIndex(c => c.id === companyId);
+                if (companyIndex > -1) {
+                    const oldCompany = appState.company.list[companyIndex];
+                    if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = oldCompany.logoDataUrl;
+                    if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = oldCompany.repLogo1DataUrl;
+                    if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = oldCompany.repLogo2DataUrl;
+                    appState.company.list[companyIndex] = { ...oldCompany, ...newCompanyData };
+                    uiFeedback.showToast('Empresa atualizada!', 'success');
+                }
+            } else {
+                newCompanyData.id = Date.now().toString();
+                appState.company.list.push(newCompanyData);
+                uiFeedback.showToast('Empresa adicionada!', 'success');
             }
-        } else {
-            newCompanyData.id = Date.now().toString();
-            companyList.push(newCompanyData);
-            showToast('Empresa adicionada com sucesso!', 'success');
-        }
 
-        await saveCompanies(companyList);
-        renderCompanyList();
-        populateCompanyDropdown();
-        resetCompanyForm();
+            await saveCompanies(appState.company.list);
+            renderCompanyList();
+            populateCompanyDropdown();
+            resetCompanyForm();
+        } catch (error) {
+            uiFeedback.showToast('Erro ao salvar empresa.', 'error');
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
+        }
     });
 
     document.getElementById('company-list').addEventListener('click', async (e) => {
@@ -1684,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteId = e.target.dataset.deleteId;
 
         if (editId) {
-            const companyToEdit = companyList.find(c => c.id === editId);
+            const companyToEdit = appState.company.list.find(c => c.id === editId);
             if (companyToEdit) {
                 document.getElementById('company-id').value = companyToEdit.id;
                 document.getElementById('company-name').value = companyToEdit.name;
@@ -1692,32 +1509,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-phones').value = companyToEdit.phones || '';
                 document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
                 
-                const logoPreview = document.getElementById('company-logo-preview');
-                if (companyToEdit.logoDataUrl) {
-                    logoPreview.src = companyToEdit.logoDataUrl;
-                    logoPreview.classList.remove('hidden');
-                } else {
-                    logoPreview.src = '';
-                    logoPreview.classList.add('hidden');
-                }
-
-                const repLogo1Preview = document.getElementById('company-rep-logo1-preview');
-                 if (companyToEdit.repLogo1DataUrl) {
-                    repLogo1Preview.src = companyToEdit.repLogo1DataUrl;
-                    repLogo1Preview.classList.remove('hidden');
-                } else {
-                    repLogo1Preview.src = '';
-                    repLogo1Preview.classList.add('hidden');
-                }
-
-                const repLogo2Preview = document.getElementById('company-rep-logo2-preview');
-                 if (companyToEdit.repLogo2DataUrl) {
-                    repLogo2Preview.src = companyToEdit.repLogo2DataUrl;
-                    repLogo2Preview.classList.remove('hidden');
-                } else {
-                    repLogo2Preview.src = '';
-                    repLogo2Preview.classList.add('hidden');
-                }
+                const showPreview = (previewId, url) => {
+                    const el = document.getElementById(previewId);
+                    el.src = url || '';
+                    el.classList.toggle('hidden', !url);
+                };
+                showPreview('company-logo-preview', companyToEdit.logoDataUrl);
+                showPreview('company-rep-logo1-preview', companyToEdit.repLogo1DataUrl);
+                showPreview('company-rep-logo2-preview', companyToEdit.repLogo2DataUrl);
                 
                 document.getElementById('company-form-title').textContent = 'Editar Empresa';
                 document.getElementById('company-form-submit-btn').textContent = 'Salvar Alterações';
@@ -1727,52 +1526,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (deleteId) {
             if (confirm('Tem certeza que deseja apagar esta empresa?')) {
-                companyList = companyList.filter(c => c.id !== deleteId);
-                await saveCompanies(companyList);
+                appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
+                await saveCompanies(appState.company.list);
                 renderCompanyList();
                 populateCompanyDropdown();
                 resetCompanyForm(); 
-                showToast('Empresa apagada.', 'info');
+                uiFeedback.showToast('Empresa apagada.', 'info');
             }
         }
     });
 
     document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
     
-    function processLogoUpload(file, previewElement, tempVariableSetter) {
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            showToast('Por favor, selecione um arquivo de imagem (PNG, JPG, etc).', 'error');
-            return;
-        }
-
+    function processLogoUpload(file, previewElement, tempStateSetter) {
+        if (!file || !file.type.startsWith('image/')) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const MAX_WIDTH = 200;
-                const MAX_HEIGHT = 80;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                } else {
-                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                }
-                canvas.width = width;
-                canvas.height = height;
+                const MAX_WIDTH = 200, MAX_HEIGHT = 80;
+                let {width, height} = img;
+                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                canvas.width = width; canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
                 const dataUrl = canvas.toDataURL('image/png');
-
-                if (dataUrl.length > 500000) {
-                   showToast('A imagem é muito grande. Tente uma imagem menor.', 'error');
-                   return;
-                }
-                
-                tempVariableSetter(dataUrl);
+                if (dataUrl.length > 500000) { uiFeedback.showToast('Imagem muito grande.', 'error'); return; }
+                tempStateSetter(dataUrl);
                 previewElement.src = dataUrl;
                 previewElement.classList.remove('hidden');
             };
@@ -1781,13 +1563,13 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     }
 
-    document.getElementById('company-logo-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-logo-preview'), (data) => temporaryCompanyLogo = data));
-    document.getElementById('company-rep-logo1-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo1-preview'), (data) => temporaryRepLogo1 = data));
-    document.getElementById('company-rep-logo2-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo2-preview'), (data) => temporaryRepLogo2 = data));
+    document.getElementById('company-logo-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-logo-preview'), (data) => appState.ui.temporaryCompanyLogo = data));
+    document.getElementById('company-rep-logo1-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo1-preview'), (data) => appState.ui.temporaryRepLogo1 = data));
+    document.getElementById('company-rep-logo2-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo2-preview'), (data) => appState.ui.temporaryRepLogo2 = data));
 
     document.getElementById('company-select').addEventListener('change', (e) => {
         const selectedCompanyId = e.target.value;
-        currentCompany = companyList.find(c => c.id === selectedCompanyId);
+        appState.company.selected = appState.company.list.find(c => c.id === selectedCompanyId);
         updateCompanyInfoOnPages();
     });
 
@@ -1795,50 +1577,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById(`${prefix}-btn`);
         const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
         const config = configMap[prefix];
-
-        if (!btn || !config) {
-            console.error(`Botão ou configuração para '${prefix}' não encontrado.`);
-            return;
-        }
+        if (!btn || !config) return;
 
         btn.addEventListener('click', () => {
             const usageCount = parseInt(localStorage.getItem(config.usageKey) || '0');
-
             if (usageCount >= config.usageLimit) {
-                const usageLimitOverlay = document.getElementById('usage-limit-overlay');
-                usageLimitOverlay.classList.remove('hidden');
-                usageLimitOverlay.classList.add('flex');
+                document.getElementById('usage-limit-overlay').classList.add('flex');
                 return;
             }
-
-            const newUsageCount = usageCount + 1;
-            localStorage.setItem(config.usageKey, newUsageCount.toString());
-
-            const remainingUses = config.usageLimit - newUsageCount;
-            const counterEl = document.getElementById(`${prefix}-usage-counter`);
+            localStorage.setItem(config.usageKey, (usageCount + 1).toString());
+            const counterEl = document.getElementById(`${config.prefix}-usage-counter`);
             if (counterEl) {
-                counterEl.textContent = `Você ainda tem ${remainingUses} usos.`;
-                if (remainingUses <= 5) {
-                    counterEl.classList.remove('text-gray-600', 'bg-gray-100');
-                    counterEl.classList.add('text-red-700', 'bg-red-100');
-                } else {
-                    counterEl.classList.add('text-gray-600', 'bg-gray-100');
-                    counterEl.classList.remove('text-red-700', 'bg-red-100');
-                }
+                const remaining = config.usageLimit - (usageCount + 1);
+                counterEl.textContent = `Você ainda tem ${remaining} usos.`;
+                counterEl.classList.toggle('text-red-700', remaining <= 5);
+                counterEl.classList.toggle('bg-red-100', remaining <= 5);
             }
 
-            currentlyEditingIndex = null; 
+            appState.currentReport.editingIndex = null; 
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
-            if(addBtn) {
-                addBtn.textContent = 'Adicionar ao Relatório';
-                addBtn.disabled = true;
-            }
-            if (currentCompany) {
-                document.getElementById(`${prefix}-company-name-header`).textContent = currentCompany.name;
+            if(addBtn) { addBtn.textContent = 'Adicionar ao Relatório'; addBtn.disabled = true; }
+            if (appState.company.selected) {
+                document.getElementById(`${prefix}-company-name-header`).textContent = appState.company.selected.name;
             }
             document.getElementById(`${prefix}-cliente`).value = document.getElementById('cover-cliente').value;
             document.getElementById(`${prefix}-local`).value = document.getElementById('cover-local').value;
-            showScreen(screens[prefix]);
+            navigation.to(prefix);
         });
     };
     
@@ -1851,82 +1615,44 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSheetScreen('transformer');
     initializeCoverApp();
     
-    window.addEventListener('popstate', (event) => {
-        if (event.state && event.state.screen) {
-            const screenName = event.state.screen;
-            showScreen(screens[screenName], false);
-        } else {
-            showScreen(screens.menu, false);
-        }
+    // --- EVENT LISTENERS DE NAVEGAÇÃO ---
+    document.getElementById('cover-btn').addEventListener('click', () => { updateCompanyInfoOnPages(); navigation.to('cover'); });
+    document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
+    document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
+    document.getElementById('manage-companies-btn').addEventListener('click', () => { renderCompanyList(); navigation.to('companyManagement'); });
+    document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
+    document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
+    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => { 
+        btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu')); 
     });
 
-    document.getElementById('cover-btn').addEventListener('click', () => { 
-        updateCompanyInfoOnPages();
-        showScreen(screens.cover); 
-    });
-    document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); showScreen(screens.index); });
-    document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
+    // --- OUTROS EVENT LISTENERS ---
     document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
     document.getElementById('cover-save-report-btn').addEventListener('click', saveFullReport);
-    document.getElementById('manage-companies-btn').addEventListener('click', () => {
-        renderCompanyList();
-        showScreen(screens.companyManagement);
-    });
-    document.getElementById('equipamentos-btn').addEventListener('click', () => showScreen(screens.equipamentos));
-    document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => showScreen(screens.cover));
-    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => { 
-        btn.addEventListener('click', (e) => {
-            const screenContainer = btn.closest('[id$="-screen"]');
-            if (screenContainer) {
-                const appContainer = screenContainer.querySelector('[id$="-app-container"]');
-                if (appContainer && isFormDirty(appContainer)) {
-                    if (!confirm('Você tem alterações não salvas. Deseja sair mesmo assim?')) {
-                        return; 
-                    }
-                }
-            }
-            showScreen(screens.menu)
-        }); 
-    });
-    document.querySelectorAll('.wip-btn').forEach(btn => btn.addEventListener('click', () => { wipModal.classList.remove('hidden'); wipModal.classList.add('flex'); }));
+    document.querySelectorAll('.wip-btn').forEach(btn => btn.addEventListener('click', () => { wipModal.classList.add('flex'); wipModal.classList.remove('hidden'); }));
     document.getElementById('close-wip-modal').addEventListener('click', () => { wipModal.classList.add('hidden'); wipModal.classList.remove('flex'); });
     
     document.getElementById('saved-reports-list').addEventListener('click', async (e) => {
         const loadButton = e.target.closest('[data-load-id]');
         const deleteButton = e.target.closest('[data-delete-id]');
-
-        if (loadButton) {
-            e.preventDefault();
-            await loadFullReport(loadButton.dataset.loadId);
-        }
-        if (deleteButton) {
-            e.preventDefault();
-            if (confirm('Tem certeza que deseja apagar este relatório permanentemente?')) {
-                await deleteSavedFullReport(deleteButton.dataset.deleteId);
-            }
-        }
+        if (loadButton) { e.preventDefault(); await loadFullReport(loadButton.dataset.loadId); }
+        if (deleteButton) { e.preventDefault(); if (confirm('Tem certeza?')) { await deleteSavedFullReport(deleteButton.dataset.deleteId); } }
     });
 
     document.getElementById('index-content-list').addEventListener('click', (e) => {
         const reportLink = e.target.closest('[data-report-index]');
         const deleteButton = e.target.closest('[data-delete-index]');
-
-        if (reportLink) {
-            e.preventDefault();
-            editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10));
-        }
+        if (reportLink) { e.preventDefault(); editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10)); }
         if (deleteButton) {
             e.preventDefault();
-            if (confirm('Tem certeza que deseja remover esta planilha do relatório atual?')) {
-                const indexToRemove = parseInt(deleteButton.dataset.deleteIndex, 10);
-                localReportsCache.splice(indexToRemove, 1);
-                showToast('Planilha removida do relatório.', 'info');
+            if (confirm('Remover esta planilha do relatório atual?')) {
+                appState.currentReport.cache.splice(parseInt(deleteButton.dataset.deleteIndex, 10), 1);
+                uiFeedback.showToast('Planilha removida.', 'info');
                 updateIndexPage();
             }
         }
     });
     
-    // Event listener para o novo botão de exportação
     document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
 });
 </script>
