@@ -682,12 +682,12 @@
         init: function() {
             // CORREÇÃO: As credenciais fornecidas pelo usuário foram implementadas.
             const firebaseConfig = {
-              apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80", // CHAVE DE API ATUALIZADA AQUI!
-              authDomain: "relatorios-tecnicos-app.firebaseapp.com",
-              projectId: "relatorios-tecnicos-app",
-              storageBucket: "relatorios-tecnicos-app.appspot.com",
-              messagingSenderId: "280958854421",
-              appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+                apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80", // CHAVE DE API ATUALIZADA AQUI!
+                authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+                projectId: "relatorios-tecnicos-app",
+                storageBucket: "relatorios-tecnicos-app.appspot.com",
+                messagingSenderId: "280958854421",
+                appId: "1:280958854421:web:90e4b288f3c57592d9351c"
             };
 
             // Adiciona uma verificação para garantir que as chaves não são placeholders
@@ -1257,6 +1257,27 @@ document.addEventListener('DOMContentLoaded', () => {
         await setDoc(docRef, { list: privateCompanies });
     }
 
+    // ==================================================================================
+    // --- NOVA FUNÇÃO PARA SALVAR EMPRESAS PÚBLICAS ---
+    // ==================================================================================
+    async function savePublicCompanies(companies) {
+        // Apenas administradores podem modificar empresas públicas
+        if (!appState.user.isAdmin) {
+            console.log("Usuário não é admin, não pode salvar empresas públicas.");
+            return;
+        }
+        const publicCompanies = companies.filter(c => c.isPublic);
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "public_data", "companies");
+        try {
+            await setDoc(docRef, { list: publicCompanies });
+            console.log("Empresas públicas salvas com sucesso.");
+        } catch (error) {
+            console.error("Erro ao salvar empresas públicas:", error);
+            uiFeedback.showToast('Falha ao salvar dados públicos.', 'error');
+        }
+    }
+
     function populateCompanyDropdown() {
         const companySelect = document.getElementById('company-select');
         const originalValue = companySelect.value;
@@ -1466,8 +1487,8 @@ document.addEventListener('DOMContentLoaded', () => {
              const li = document.createElement('li');
              li.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-100';
              li.innerHTML = `
-                 <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
-                 <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
+                <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
+                <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
              list.appendChild(li);
         });
     }
@@ -1747,9 +1768,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const companyIndex = appState.company.list.findIndex(c => c.id === companyId);
                 if (companyIndex > -1) {
                     const oldCompany = appState.company.list[companyIndex];
+                    // Mantém os logos antigos se nenhum novo foi carregado
                     if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = oldCompany.logoDataUrl;
                     if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = oldCompany.repLogo1DataUrl;
                     if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = oldCompany.repLogo2DataUrl;
+                    
                     appState.company.list[companyIndex] = { ...oldCompany, ...newCompanyData };
                     uiFeedback.showToast('Empresa atualizada!', 'success');
                 }
@@ -1760,11 +1783,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 uiFeedback.showToast('Empresa adicionada!', 'success');
             }
 
+            // ==================================================================================
+            // --- CORREÇÃO: SALVA AMBAS AS LISTAS (PÚBLICA E PRIVADA) ---
+            // ==================================================================================
+            await savePublicCompanies(appState.company.list);
             await savePrivateCompanies(appState.company.list);
+            
             renderCompanyList();
             populateCompanyDropdown();
             resetCompanyForm();
         } catch (error) {
+            console.error("Erro ao salvar empresa:", error);
             uiFeedback.showToast('Erro ao salvar empresa.', 'error');
         } finally {
             uiFeedback.toggleButtonLoading(button, false);
