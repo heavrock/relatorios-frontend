@@ -235,14 +235,14 @@
                 </div>
 
                 <div class="w-full max-w-4xl flex flex-col gap-6 text-center">
-                      <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg hidden">PAINEL ADMIN</button>
-                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                          <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
-                          <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
-                          <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
-                          <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
-                          <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
-                      </div>
+                    <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg hidden">PAINEL ADMIN</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
+                        <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
+                        <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
+                        <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
+                        <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
+                    </div>
                 </div>
                 <div class="mt-12 text-center">
                     <p id="user-display-name" class="text-indigo-300 mb-2"></p>
@@ -306,13 +306,13 @@
             <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
                 <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
                 <div class="w-full max-w-4xl">
-                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
-                          <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
-                          <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
-                          <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
-                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
-                          <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
-                      </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+                        <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
+                        <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
+                        <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
+                    </div>
                 </div>
                 <div class="mt-8">
                     <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
@@ -409,8 +409,8 @@
                     </main>
                      <footer class="mt-auto pt-4">
                         <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
-                             <img id="index-rep-logo1" src="" class="h-12 w-auto object-contain">
-                             <img id="index-rep-logo2" src="" class="h-12 w-auto object-contain">
+                            <img id="index-rep-logo1" src="" class="h-12 w-auto object-contain">
+                            <img id="index-rep-logo2" src="" class="h-12 w-auto object-contain">
                         </div>
                         <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
                     </footer>
@@ -682,7 +682,7 @@
         init: function() {
             // CORREÇÃO: As credenciais fornecidas pelo usuário foram implementadas.
             const firebaseConfig = {
-              apiKey: "AIzaSyB33aPQE8hRp_tAj1s1LF7seNgTivdhn_A",
+              apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80", // CHAVE DE API ATUALIZADA AQUI!
               authDomain: "relatorios-tecnicos-app.firebaseapp.com",
               projectId: "relatorios-tecnicos-app",
               storageBucket: "relatorios-tecnicos-app.appspot.com",
@@ -701,7 +701,7 @@
             this.db = getFirestore(app);
         },
         getAuth: function() { return this.auth; }, // Não inicializa mais aqui
-        getDb: function() { return this.db; }   // Não inicializa mais aqui
+        getDb: function() { return this.db; }    // Não inicializa mais aqui
     };
     
     // Objeto de Estado Centralizado
@@ -736,18 +736,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
     
     const navigation = {
-        screens: { 
-            menu: document.getElementById('menu-screen'), 
-            cover: document.getElementById('cover-screen'), 
-            index: document.getElementById('index-screen'), 
+        screens: {    
+            menu: document.getElementById('menu-screen'),    
+            cover: document.getElementById('cover-screen'),    
+            index: document.getElementById('index-screen'),    
             savedReports: document.getElementById('saved-reports-screen'),
             companyManagement: document.getElementById('company-management-screen'),
             equipamentos: document.getElementById('equipamentos-screen'),
-            gen: document.getElementById('generator-app-screen'), 
-            motor: document.getElementById('motor-app-screen'), 
-            transformer: document.getElementById('transformer-app-screen'), 
+            gen: document.getElementById('generator-app-screen'),    
+            motor: document.getElementById('motor-app-screen'),    
+            transformer: document.getElementById('transformer-app-screen'),    
             adminPanel: document.getElementById('admin-panel-screen'),
-            profile: document.getElementById('profile-screen'), 
+            profile: document.getElementById('profile-screen'),    
         },
         currentScreen: null,
         to: function(screenName, updateHistory = true) {
@@ -933,13 +933,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const userCredential = await createUserWithEmailAndPassword(firebaseService.getAuth(), email, password);
             const user = userCredential.user;
             const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
-            await setDoc(userDocRef, { 
-                uid: user.uid, 
-                email: user.email, 
-                displayName: name, 
-                role: 'user', 
-                status: 'pending', 
-                createdAt: new Date().toISOString() 
+            await setDoc(userDocRef, {    
+                uid: user.uid,    
+                email: user.email,    
+                displayName: name,    
+                role: 'user',    
+                status: 'pending',    
+                createdAt: new Date().toISOString()    
             });
             showAuthForm('pending');
             await signOut(firebaseService.getAuth());
@@ -1045,8 +1045,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (confirmed) {
                 try {
-                    if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); } 
-                    else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); } 
+                    if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); }    
+                    else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); }    
                     else if (action === 'delete') { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); }
                     if (action) await loadAdminPanelData();
                 } catch (error) {
@@ -1195,10 +1195,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     uiFeedback.showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
                 }
                 
-                clearForm(config, true); 
-                ['equipamento', 'numeroSerie', 'avr', 'tensao', 'potencia', 'tecnico', 'responsavelTecnico', 'rotacao', 'fabricante'].forEach(id => { 
-                    const el = getEl(id); 
-                    if(el) el.value = ''; 
+                clearForm(config, true);    
+                ['equipamento', 'numeroSerie', 'avr', 'tensao', 'potencia', 'tecnico', 'responsavelTecnico', 'rotacao', 'fabricante'].forEach(id => {    
+                    const el = getEl(id);    
+                    if(el) el.value = '';    
                 });
                 
                 addSheetBtn.textContent = 'Adicionar ao Relatório';
@@ -1368,8 +1368,8 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.currentReport.editingIndex = null;
         document.getElementById('cover-cliente').value = '';
         document.getElementById('cover-local').value = '';
-        initializeCoverApp(); 
-        updateIndexPage(); 
+        initializeCoverApp();    
+        updateIndexPage();    
     }
 
     async function saveFullReport(event) {
@@ -1442,7 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateIndexPage() {
         const indexList = document.getElementById('index-content-list');
-        indexList.innerHTML = ''; 
+        indexList.innerHTML = '';    
         document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
         document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
         updateCompanyInfoOnPages();
@@ -1466,8 +1466,8 @@ document.addEventListener('DOMContentLoaded', () => {
              const li = document.createElement('li');
              li.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-100';
              li.innerHTML = `
-                <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
-                <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
+                 <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
+                 <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
              list.appendChild(li);
         });
     }
@@ -1522,16 +1522,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return canvas.toDataURL();
     }
 
-    function initializeCoverApp() { 
-        const inputs = { cliente: document.getElementById('cover-cliente'), local: document.getElementById('cover-local') }; 
-        const imageUpload = document.getElementById('cover-image-upload'); 
-        const previews = { cliente: document.getElementById('cover-preview-cliente'), local: document.getElementById('cover-preview-local'), image: document.getElementById('cover-preview-image') }; 
+    function initializeCoverApp() {    
+        const inputs = { cliente: document.getElementById('cover-cliente'), local: document.getElementById('cover-local') };    
+        const imageUpload = document.getElementById('cover-image-upload');    
+        const previews = { cliente: document.getElementById('cover-preview-cliente'), local: document.getElementById('cover-preview-local'), image: document.getElementById('cover-preview-image') };    
         
-        function updatePreviewText() { 
-            previews.cliente.textContent = inputs.cliente.value.toUpperCase() || 'CLIENTE'; 
-            previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO'; 
-        } 
-        Object.values(inputs).forEach(input => input.addEventListener('input', updatePreviewText)); 
+        function updatePreviewText() {    
+            previews.cliente.textContent = inputs.cliente.value.toUpperCase() || 'CLIENTE';    
+            previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO';    
+        }    
+        Object.values(inputs).forEach(input => input.addEventListener('input', updatePreviewText));    
         
         imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -1544,7 +1544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ctx = canvas.getContext('2d');
                     const MAX_WIDTH = 800, MAX_HEIGHT = 600;
                     let {width, height} = img;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }    
                     else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
@@ -1563,22 +1563,22 @@ document.addEventListener('DOMContentLoaded', () => {
             appState.currentReport.coverImage = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
             previews.image.src = appState.currentReport.coverImage;
         }
-        updatePreviewText(); 
+        updatePreviewText();    
     }
 
-    const createApp = (config) => { 
-        const appContainer = document.getElementById(config.containerId); 
-        if (!appContainer) return; 
-        const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); 
-        const recalculate = (container = appContainer) => { const tempInput = container.querySelector(`#${config.prefix}-${config.tempInputId}`); const temp = parseFloat(tempInput?.value); const hasTemp = !isNaN(temp); const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1; const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1; config.sections.forEach(section => { if (section.type === 'insulation') { section.rows.forEach(row => { const getVal = (col) => container.querySelector(`input[data-row="${row.id}"][data-col="${col}"]`)?.value || ''; const updateSpan = (col, value, bgColor = '#e0f2fe', textColor = 'black') => { const el = container.querySelector(`span[data-row="${row.id}"][data-col="${col}"]`); if (el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const updateDiv = (col, value, bgColor = 'transparent', textColor = 'white') => { const el = container.querySelector(`div[data-row="${row.id}"][data-col="${col}"]`); if(el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const reg30s = parseFloat(getVal('reg30s')); const reg1min = parseFloat(getVal('reg1min')); const reg10min = parseFloat(getVal('reg10min')); const highValueThreshold = 21000; const isHigh30s = reg30s > highValueThreshold; const isHigh1min = reg1min > highValueThreshold; const isHigh10min = reg10min > highValueThreshold; const isAnyHigh = isHigh30s || isHigh1min || isHigh10min; const corr30sNum = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN; const corr1minNum = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN; const corr10minNum = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN; let ia_val, ip_val, ia_result, ip_result; if (isAnyHigh) { ia_val = 1.6; ip_val = 4.0; ia_result = { status: 'Excelente', color: statusColors['Excelente'] }; ip_result = { status: 'Excelente', color: statusColors['Excelente'] }; } else { if (!isNaN(reg1min) && !isNaN(reg30s)) { ia_val = (reg30s === 0) ? 0 : (reg1min / reg30s); } else { ia_val = null; } if (!isNaN(reg10min) && !isNaN(reg1min)) { ip_val = (reg1min === 0) ? 0 : (reg10min / reg1min); } else { ip_val = null; } ia_result = evaluateIA(ia_val); ip_result = evaluateIP(ip_val); } const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white'; const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white'; updateSpan('corr30s', isHigh30s ? '>21000' : (!isNaN(corr30sNum) ? corr30sNum.toFixed(0) : '')); updateSpan('corr1min', isHigh1min ? '>21000' : (!isNaN(corr1minNum) ? corr1minNum.toFixed(0) : '')); updateSpan('corr10min', isHigh10min ? '>21000' : (!isNaN(corr10minNum) ? corr10minNum.toFixed(0) : '')); updateSpan('ia_val', ia_val !== null ? ia_val.toFixed(2) : ''); updateSpan('ip_val', ip_val !== null ? ip_val.toFixed(2) : ''); if (config.layout === 'grid') { updateDiv('ia_status', ia_result.status, ia_result.color, iaTextColor); updateDiv('ip_status', ip_result.status, ip_result.color, ipTextColor); } else { updateSpan('ia_status', ia_result.status, ia_result.color, iaTextColor); updateSpan('ip_status', ip_result.status, ip_result.color, ipTextColor); } }); } else if (section.type === 'ohmic') { section.rows.forEach(row => { const regValue = parseFloat(container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`)?.value || ''); const corrValueNum = !isNaN(regValue) ? (hasTemp ? regValue * KtOhm : regValue) : NaN; const span = container.querySelector(`span[data-row="${row.id}"][data-col="corr"]`); if(span) span.textContent = !isNaN(corrValueNum) ? corrValueNum.toFixed(2) : ''; }); } }); }; 
-        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; }; 
-        createTables(); 
-        appContainer.addEventListener('input', (e) => (e.target.matches('input, select')) && recalculate()); 
-        if (config.specialHandlers && config.specialHandlers.init) { 
-            config.specialHandlers.init(appContainer, recalculate, getEl, (keep) => clearForm(config, keep), collectSheetData, config); 
-        } 
-        recalculate(); 
-        window[`recalculate_${config.prefix}`] = recalculate; 
+    const createApp = (config) => {    
+        const appContainer = document.getElementById(config.containerId);    
+        if (!appContainer) return;    
+        const getEl = (id) => document.getElementById(`${config.prefix}-${id}`);    
+        const recalculate = (container = appContainer) => { const tempInput = container.querySelector(`#${config.prefix}-${config.tempInputId}`); const temp = parseFloat(tempInput?.value); const hasTemp = !isNaN(temp); const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1; const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1; config.sections.forEach(section => { if (section.type === 'insulation') { section.rows.forEach(row => { const getVal = (col) => container.querySelector(`input[data-row="${row.id}"][data-col="${col}"]`)?.value || ''; const updateSpan = (col, value, bgColor = '#e0f2fe', textColor = 'black') => { const el = container.querySelector(`span[data-row="${row.id}"][data-col="${col}"]`); if (el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const updateDiv = (col, value, bgColor = 'transparent', textColor = 'white') => { const el = container.querySelector(`div[data-row="${row.id}"][data-col="${col}"]`); if(el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const reg30s = parseFloat(getVal('reg30s')); const reg1min = parseFloat(getVal('reg1min')); const reg10min = parseFloat(getVal('reg10min')); const highValueThreshold = 21000; const isHigh30s = reg30s > highValueThreshold; const isHigh1min = reg1min > highValueThreshold; const isHigh10min = reg10min > highValueThreshold; const isAnyHigh = isHigh30s || isHigh1min || isHigh10min; const corr30sNum = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN; const corr1minNum = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN; const corr10minNum = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN; let ia_val, ip_val, ia_result, ip_result; if (isAnyHigh) { ia_val = 1.6; ip_val = 4.0; ia_result = { status: 'Excelente', color: statusColors['Excelente'] }; ip_result = { status: 'Excelente', color: statusColors['Excelente'] }; } else { if (!isNaN(reg1min) && !isNaN(reg30s)) { ia_val = (reg30s === 0) ? 0 : (reg1min / reg30s); } else { ia_val = null; } if (!isNaN(reg10min) && !isNaN(reg1min)) { ip_val = (reg1min === 0) ? 0 : (reg10min / reg1min); } else { ip_val = null; } ia_result = evaluateIA(ia_val); ip_result = evaluateIP(ip_val); } const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white'; const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white'; updateSpan('corr30s', isHigh30s ? '>21000' : (!isNaN(corr30sNum) ? corr30sNum.toFixed(0) : '')); updateSpan('corr1min', isHigh1min ? '>21000' : (!isNaN(corr1minNum) ? corr1minNum.toFixed(0) : '')); updateSpan('corr10min', isHigh10min ? '>21000' : (!isNaN(corr10minNum) ? corr10minNum.toFixed(0) : '')); updateSpan('ia_val', ia_val !== null ? ia_val.toFixed(2) : ''); updateSpan('ip_val', ip_val !== null ? ip_val.toFixed(2) : ''); if (config.layout === 'grid') { updateDiv('ia_status', ia_result.status, ia_result.color, iaTextColor); updateDiv('ip_status', ip_result.status, ip_result.color, ipTextColor); } else { updateSpan('ia_status', ia_result.status, ia_result.color, iaTextColor); updateSpan('ip_status', ip_result.status, ip_result.color, ipTextColor); } }); } else if (section.type === 'ohmic') { section.rows.forEach(row => { const regValue = parseFloat(container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`)?.value || ''); const corrValueNum = !isNaN(regValue) ? (hasTemp ? regValue * KtOhm : regValue) : NaN; const span = container.querySelector(`span[data-row="${row.id}"][data-col="corr"]`); if(span) span.textContent = !isNaN(corrValueNum) ? corrValueNum.toFixed(2) : ''; }); } }); };    
+        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; };    
+        createTables();    
+        appContainer.addEventListener('input', (e) => (e.target.matches('input, select')) && recalculate());    
+        if (config.specialHandlers && config.specialHandlers.init) {    
+            config.specialHandlers.init(appContainer, recalculate, getEl, (keep) => clearForm(config, keep), collectSheetData, config);    
+        }    
+        recalculate();    
+        window[`recalculate_${config.prefix}`] = recalculate;    
     };
     
     function populateSheetFromData(container, reportData, config) { Object.entries(reportData.header).forEach(([key, value]) => { const el = container.querySelector(`#${config.prefix}-${key}`); if (el) el.value = value; }); Object.entries(reportData.sections).forEach(([sectionName, sectionData]) => { Object.entries(sectionData).forEach(([rowId, rowData]) => { Object.entries(rowData).forEach(([colId, value]) => { const input = container.querySelector(`input[data-row="${rowId}"][data-col="${colId}"], select[data-row="${rowId}"][data-col="${colId}"]`); if (input) input.value = value; }); }); }); if (config.prefix === 'gen') { const pmgBtn = container.querySelector('#gen-togglePmg'); const pmgSection = container.querySelector('#gen-pmg-section-container'); const hasPmgData = reportData.sections['EXCITAÇÃO AUXILIAR (PMG)']; if (pmgBtn && pmgSection) { const isPmgSectionHidden = pmgSection.classList.contains('hidden'); if (hasPmgData && isPmgSectionHidden) { pmgBtn.click(); } else if (!hasPmgData && !isPmgSectionHidden) { pmgBtn.click(); } } const diodesBtn = container.querySelector('#gen-toggleDiodes'); const diodesHeader = document.getElementById('gen-diodes-d7d12-header'); const diodesBody = document.getElementById('gen-diodes-d7d12-body'); const hasD7Data = reportData.sections['DIODOS ROTATIVOS']?.['gen-diodes-dir']?.d7; if (diodesBtn && diodesHeader && diodesBody) { const isDiodesSectionHidden = diodesHeader.classList.contains('hidden'); if (hasD7Data && isDiodesSectionHidden) { diodesBtn.click(); } else if (!hasD7Data && !isDiodesSectionHidden) { diodesBtn.click(); } } } window[`recalculate_${config.prefix}`](container); }
@@ -1651,7 +1651,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0); const spacing = 15;
                 let startX = (pageWidth - totalLogoWidth - (spacing * (repLogos.length - 1))) / 2;
                 for (let i = 0; i < repLogos.length; i++) {
-                    try { doc.addImage(repLogos[i], 'PNG', startX, pageHeight - 35, logoWidths[i], maxImgHeight); startX += logoWidths[i] + spacing; } 
+                    try { doc.addImage(repLogos[i], 'PNG', startX, pageHeight - 35, logoWidths[i], maxImgHeight); startX += logoWidths[i] + spacing; }    
                     catch(e) { console.error("Erro ao adicionar logo de representante", e); }
                 }
             }
@@ -1806,7 +1806,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await savePrivateCompanies(appState.company.list);
                 renderCompanyList();
                 populateCompanyDropdown();
-                resetCompanyForm(); 
+                resetCompanyForm();    
                 uiFeedback.showToast('Empresa apagada.', 'info');
             }
         }
@@ -1824,7 +1824,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ctx = canvas.getContext('2d');
                 const MAX_WIDTH = 200, MAX_HEIGHT = 80;
                 let {width, height} = img;
-                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }    
                 else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
                 canvas.width = width; canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
@@ -1857,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btn.addEventListener('click', () => {
             // Lógica de contagem de uso removida.
-            appState.currentReport.editingIndex = null; 
+            appState.currentReport.editingIndex = null;    
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
             if(addBtn) { addBtn.textContent = 'Adicionar ao Relatório'; addBtn.disabled = true; }
             if (appState.company.selected) {
@@ -1885,8 +1885,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('manage-companies-btn').addEventListener('click', () => { renderCompanyList(); navigation.to('companyManagement'); });
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
-    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => { 
-        btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu')); 
+    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {    
+        btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu'));    
     });
     document.getElementById('profile-btn').addEventListener('click', () => {
         populateProfileScreen();
@@ -1905,12 +1905,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadButton = e.target.closest('[data-load-id]');
         const deleteButton = e.target.closest('[data-delete-id]');
         if (loadButton) { e.preventDefault(); await loadFullReport(loadButton.dataset.loadId); }
-        if (deleteButton) { 
-            e.preventDefault(); 
+        if (deleteButton) {    
+            e.preventDefault();    
             const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar este relatório?');
-            if (confirmed) { 
-                await deleteSavedFullReport(deleteButton.dataset.deleteId); 
-            } 
+            if (confirmed) {    
+                await deleteSavedFullReport(deleteButton.dataset.deleteId);    
+            }    
         }
     });
 
