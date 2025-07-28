@@ -481,6 +481,13 @@
                                     <img id="company-rep-logo2-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
                                 </div>
                             </div>
+                            <!-- ATUALIZAÇÃO: Checkbox para status público (só para admins) -->
+                            <div id="company-public-toggle-container" class="hidden pt-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="company-is-public" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-gray-900 font-medium">Empresa Pública (visível para todos)</span>
+                                </label>
+                            </div>
                             <div class="flex gap-4">
                                 <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
                                 <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
@@ -1232,9 +1239,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const docSnap = await getDoc(docRef);
 
         if (!docSnap.exists() && appState.user.isAdmin) {
+             // ATUALIZAÇÃO: Adicionada a empresa UNITEDPOWER e placeholders de logos
             const defaultPublicCompanies = [
                 { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true },
-                { id: 'power', name: 'POWER', address: 'Endereço da Power', phones: 'Telefone da Power', phone2: '', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true }
+                { id: 'power', name: 'POWER', address: 'Endereço da Power', phones: 'Telefone da Power', phone2: '', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true },
+                { id: 'unitedpower', name: 'UNITEDPOWER', address: 'Endereço da United Power', phones: 'Telefone da United Power', phone2: '', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true }
             ];
             await setDoc(docRef, { list: defaultPublicCompanies });
             return defaultPublicCompanies;
@@ -1300,7 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
+    // ATUALIZAÇÃO: Função reescrita para incluir o toggle de status público para admins
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
@@ -1329,28 +1338,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isPublic) {
                 const publicSpan = document.createElement('span');
-                publicSpan.className = 'text-xs text-blue-500 ml-2';
+                publicSpan.className = 'text-xs text-blue-500 ml-2 font-normal';
                 publicSpan.textContent = '(Pública)'; // Seguro
                 nameP.appendChild(publicSpan);
             }
 
-            const addressP = document.createElement('p');
-            addressP.className = 'text-xs text-gray-500';
-            addressP.textContent = company.address || 'Sem endereço'; // Seguro
-
-            textContainer.append(nameP, addressP);
+            textContainer.append(nameP);
             infoContainer.append(img, textContainer);
-            div.appendChild(infoContainer);
+            
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'flex items-center gap-4';
+
+            // ATUALIZAÇÃO: Adiciona o toggle de público para admins
+            if (appState.user.isAdmin) {
+                const toggleLabel = document.createElement('label');
+                toggleLabel.className = 'flex items-center cursor-pointer';
+                toggleLabel.title = 'Tornar empresa pública/privada';
+                const toggleInput = document.createElement('input');
+                toggleInput.type = 'checkbox';
+                toggleInput.checked = isPublic;
+                toggleInput.dataset.togglePublicId = company.id;
+                toggleInput.className = 'h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500';
+                toggleLabel.appendChild(toggleInput);
+                btnContainer.appendChild(toggleLabel);
+            }
 
             if (canEdit) {
-                const btnContainer = document.createElement('div');
-                btnContainer.className = 'flex gap-2';
-                btnContainer.innerHTML = `
-                    <button data-edit-id="${company.id}" class="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded">Editar</button>
-                    <button data-delete-id="${company.id}" class="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Apagar</button>`;
-                div.appendChild(btnContainer);
+                const editButton = document.createElement('button');
+                editButton.dataset.editId = company.id;
+                editButton.className = "text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded";
+                editButton.textContent = 'Editar';
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.dataset.deleteId = company.id;
+                deleteButton.className = "text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded";
+                deleteButton.textContent = 'Apagar';
+
+                btnContainer.append(editButton, deleteButton);
             }
             
+            div.append(infoContainer, btnContainer);
             listEl.appendChild(div);
         });
     }
@@ -1362,6 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('company-form-title').textContent = 'Adicionar Nova Empresa';
         document.getElementById('company-form-submit-btn').textContent = 'Adicionar Empresa';
         document.getElementById('company-form-cancel-btn').classList.add('hidden');
+        document.getElementById('company-is-public').checked = false;
         
         document.getElementById('company-logo-preview').src = '';
         document.getElementById('company-logo-preview').classList.add('hidden');
@@ -1760,7 +1788,8 @@ document.addEventListener('DOMContentLoaded', () => {
             phone2: document.getElementById('company-phone2').value,
             logoDataUrl: appState.ui.temporaryCompanyLogo,
             repLogo1DataUrl: appState.ui.temporaryRepLogo1,
-            repLogo2DataUrl: appState.ui.temporaryRepLogo2
+            repLogo2DataUrl: appState.ui.temporaryRepLogo2,
+            isPublic: document.getElementById('company-is-public').checked // ATUALIZAÇÃO: Captura o status
         };
 
         try {
@@ -1776,9 +1805,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     appState.company.list[companyIndex] = { ...oldCompany, ...newCompanyData };
                     uiFeedback.showToast('Empresa atualizada!', 'success');
                 }
-            } else { // Adicionando uma nova empresa (sempre privada)
+            } else { // Adicionando uma nova empresa
                 newCompanyData.id = Date.now().toString();
-                newCompanyData.isPublic = false;
+                // O status público é definido pelo checkbox, não é mais sempre privado
                 appState.company.list.push(newCompanyData);
                 uiFeedback.showToast('Empresa adicionada!', 'success');
             }
@@ -1800,11 +1829,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ATUALIZAÇÃO: Listener de eventos para a lista de empresas para lidar com edição, exclusão e o novo toggle de status público
     document.getElementById('company-list').addEventListener('click', async (e) => {
-        const editId = e.target.dataset.editId;
-        const deleteId = e.target.dataset.deleteId;
+        const editButton = e.target.closest('[data-edit-id]');
+        const deleteButton = e.target.closest('[data-delete-id]');
 
-        if (editId) {
+        if (editButton) {
+            const editId = editButton.dataset.editId;
             const companyToEdit = appState.company.list.find(c => c.id === editId);
             if (companyToEdit) {
                 document.getElementById('company-id').value = companyToEdit.id;
@@ -1812,6 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-address').value = companyToEdit.address || '';
                 document.getElementById('company-phones').value = companyToEdit.phones || '';
                 document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
+                document.getElementById('company-is-public').checked = companyToEdit.isPublic || false;
                 
                 const showPreview = (previewId, url) => {
                     const el = document.getElementById(previewId);
@@ -1828,10 +1860,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (deleteId) {
+        if (deleteButton) {
+            const deleteId = deleteButton.dataset.deleteId;
             const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar esta empresa?');
             if (confirmed) {
                 appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
+                await savePublicCompanies(appState.company.list);
                 await savePrivateCompanies(appState.company.list);
                 renderCompanyList();
                 populateCompanyDropdown();
@@ -1840,6 +1874,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    document.getElementById('company-list').addEventListener('change', async (e) => {
+        const toggleInput = e.target.closest('[data-toggle-public-id]');
+        if (toggleInput) {
+            const companyId = toggleInput.dataset.togglePublicId;
+            const company = appState.company.list.find(c => c.id === companyId);
+            if (company) {
+                company.isPublic = toggleInput.checked;
+                await savePublicCompanies(appState.company.list);
+                await savePrivateCompanies(appState.company.list);
+                renderCompanyList();
+                populateCompanyDropdown();
+                uiFeedback.showToast(`Status de "${company.name}" atualizado.`, 'success');
+            }
+        }
+    });
+
 
     document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
     
@@ -1911,7 +1962,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cover-btn').addEventListener('click', () => { updateCompanyInfoOnPages(); navigation.to('cover'); });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
     document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
-    document.getElementById('manage-companies-btn').addEventListener('click', () => { renderCompanyList(); navigation.to('companyManagement'); });
+    
+    // ATUALIZAÇÃO: Mostra o checkbox de "Pública" para admins
+    document.getElementById('manage-companies-btn').addEventListener('click', () => { 
+        if (appState.user.isAdmin) {
+            document.getElementById('company-public-toggle-container').classList.remove('hidden');
+        }
+        renderCompanyList(); 
+        navigation.to('companyManagement'); 
+    });
+
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
     document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {    
