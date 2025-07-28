@@ -680,7 +680,7 @@
     // Importações dos módulos do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Módulo de serviço do Firebase
     const firebaseService = {
@@ -873,43 +873,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminPanelBtn = document.getElementById('admin-panel-btn');
     const userDisplayNameEl = document.getElementById('user-display-name');
 
-    onAuthStateChanged(firebaseService.getAuth(), async (user) => {
+    // ATUALIZAÇÃO: Lógica de autenticação refatorada para usar um listener em tempo real (onSnapshot)
+    // Isso resolve o problema de cache onde um usuário recém-aprovado ainda era visto como 'pending'.
+    let userStatusUnsubscribe = null;
+    let isAppInitialized = false;
+
+    onAuthStateChanged(firebaseService.getAuth(), (user) => {
+        if (userStatusUnsubscribe) {
+            userStatusUnsubscribe(); // Cancela o listener anterior para evitar memory leaks
+        }
+
         if (user) {
             const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
+            
+            userStatusUnsubscribe = onSnapshot(userDocRef, (userDocSnap) => {
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    
+                    if (userData.status === 'approved') {
+                        // Guarda os dados do usuário no estado global
+                        appState.user.id = user.uid;
+                        appState.user.isAdmin = userData.role === 'admin';
+                        appState.user.displayName = userData.displayName || '';
+                        appState.user.email = userData.email || '';
+                        userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
 
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                
-                if (userData.status === 'approved') {
-                    appState.user.id = user.uid;
-                    appState.user.isAdmin = userData.role === 'admin';
-                    appState.user.displayName = userData.displayName || '';
-                    appState.user.email = userData.email || '';
-                    
-                    // CORREÇÃO DE XSS: Usar `textContent` em vez de `innerHTML` para prevenir injeção de script.
-                    userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
+                        // Mostra o aplicativo principal
+                        authScreen.classList.add('hidden');
+                        mainAppWrapper.classList.remove('hidden');
+                        adminPanelBtn.classList.toggle('hidden', !appState.user.isAdmin);
 
-                    authScreen.classList.add('hidden');
-                    mainAppWrapper.classList.remove('hidden');
-                    adminPanelBtn.classList.toggle('hidden', !appState.user.isAdmin);
-                    
-                    await loadAllCompanies();
-                    
-                    populateCompanyDropdown();
-                    navigation.init();
+                        // Inicializa o aplicativo (carrega empresas, etc.) apenas uma vez
+                        if (!isAppInitialized) {
+                            loadAllCompanies().then(() => {
+                                populateCompanyDropdown();
+                                navigation.init();
+                                isAppInitialized = true;
+                            });
+                        }
+                    } else {
+                        // Se o status não for 'approved', desloga o usuário e mostra a mensagem apropriada
+                        const message = userData.status === 'pending' ? 'Sua conta está aguardando aprovação.' : 'Seu acesso foi recusado.';
+                        uiFeedback.showToast(message, 'info');
+                        showAuthForm(userData.status === 'pending' ? 'pending' : 'login');
+                        signOut(firebaseService.getAuth());
+                    }
                 } else {
-                    const message = userData.status === 'pending' ? 'Sua conta está aguardando aprovação.' : 'Seu acesso foi recusado.';
-                    uiFeedback.showToast(message, 'info');
-                    showAuthForm(userData.status === 'pending' ? 'pending' : 'login');
-                    await signOut(firebaseService.getAuth());
+                    // Se o usuário existe na autenticação mas não no Firestore, é um erro. Desloga.
+                    uiFeedback.showToast('Seus dados não foram encontrados. Cadastre-se novamente.', 'error');
+                    signOut(firebaseService.getAuth());
                 }
-            } else {
-                uiFeedback.showToast('Seus dados não foram encontrados. Cadastre-se novamente.', 'error');
-                await signOut(firebaseService.getAuth());
-                showAuthForm('login');
-            }
+            }, (error) => {
+                console.error("Erro ao escutar status do usuário:", error);
+                uiFeedback.showToast('Erro de conexão. Tentando novamente.', 'error');
+                signOut(firebaseService.getAuth());
+            });
         } else {
+            // Nenhum usuário logado
             appState.user.id = null;
             appState.user.isAdmin = false;
             appState.user.displayName = null;
@@ -919,8 +939,10 @@ document.addEventListener('DOMContentLoaded', () => {
             mainAppWrapper.classList.add('hidden');
             showAuthForm('login');
             navigation.currentScreen = null;
+            isAppInitialized = false; // Reseta o estado de inicialização para o próximo login
         }
     });
+
 
     document.getElementById('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
