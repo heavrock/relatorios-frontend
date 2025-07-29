@@ -481,6 +481,13 @@
                                     <img id="company-rep-logo2-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
                                 </div>
                             </div>
+                            <!-- **NOVO**: Checkbox para admin tornar empresa pública -->
+                            <div id="company-public-toggle-container" class="hidden">
+                                <div class="flex items-center">
+                                    <input id="company-is-public" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="company-is-public" class="ml-2 block text-sm text-gray-900">Tornar esta empresa pública (visível para todos)</label>
+                                </div>
+                            </div>
                             <div class="flex gap-4">
                                 <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
                                 <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
@@ -680,9 +687,9 @@
         auth: null,
         db: null,
         init: function() {
-            // CORREÇÃO: As credenciais fornecidas pelo usuário foram implementadas.
+            // As credenciais do seu projeto Firebase.
             const firebaseConfig = {
-              apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80", // CHAVE DE API ATUALIZADA AQUI!
+              apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
               authDomain: "relatorios-tecnicos-app.firebaseapp.com",
               projectId: "relatorios-tecnicos-app",
               storageBucket: "relatorios-tecnicos-app.appspot.com",
@@ -690,18 +697,19 @@
               appId: "1:280958854421:web:90e4b288f3c57592d9351c"
             };
 
-            // Adiciona uma verificação para garantir que as chaves não são placeholders
-            if (firebaseConfig.apiKey.startsWith("SUA_")) {
+            if (firebaseConfig.apiKey.startsWith("AIza")) {
+                 // A chave parece válida, então inicializa.
+            } else {
                 console.error("CONFIGURAÇÃO DO FIREBASE INCOMPLETA. Substitua os placeholders pelas suas credenciais reais.");
-                return; // Retorna sem inicializar, deixando this.auth e this.db como null
+                return; 
             }
 
             const app = initializeApp(firebaseConfig);
             this.auth = getAuth(app);
             this.db = getFirestore(app);
         },
-        getAuth: function() { return this.auth; }, // Não inicializa mais aqui
-        getDb: function() { return this.db; }     // Não inicializa mais aqui
+        getAuth: function() { return this.auth; },
+        getDb: function() { return this.db; }
     };
     
     // Objeto de Estado Centralizado
@@ -713,7 +721,6 @@
             temporaryCompanyLogo: null, 
             temporaryRepLogo1: null, 
             temporaryRepLogo2: null,
-            // **NOVO**: Variáveis para armazenar as funções de cancelamento dos listeners
             pendingUsersListener: null,
             activeUsersListener: null
         }
@@ -723,7 +730,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     firebaseService.init();
 
-    // CORREÇÃO DE ERRO: Adiciona uma verificação para parar a execução se o Firebase não for inicializado.
     if (!firebaseService.auth) {
         const authScreen = document.getElementById('auth-screen');
         if (authScreen) {
@@ -735,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             authScreen.style.display = 'block';
         }
-        return; // Para a execução do script aqui para prevenir mais erros.
+        return;
     }
 
     // ==================================================================================
@@ -761,7 +767,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const newScreenElement = this.screens[screenName];
             if (!newScreenElement || newScreenElement === this.currentScreen) return;
 
-            // **NOVO**: Cancela os listeners do painel admin ao sair da tela
             if (this.currentScreen === this.screens.adminPanel) {
                 adminManager.stopListeners();
             }
@@ -825,7 +830,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => { toast.remove(); }, 500);
             }, 3000);
         },
-        // CORREÇÃO DE SEGURANÇA: Substituído o `confirm()` nativo por um modal customizado.
         showConfirm: function(message) {
             return new Promise(resolve => {
                 const overlay = document.createElement('div');
@@ -893,7 +897,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     appState.user.displayName = userData.displayName || '';
                     appState.user.email = userData.email || '';
                     
-                    // CORREÇÃO DE XSS: Usar `textContent` em vez de `innerHTML` para prevenir injeção de script.
                     userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
 
                     authScreen.classList.add('hidden');
@@ -957,7 +960,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showAuthForm('pending');
             await signOut(firebaseService.getAuth());
         } catch (error) {
-            // CORREÇÃO DE SEGURANÇA: Evita vazar mensagens de erro detalhadas.
             let msg = "Ocorreu um erro ao criar a conta.";
             if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
             else if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mínimo 6 caracteres).";
@@ -967,9 +969,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // **NOVO**: Módulo para gerenciar o painel de administração
     const adminManager = {
-        // Função para renderizar a lista de usuários
         renderUserList: (elementId, users, isPending) => {
             const listEl = document.getElementById(elementId);
             listEl.innerHTML = '';
@@ -989,16 +989,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const strong = document.createElement('strong');
                 strong.className = 'block';
-                strong.textContent = user.displayName || ''; // Seguro
+                strong.textContent = user.displayName || '';
                 userInfo.appendChild(strong);
-                userInfo.append(document.createTextNode(user.email)); // Seguro
+                userInfo.append(document.createTextNode(user.email));
 
                 userInfoContainer.appendChild(userInfo);
 
                 if (!isPending) {
                     const roleBadge = document.createElement('span');
                     roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
-                    roleBadge.textContent = user.role; // Seguro
+                    roleBadge.textContent = user.role;
                     userInfoContainer.appendChild(roleBadge);
                 }
 
@@ -1017,11 +1017,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 listEl.appendChild(userEl);
             });
         },
-        // Função para iniciar os listeners em tempo real
         startListeners: () => {
             const db = firebaseService.getDb();
             
-            // Listener para usuários pendentes
             const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
             appState.ui.pendingUsersListener = onSnapshot(pendingQuery, (snapshot) => {
                 const pendingUsers = snapshot.docs.map(doc => doc.data());
@@ -1031,7 +1029,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 uiFeedback.showToast('Erro ao carregar usuários pendentes.', 'error');
             });
 
-            // Listener para usuários ativos
             const activeQuery = query(collection(db, "users"), where("status", "==", "approved"));
             appState.ui.activeUsersListener = onSnapshot(activeQuery, (snapshot) => {
                 const activeUsers = snapshot.docs.map(doc => doc.data());
@@ -1041,14 +1038,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 uiFeedback.showToast('Erro ao carregar usuários ativos.', 'error');
             });
         },
-        // Função para parar os listeners
         stopListeners: () => {
             if (appState.ui.pendingUsersListener) {
-                appState.ui.pendingUsersListener(); // Cancela o listener
+                appState.ui.pendingUsersListener();
                 appState.ui.pendingUsersListener = null;
             }
             if (appState.ui.activeUsersListener) {
-                appState.ui.activeUsersListener(); // Cancela o listener
+                appState.ui.activeUsersListener();
                 appState.ui.activeUsersListener = null;
             }
         }
@@ -1056,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     adminPanelBtn.addEventListener('click', () => {
         navigation.to('adminPanel');
-        adminManager.startListeners(); // Inicia os listeners ao entrar na tela
+        adminManager.startListeners();
     });
 
     document.getElementById('admin-panel-screen').addEventListener('click', async (e) => {
@@ -1077,7 +1073,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); }    
                     else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); }    
                     else if (action === 'delete') { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); }
-                    // Não precisa mais chamar loadAdminPanelData(), o listener cuida disso.
                 } catch (error) {
                     console.error(`Erro na ação '${action}':`, error);
                     uiFeedback.showToast('Ocorreu um erro ao processar a ação.', 'error');
@@ -1136,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await updateDoc(userDocRef, {
                 displayName: newName
             });
-            appState.user.displayName = newName; // Update state locally
+            appState.user.displayName = newName;
             uiFeedback.showToast('Perfil atualizado com sucesso!', 'success');
             navigation.to('menu');
         } catch (error) {
@@ -1286,6 +1281,15 @@ document.addEventListener('DOMContentLoaded', () => {
         await setDoc(docRef, { list: privateCompanies });
     }
 
+    // **NOVO**: Função para salvar empresas públicas
+    async function savePublicCompanies(companies) {
+        if (!appState.user.isAdmin) return; // Segurança extra
+        const publicCompanies = companies.filter(c => c.isPublic);
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "public_data", "companies");
+        await setDoc(docRef, { list: publicCompanies });
+    }
+
     function populateCompanyDropdown() {
         const companySelect = document.getElementById('company-select');
         const originalValue = companySelect.value;
@@ -1308,7 +1312,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
     function renderCompanyList() {
         const listEl = document.getElementById('company-list');
         listEl.innerHTML = '';
@@ -1333,18 +1336,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const textContainer = document.createElement('div');
             const nameP = document.createElement('p');
             nameP.className = 'font-semibold';
-            nameP.textContent = company.name; // Seguro
+            nameP.textContent = company.name;
 
             if (isPublic) {
                 const publicSpan = document.createElement('span');
                 publicSpan.className = 'text-xs text-blue-500 ml-2';
-                publicSpan.textContent = '(Pública)'; // Seguro
+                publicSpan.textContent = '(Pública)';
                 nameP.appendChild(publicSpan);
             }
 
             const addressP = document.createElement('p');
             addressP.className = 'text-xs text-gray-500';
-            addressP.textContent = company.address || 'Sem endereço'; // Seguro
+            addressP.textContent = company.address || 'Sem endereço';
 
             textContainer.append(nameP, addressP);
             infoContainer.append(img, textContainer);
@@ -1768,32 +1771,42 @@ document.addEventListener('DOMContentLoaded', () => {
             phone2: document.getElementById('company-phone2').value,
             logoDataUrl: appState.ui.temporaryCompanyLogo,
             repLogo1DataUrl: appState.ui.temporaryRepLogo1,
-            repLogo2DataUrl: appState.ui.temporaryRepLogo2
+            repLogo2DataUrl: appState.ui.temporaryRepLogo2,
+            // **NOVO**: Lê o valor do checkbox de empresa pública
+            isPublic: appState.user.isAdmin ? document.getElementById('company-is-public').checked : false
         };
 
         try {
-            if (companyId) { // Editando uma empresa existente
+            if (companyId) { // Editando
                 const companyIndex = appState.company.list.findIndex(c => c.id === companyId);
                 if (companyIndex > -1) {
                     const oldCompany = appState.company.list[companyIndex];
+                    // Mantém logos antigos se nenhum novo for enviado
                     if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = oldCompany.logoDataUrl;
                     if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = oldCompany.repLogo1DataUrl;
                     if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = oldCompany.repLogo2DataUrl;
+                    
                     appState.company.list[companyIndex] = { ...oldCompany, ...newCompanyData };
                     uiFeedback.showToast('Empresa atualizada!', 'success');
                 }
-            } else { // Adicionando uma nova empresa (sempre privada)
+            } else { // Adicionando
                 newCompanyData.id = Date.now().toString();
-                newCompanyData.isPublic = false;
+                // O `isPublic` já foi definido acima
                 appState.company.list.push(newCompanyData);
                 uiFeedback.showToast('Empresa adicionada!', 'success');
             }
 
+            // **NOVO**: Salva ambas as listas se o usuário for admin
+            if (appState.user.isAdmin) {
+                await savePublicCompanies(appState.company.list);
+            }
             await savePrivateCompanies(appState.company.list);
+
             renderCompanyList();
             populateCompanyDropdown();
             resetCompanyForm();
         } catch (error) {
+            console.error("Erro ao salvar empresa:", error);
             uiFeedback.showToast('Erro ao salvar empresa.', 'error');
         } finally {
             uiFeedback.toggleButtonLoading(button, false);
@@ -1813,6 +1826,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-phones').value = companyToEdit.phones || '';
                 document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
                 
+                // **NOVO**: Popula o checkbox de empresa pública
+                if (appState.user.isAdmin) {
+                    document.getElementById('company-is-public').checked = companyToEdit.isPublic || false;
+                }
+
                 const showPreview = (previewId, url) => {
                     const el = document.getElementById(previewId);
                     el.src = url || '';
@@ -1832,7 +1850,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar esta empresa?');
             if (confirmed) {
                 appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
+                
+                // **NOVO**: Salva ambas as listas após apagar
+                if (appState.user.isAdmin) {
+                    await savePublicCompanies(appState.company.list);
+                }
                 await savePrivateCompanies(appState.company.list);
+
                 renderCompanyList();
                 populateCompanyDropdown();
                 resetCompanyForm();    
@@ -1885,7 +1909,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!btn || !config) return;
 
         btn.addEventListener('click', () => {
-            // Lógica de contagem de uso removida.
             appState.currentReport.editingIndex = null;    
             const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
             if(addBtn) { addBtn.textContent = 'Adicionar ao Relatório'; addBtn.disabled = true; }
@@ -1911,7 +1934,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cover-btn').addEventListener('click', () => { updateCompanyInfoOnPages(); navigation.to('cover'); });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
     document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
-    document.getElementById('manage-companies-btn').addEventListener('click', () => { renderCompanyList(); navigation.to('companyManagement'); });
+    
+    // **NOVO**: Mostra/esconde a opção de empresa pública para admins
+    document.getElementById('manage-companies-btn').addEventListener('click', () => { 
+        renderCompanyList(); 
+        const publicToggle = document.getElementById('company-public-toggle-container');
+        if (appState.user.isAdmin) {
+            publicToggle.classList.remove('hidden');
+        } else {
+            publicToggle.classList.add('hidden');
+        }
+        navigation.to('companyManagement'); 
+    });
+
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
     document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {    
