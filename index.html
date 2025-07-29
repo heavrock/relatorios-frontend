@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Controle - Relatórios Técnicos</title>
-    <!-- CORREÇÃO: URL do Tailwind CSS corrigida -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- CORREÇÃO: Atributo 'xintegrity' corrigido para 'integrity' -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
@@ -176,11 +174,11 @@
             print-color-adjust: exact;
         }
 
-        /* Estilos para a página de índice */
+        /* **NOVO**: Estilos aprimorados para a página de índice */
         #index-page {
-            display: block; /* Sobrescreve o 'flex' da classe .report-page */
+            display: block; /* Sobrescreve o 'flex' da classe .report-page para um fluxo natural */
         }
-        #index-page h2.index-title {
+        #index-page .index-title {
             font-size: 1.25rem; /* text-xl */
             font-weight: 700;
             margin-bottom: 1.5rem;
@@ -188,12 +186,22 @@
             border-bottom: 1px solid #e5e7eb;
         }
         #index-page .index-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
             font-size: 1rem; /* text-base */
             padding: 0.75rem 0.25rem;
             border-bottom: 1px dotted #9ca3af;
         }
         #index-page .index-list-item:last-child {
             border-bottom: none;
+        }
+        #index-page .item-dots {
+            flex-grow: 1;
+            border-bottom: 2px dotted #ccc;
+            margin: 0 0.5rem;
+            position: relative;
+            bottom: 4px;
         }
         #index-page #index-company-logo {
             height: 3.5rem; /* 56px */
@@ -448,19 +456,22 @@
                     <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
                 </div>
 
+                <!-- **CORREÇÃO**: Layout do índice reestruturado para um fluxo natural -->
                 <div id="index-page" class="report-page">
-                    <header class="flex justify-between items-start">
-                        <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
-                        <div class="text-right text-xs">
-                            <p class="font-bold" id="index-company-name"></p>
-                            <p id="index-company-address"></p>
-                            <p id="index-company-phones"></p>
-                            <p id="index-company-phone2"></p>
-                        </div>
-                    </header>
-                    <main id="index-content-list" class="p-4">
-                        <!-- Conteúdo do índice será carregado -->
-                    </main>
+                    <div>
+                        <header class="flex justify-between items-start">
+                            <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
+                            <div class="text-right text-xs">
+                                <p class="font-bold" id="index-company-name"></p>
+                                <p id="index-company-address"></p>
+                                <p id="index-company-phones"></p>
+                                <p id="index-company-phone2"></p>
+                            </div>
+                        </header>
+                        <main id="index-content-list" class="p-4">
+                            <!-- Conteúdo do índice será carregado -->
+                        </main>
+                    </div>
                      <footer class="mt-auto pt-4">
                         <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
                             <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
@@ -1549,9 +1560,16 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.currentReport.cache.forEach((report, index) => {
              const li = document.createElement('li');
                li.className = 'flex items-center justify-between index-list-item';
+               // **NOVO**: Adiciona a linha pontilhada e o número da página
                li.innerHTML = `
-                    <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
-                    <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
+                    <span class="flex-shrink-0">
+                        ${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a>
+                    </span>
+                    <span class="item-dots"></span>
+                    <span class="flex-shrink-0 font-semibold">
+                        ${index + 3}
+                        <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-2" title="Remover esta planilha do relatório atual">&times;</button>
+                    </span>`;
                list.appendChild(li);
         });
     }
