@@ -174,9 +174,9 @@
             print-color-adjust: exact;
         }
 
-        /* **NOVO**: Estilos para a página de índice */
+        /* Estilos para a página de índice */
         #index-page #index-content-list {
-            flex-grow: 0 !important; /* Impede que a lista se estique */
+            flex-grow: 0 !important;
         }
         #index-page .index-list-item {
             font-size: 14px;
@@ -431,7 +431,6 @@
 
                 <div id="index-page" class="report-page">
                     <header class="flex justify-between items-start">
-                        <!-- **NOVO**: Tamanho do logo do cabeçalho reduzido -->
                         <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
                         <div class="text-right text-xs">
                             <p class="font-bold" id="index-company-name"></p>
@@ -440,12 +439,13 @@
                             <p id="index-company-phone2"></p>
                         </div>
                     </header>
-                    <main id="index-content-list" class="flex-grow p-4">
+                    <!-- **CORREÇÃO**: Removido flex-grow para o layout fluir naturalmente -->
+                    <main id="index-content-list" class="p-4">
                         <!-- Conteúdo do índice será carregado -->
                     </main>
-                     <footer class="mt-auto pt-4">
+                     <!-- **CORREÇÃO**: Removido mt-auto para o rodapé seguir o conteúdo -->
+                     <footer class="pt-4">
                         <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
-                            <!-- **NOVO**: Tamanho dos logos do rodapé reduzido -->
                             <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
                             <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
                         </div>
@@ -1531,7 +1531,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appState.currentReport.cache.forEach((report, index) => {
              const li = document.createElement('li');
-               // **NOVO**: Adiciona classe para estilização do item do índice
                li.className = 'flex items-center justify-between index-list-item';
                li.innerHTML = `
                     <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
