@@ -151,7 +151,7 @@
             text-align: center;
         }
 
-        /* **NOVO**: Estilos para renderização do PDF */
+        /* Estilos para renderização do PDF */
         .pdf-page-render {
             width: 210mm;
             min-height: 297mm;
@@ -1633,7 +1633,51 @@ document.addEventListener('DOMContentLoaded', () => {
         window[`recalculate_${config.prefix}`] = recalculate;    
     };
     
-    function populateSheetFromData(container, reportData, config) { Object.entries(reportData.header).forEach(([key, value]) => { const el = container.querySelector(`#${config.prefix}-${key}`); if (el) el.value = value; }); Object.entries(reportData.sections).forEach(([sectionName, sectionData]) => { Object.entries(sectionData).forEach(([rowId, rowData]) => { Object.entries(rowData).forEach(([colId, value]) => { const input = container.querySelector(`input[data-row="${rowId}"][data-col="${colId}"], select[data-row="${rowId}"][data-col="${colId}"]`); if (input) input.value = value; }); }); }); if (config.prefix === 'gen') { const pmgBtn = container.querySelector('#gen-togglePmg'); const pmgSection = container.querySelector('#gen-pmg-section-container'); const hasPmgData = reportData.sections['EXCITAÇÃO AUXILIAR (PMG)']; if (pmgBtn && pmgSection) { const isPmgSectionHidden = pmgSection.classList.contains('hidden'); if (hasPmgData && isPmgSectionHidden) { pmgBtn.click(); } else if (!hasPmgData && !isPmgSectionHidden) { pmgBtn.click(); } } const diodesBtn = container.querySelector('#gen-toggleDiodes'); const diodesHeader = document.getElementById('gen-diodes-d7d12-header'); const diodesBody = document.getElementById('gen-diodes-d7d12-body'); const hasD7Data = reportData.sections['DIODOS ROTATIVOS']?.['gen-diodes-dir']?.d7; if (diodesBtn && diodesHeader && diodesBody) { const isDiodesSectionHidden = diodesHeader.classList.contains('hidden'); if (hasD7Data && isDiodesSectionHidden) { diodesBtn.click(); } else if (!hasD7Data && !isDiodesSectionHidden) { diodesBtn.click(); } } } window[`recalculate_${config.prefix}`](container); }
+    function populateSheetFromData(container, reportData, config) {
+        Object.entries(reportData.header).forEach(([key, value]) => {
+            const el = container.querySelector(`#${config.prefix}-${key}`);
+            if (el) el.value = value;
+        });
+        Object.entries(reportData.sections).forEach(([sectionName, sectionData]) => {
+            Object.entries(sectionData).forEach(([rowId, rowData]) => {
+                Object.entries(rowData).forEach(([colId, value]) => {
+                    const input = container.querySelector(`input[data-row="${rowId}"][data-col="${colId}"], select[data-row="${rowId}"][data-col="${colId}"]`);
+                    if (input) input.value = value;
+                });
+            });
+        });
+
+        if (config.prefix === 'gen') {
+            const pmgBtn = container.querySelector('#gen-togglePmg');
+            const pmgSection = container.querySelector('#gen-pmg-section-container');
+            const pmgOhmicRow = document.getElementById('gen-pmg-ohmic-row');
+            const hasPmgData = reportData.sections['EXCITAÇÃO AUXILIAR (PMG)'];
+
+            if (pmgBtn && pmgSection) {
+                const shouldBeVisible = !!hasPmgData;
+                pmgSection.classList.toggle('hidden', !shouldBeVisible);
+                if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden', !shouldBeVisible);
+                pmgBtn.textContent = shouldBeVisible ? 'Desativar Seção PMG' : 'Ativar Seção PMG';
+                pmgBtn.classList.toggle('bg-gray-200', !shouldBeVisible);
+                pmgBtn.classList.toggle('bg-yellow-400', shouldBeVisible);
+            }
+
+            const diodesBtn = container.querySelector('#gen-toggleDiodes');
+            const diodesHeader = document.getElementById('gen-diodes-d7d12-header');
+            const diodesBody = document.getElementById('gen-diodes-d7d12-body');
+            const hasD7Data = reportData.sections['DIODOS ROTATIVOS']?.['gen-diodes-dir']?.d7;
+
+            if (diodesBtn && diodesHeader && diodesBody) {
+                const shouldBeVisible = !!hasD7Data;
+                diodesHeader.classList.toggle('hidden', !shouldBeVisible);
+                diodesBody.classList.toggle('hidden', !shouldBeVisible);
+                diodesBtn.textContent = shouldBeVisible ? 'Desativar Diodos D7-D12' : 'Ativar Diodos D7-D12';
+                diodesBtn.classList.toggle('bg-gray-200', !shouldBeVisible);
+                diodesBtn.classList.toggle('bg-red-400', shouldBeVisible);
+            }
+        }
+        window[`recalculate_${config.prefix}`](container);
+    }
     
     function isFormDirty(container) {
         const inputs = container.querySelectorAll('input[type="number"], input[type="text"]');
@@ -1647,6 +1691,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
+        
+        if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram. Verifique sua conexão.', 'error');
+            return;
+        }
+
         loader.classList.remove('hidden');
         loader.classList.add('flex');
 
@@ -1656,12 +1706,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
-            // 1. Gerar a Capa
             const coverPage = document.getElementById('cover-preview');
             const canvasCover = await html2canvas(coverPage, { scale: 3 });
             doc.addImage(canvasCover.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
 
-            // 2. Gerar o Índice (se houver planilhas)
             if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
                 const indexPage = document.getElementById('index-page');
@@ -1669,21 +1717,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.addImage(canvasIndex.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             }
 
-            // 3. Gerar cada Planilha em uma página separada
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
-                const sheetContainer = document.getElementById(config.containerId);
-                const appContainer = document.getElementById(`${config.prefix}-app-container`);
+                const appContainer = document.getElementById(config.containerId);
                 
                 navigation.to(config.prefix, false);
-                populateSheetFromData(sheetContainer, reportSheet, config);
+                populateSheetFromData(appContainer, reportSheet, config);
                 
                 const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
                 elementsToHide.forEach(el => el.style.display = 'none');
                 
-                // **NOVO**: Aplica classes de renderização para o PDF
                 appContainer.classList.add('pdf-page-render', 'pdf-fix-colors');
                 
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -1697,7 +1742,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 doc.addImage(canvasSheet.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
                 
-                // **NOVO**: Remove as classes de renderização após a captura
                 appContainer.classList.remove('pdf-page-render', 'pdf-fix-colors');
                 elementsToHide.forEach(el => el.style.display = 'flex');
             }
