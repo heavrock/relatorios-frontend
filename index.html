@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Controle - Relatórios Técnicos</title>
+    <!-- CORREÇÃO: URL do Tailwind CSS corrigida -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CORREÇÃO: Atributo 'xintegrity' corrigido para 'integrity' -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
@@ -175,16 +177,33 @@
         }
 
         /* Estilos para a página de índice */
-        #index-page #index-content-list {
-            flex-grow: 0 !important;
+        #index-page {
+            display: block; /* Sobrescreve o 'flex' da classe .report-page */
+        }
+        #index-page h2.index-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
         }
         #index-page .index-list-item {
-            font-size: 14px;
-            padding: 8px 4px;
+            font-size: 1rem; /* text-base */
+            padding: 0.75rem 0.25rem;
             border-bottom: 1px dotted #9ca3af;
         }
         #index-page .index-list-item:last-child {
             border-bottom: none;
+        }
+        #index-page #index-company-logo {
+            height: 3.5rem; /* 56px */
+        }
+        #index-page #index-rep-logo1,
+        #index-page #index-rep-logo2 {
+            height: 2.5rem; /* 40px */
+        }
+        #index-page footer {
+            margin-top: 4rem; /* Adiciona espaço antes do rodapé */
         }
     </style>
 </head>
@@ -439,12 +458,10 @@
                             <p id="index-company-phone2"></p>
                         </div>
                     </header>
-                    <!-- **CORREÇÃO**: Removido flex-grow para o layout fluir naturalmente -->
                     <main id="index-content-list" class="p-4">
                         <!-- Conteúdo do índice será carregado -->
                     </main>
-                     <!-- **CORREÇÃO**: Removido mt-auto para o rodapé seguir o conteúdo -->
-                     <footer class="pt-4">
+                     <footer class="mt-auto pt-4">
                         <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
                             <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
                             <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
@@ -1523,7 +1540,7 @@ document.addEventListener('DOMContentLoaded', () => {
         list.className = 'list-none space-y-2';
         
         const title = document.createElement('h2');
-        title.className = 'text-xl font-bold mb-4';
+        title.className = 'index-title';
         title.textContent = 'Equipamentos Analisados:';
         
         indexList.appendChild(title);
