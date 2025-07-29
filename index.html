@@ -6,7 +6,6 @@
     <title>Painel de Controle - Relatórios Técnicos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- CORREÇÃO DE SEGURANÇA: Adicionado hash de integridade (SRI) para garantir que o script não seja adulterado. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
@@ -132,12 +131,12 @@
             to { transform: rotate(360deg); }
         }
 
-        /* CORREÇÃO DE SEGURANÇA: Modal customizado para confirmação, substituindo o confirm() nativo */
+        /* Modal customizado para confirmação */
         .confirm-modal-overlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.6);
-            display: none; /* Inicia escondido */
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
@@ -150,6 +149,29 @@
             max-width: 400px;
             width: 90%;
             text-align: center;
+        }
+
+        /* **NOVO**: Estilos para renderização do PDF */
+        .pdf-page-render {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: none;
+            border: none;
+        }
+        .pdf-fix-colors .input-yellow {
+            background-color: #fef9c3 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .pdf-fix-colors .output-blue {
+            background-color: #e0f2fe !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
     </style>
 </head>
@@ -481,7 +503,6 @@
                                     <img id="company-rep-logo2-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
                                 </div>
                             </div>
-                            <!-- **NOVO**: Checkbox para admin tornar empresa pública -->
                             <div id="company-public-toggle-container" class="hidden">
                                 <div class="flex items-center">
                                     <input id="company-is-public" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
@@ -1281,9 +1302,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await setDoc(docRef, { list: privateCompanies });
     }
 
-    // **NOVO**: Função para salvar empresas públicas
     async function savePublicCompanies(companies) {
-        if (!appState.user.isAdmin) return; // Segurança extra
+        if (!appState.user.isAdmin) return;
         const publicCompanies = companies.filter(c => c.isPublic);
         const db = firebaseService.getDb();
         const docRef = doc(db, "public_data", "companies");
@@ -1633,68 +1653,23 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-            const pageHeight = doc.internal.pageSize.getHeight();
             const pageWidth = doc.internal.pageSize.getWidth();
-            const margin = 20;
+            const pageHeight = doc.internal.pageSize.getHeight();
 
-            const company = appState.company.selected;
-            if (company) {
-                if (company.logoDataUrl) {
-                    try {
-                        const img = new Image(); img.src = company.logoDataUrl; await img.decode();
-                        const imgWidth = 35; const imgHeight = (img.height * imgWidth) / img.width;
-                        doc.addImage(company.logoDataUrl, 'PNG', margin, margin - 10, imgWidth, imgHeight);
-                    } catch (e) { console.error("Erro ao adicionar logo da empresa:", e); }
-                }
-                doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-                doc.text(company.name || '', pageWidth - margin, margin, { align: 'right' });
-                doc.setFont('helvetica', 'normal');
-                doc.text(company.address || '', pageWidth - margin, margin + 4, { align: 'right' });
-                doc.text(company.phones || '', pageWidth - margin, margin + 8, { align: 'right' });
-                doc.text(company.phone2 || '', pageWidth - margin, margin + 12, { align: 'right' });
-                doc.setLineWidth(0.5); doc.line(margin, margin + 25, pageWidth - margin, margin + 25);
-            }
+            // 1. Gerar a Capa
+            const coverPage = document.getElementById('cover-preview');
+            const canvasCover = await html2canvas(coverPage, { scale: 3 });
+            doc.addImage(canvasCover.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
 
-            const clienteText = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
-            const localText = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
-            doc.setFontSize(26); doc.setFont('helvetica', 'bold');
-            doc.text(clienteText, pageWidth / 2, 95, { align: 'center' });
-            doc.text(localText, pageWidth / 2, 107, { align: 'center' });
-            const titleWidth = Math.max(doc.getTextWidth(clienteText), doc.getTextWidth(localText));
-            doc.setLineWidth(0.5); doc.line((pageWidth - titleWidth) / 2, 110, (pageWidth + titleWidth) / 2, 110);
-            doc.setFontSize(14); doc.setFont('helvetica', 'normal');
-            doc.text('Relatório técnico de medição de resistência de isolamento elétrico (Megagem)', pageWidth / 2, 125, { align: 'center' });
-            
-            if (appState.currentReport.coverImage && !appState.currentReport.coverImage.startsWith('data:image/svg+xml')) {
-                try {
-                    doc.addImage(appState.currentReport.coverImage, 'PNG', (pageWidth - 120) / 2, 135, 120, 90);
-                } catch (e) { console.error("Erro ao adicionar imagem da capa:", e); }
-            } else {
-                 doc.setDrawColor(150); doc.rect((pageWidth - 120) / 2, 135, 120, 90);
-                 doc.text('Imagem não carregada', pageWidth / 2, 180, { align: 'center' });
-            }
-
-            doc.setFontSize(8); doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - 15, { align: 'center' });
-            
-            const repLogos = [company?.repLogo1DataUrl, company?.repLogo2DataUrl].filter(Boolean);
-            if (repLogos.length > 0) {
-                const maxImgHeight = 12; const logoWidths = [];
-                for(const logoUrl of repLogos) { const img = new Image(); img.src = logoUrl; await img.decode(); logoWidths.push((img.width * maxImgHeight) / img.height); }
-                const totalLogoWidth = logoWidths.reduce((a, b) => a + b, 0); const spacing = 15;
-                let startX = (pageWidth - totalLogoWidth - (spacing * (repLogos.length - 1))) / 2;
-                for (let i = 0; i < repLogos.length; i++) {
-                    try { doc.addImage(repLogos[i], 'PNG', startX, pageHeight - 35, logoWidths[i], maxImgHeight); startX += logoWidths[i] + spacing; }    
-                    catch(e) { console.error("Erro ao adicionar logo de representante", e); }
-                }
-            }
-
+            // 2. Gerar o Índice (se houver planilhas)
             if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
                 const indexPage = document.getElementById('index-page');
-                const canvasIndex = await html2canvas(indexPage, { scale: 2 });
+                const canvasIndex = await html2canvas(indexPage, { scale: 3 });
                 doc.addImage(canvasIndex.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             }
 
+            // 3. Gerar cada Planilha em uma página separada
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
@@ -1702,17 +1677,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sheetContainer = document.getElementById(config.containerId);
                 const appContainer = document.getElementById(`${config.prefix}-app-container`);
                 
-                navigation.to(config.prefix, false); // Muda de tela sem afetar o histórico
+                navigation.to(config.prefix, false);
                 populateSheetFromData(sheetContainer, reportSheet, config);
                 
                 const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
                 elementsToHide.forEach(el => el.style.display = 'none');
+                
+                // **NOVO**: Aplica classes de renderização para o PDF
+                appContainer.classList.add('pdf-page-render', 'pdf-fix-colors');
+                
                 await new Promise(resolve => setTimeout(resolve, 100));
-                const canvasSheet = await html2canvas(appContainer, { scale: 2 });
+                
+                const canvasSheet = await html2canvas(appContainer, {
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    foreignObjectRendering: true,
+                    backgroundColor: '#ffffff'
+                });
                 doc.addImage(canvasSheet.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+                
+                // **NOVO**: Remove as classes de renderização após a captura
+                appContainer.classList.remove('pdf-page-render', 'pdf-fix-colors');
                 elementsToHide.forEach(el => el.style.display = 'flex');
             }
 
+            const clienteText = document.getElementById('cover-cliente').value.trim() || "Relatorio";
             doc.save(`Relatorio_${clienteText.replace(/ /g,"_")}.pdf`);
 
         } catch (error) {
@@ -1721,7 +1711,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            navigation.to('index', false); // Garante que a tela de índice seja reexibida
+            navigation.to('index', false);
         }
     }
     
@@ -1772,7 +1762,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logoDataUrl: appState.ui.temporaryCompanyLogo,
             repLogo1DataUrl: appState.ui.temporaryRepLogo1,
             repLogo2DataUrl: appState.ui.temporaryRepLogo2,
-            // **NOVO**: Lê o valor do checkbox de empresa pública
             isPublic: appState.user.isAdmin ? document.getElementById('company-is-public').checked : false
         };
 
@@ -1781,7 +1770,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const companyIndex = appState.company.list.findIndex(c => c.id === companyId);
                 if (companyIndex > -1) {
                     const oldCompany = appState.company.list[companyIndex];
-                    // Mantém logos antigos se nenhum novo for enviado
                     if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = oldCompany.logoDataUrl;
                     if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = oldCompany.repLogo1DataUrl;
                     if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = oldCompany.repLogo2DataUrl;
@@ -1791,12 +1779,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else { // Adicionando
                 newCompanyData.id = Date.now().toString();
-                // O `isPublic` já foi definido acima
                 appState.company.list.push(newCompanyData);
                 uiFeedback.showToast('Empresa adicionada!', 'success');
             }
 
-            // **NOVO**: Salva ambas as listas se o usuário for admin
             if (appState.user.isAdmin) {
                 await savePublicCompanies(appState.company.list);
             }
@@ -1826,7 +1812,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('company-phones').value = companyToEdit.phones || '';
                 document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
                 
-                // **NOVO**: Popula o checkbox de empresa pública
                 if (appState.user.isAdmin) {
                     document.getElementById('company-is-public').checked = companyToEdit.isPublic || false;
                 }
@@ -1851,7 +1836,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmed) {
                 appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
                 
-                // **NOVO**: Salva ambas as listas após apagar
                 if (appState.user.isAdmin) {
                     await savePublicCompanies(appState.company.list);
                 }
@@ -1935,7 +1919,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
     document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
     
-    // **NOVO**: Mostra/esconde a opção de empresa pública para admins
     document.getElementById('manage-companies-btn').addEventListener('click', () => { 
         renderCompanyList(); 
         const publicToggle = document.getElementById('company-public-toggle-container');
