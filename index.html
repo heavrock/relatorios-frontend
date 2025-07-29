@@ -673,7 +673,7 @@
     // Importações dos módulos do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Módulo de serviço do Firebase
     const firebaseService = {
@@ -701,7 +701,7 @@
             this.db = getFirestore(app);
         },
         getAuth: function() { return this.auth; }, // Não inicializa mais aqui
-        getDb: function() { return this.db; }    // Não inicializa mais aqui
+        getDb: function() { return this.db; }     // Não inicializa mais aqui
     };
     
     // Objeto de Estado Centralizado
@@ -709,7 +709,14 @@
         user: { id: null, isAdmin: false, displayName: null, email: null },
         company: { list: [], selected: null },
         currentReport: { cache: [], editingIndex: null, coverImage: null },
-        ui: { temporaryCompanyLogo: null, temporaryRepLogo1: null, temporaryRepLogo2: null }
+        ui: { 
+            temporaryCompanyLogo: null, 
+            temporaryRepLogo1: null, 
+            temporaryRepLogo2: null,
+            // **NOVO**: Variáveis para armazenar as funções de cancelamento dos listeners
+            pendingUsersListener: null,
+            activeUsersListener: null
+        }
     };
 
 
@@ -753,6 +760,12 @@ document.addEventListener('DOMContentLoaded', () => {
         to: function(screenName, updateHistory = true) {
             const newScreenElement = this.screens[screenName];
             if (!newScreenElement || newScreenElement === this.currentScreen) return;
+
+            // **NOVO**: Cancela os listeners do painel admin ao sair da tela
+            if (this.currentScreen === this.screens.adminPanel) {
+                adminManager.stopListeners();
+            }
+
             Object.values(this.screens).forEach(screen => { if (screen) screen.classList.add('hidden'); });
             newScreenElement.classList.remove('hidden');
             this.currentScreen = newScreenElement;
@@ -954,81 +967,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    adminPanelBtn.addEventListener('click', async () => {
-        navigation.to('adminPanel');
-        await loadAdminPanelData();
-    });
-
-    // CORREÇÃO DE XSS: Função reescrita para criar elementos DOM de forma segura.
-    async function loadAdminPanelData() {
-        const pendingListEl = document.getElementById('pending-users-list');
-        const activeListEl = document.getElementById('active-users-list');
-        pendingListEl.innerHTML = '<p>Carregando...</p>';
-        activeListEl.innerHTML = '<p>Carregando...</p>';
-
-        const createUserRow = (user, isPending) => {
-            const userEl = document.createElement('div');
-            userEl.className = 'flex items-center justify-between p-2 border rounded-md';
-
-            const userInfoContainer = document.createElement('div');
-            const userInfo = document.createElement('span');
-            userInfo.className = 'text-sm truncate';
-            userInfo.title = user.email;
-
-            const strong = document.createElement('strong');
-            strong.className = 'block';
-            strong.textContent = user.displayName || ''; // Seguro
-            userInfo.appendChild(strong);
-            userInfo.append(document.createTextNode(user.email)); // Seguro
-
-            userInfoContainer.appendChild(userInfo);
-
-            if (!isPending) {
-                const roleBadge = document.createElement('span');
-                roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
-                roleBadge.textContent = user.role; // Seguro
-                userInfoContainer.appendChild(roleBadge);
+    // **NOVO**: Módulo para gerenciar o painel de administração
+    const adminManager = {
+        // Função para renderizar a lista de usuários
+        renderUserList: (elementId, users, isPending) => {
+            const listEl = document.getElementById(elementId);
+            listEl.innerHTML = '';
+            if (users.length === 0) {
+                const message = isPending ? 'Nenhum usuário pendente.' : 'Nenhum usuário ativo.';
+                listEl.innerHTML = `<p class="text-gray-500">${message}</p>`;
+                return;
             }
+            users.forEach(user => {
+                const userEl = document.createElement('div');
+                userEl.className = 'flex items-center justify-between p-2 border rounded-md';
 
-            const buttons = document.createElement('div');
-            buttons.className = 'flex gap-2';
+                const userInfoContainer = document.createElement('div');
+                const userInfo = document.createElement('span');
+                userInfo.className = 'text-sm truncate';
+                userInfo.title = user.email;
 
-            if (isPending) {
-                buttons.innerHTML = `
-                    <button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button>
-                    <button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button>`;
-            } else {
-                buttons.innerHTML = `<button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
-            }
+                const strong = document.createElement('strong');
+                strong.className = 'block';
+                strong.textContent = user.displayName || ''; // Seguro
+                userInfo.appendChild(strong);
+                userInfo.append(document.createTextNode(user.email)); // Seguro
 
-            userEl.append(userInfoContainer, buttons);
-            return userEl;
-        };
+                userInfoContainer.appendChild(userInfo);
 
-        try {
+                if (!isPending) {
+                    const roleBadge = document.createElement('span');
+                    roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
+                    roleBadge.textContent = user.role; // Seguro
+                    userInfoContainer.appendChild(roleBadge);
+                }
+
+                const buttons = document.createElement('div');
+                buttons.className = 'flex gap-2';
+
+                if (isPending) {
+                    buttons.innerHTML = `
+                        <button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button>
+                        <button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button>`;
+                } else {
+                    buttons.innerHTML = `<button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
+                }
+
+                userEl.append(userInfoContainer, buttons);
+                listEl.appendChild(userEl);
+            });
+        },
+        // Função para iniciar os listeners em tempo real
+        startListeners: () => {
             const db = firebaseService.getDb();
+            
+            // Listener para usuários pendentes
             const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
-            const pendingSnapshot = await getDocs(pendingQuery);
-            pendingListEl.innerHTML = '';
-            if (pendingSnapshot.empty) {
-                pendingListEl.innerHTML = '<p class="text-gray-500">Nenhum usuário pendente.</p>';
-            } else {
-                pendingSnapshot.forEach(doc => pendingListEl.appendChild(createUserRow(doc.data(), true)));
-            }
+            appState.ui.pendingUsersListener = onSnapshot(pendingQuery, (snapshot) => {
+                const pendingUsers = snapshot.docs.map(doc => doc.data());
+                adminManager.renderUserList('pending-users-list', pendingUsers, true);
+            }, (error) => {
+                console.error("Erro no listener de usuários pendentes:", error);
+                uiFeedback.showToast('Erro ao carregar usuários pendentes.', 'error');
+            });
 
+            // Listener para usuários ativos
             const activeQuery = query(collection(db, "users"), where("status", "==", "approved"));
-            const activeSnapshot = await getDocs(activeQuery);
-            activeListEl.innerHTML = '';
-            if (activeSnapshot.empty) {
-                activeListEl.innerHTML = '<p class="text-gray-500">Nenhum usuário ativo.</p>';
-            } else {
-                activeSnapshot.forEach(doc => activeListEl.appendChild(createUserRow(doc.data(), false)));
+            appState.ui.activeUsersListener = onSnapshot(activeQuery, (snapshot) => {
+                const activeUsers = snapshot.docs.map(doc => doc.data());
+                adminManager.renderUserList('active-users-list', activeUsers, false);
+            }, (error) => {
+                console.error("Erro no listener de usuários ativos:", error);
+                uiFeedback.showToast('Erro ao carregar usuários ativos.', 'error');
+            });
+        },
+        // Função para parar os listeners
+        stopListeners: () => {
+            if (appState.ui.pendingUsersListener) {
+                appState.ui.pendingUsersListener(); // Cancela o listener
+                appState.ui.pendingUsersListener = null;
             }
-        } catch (error) {
-            console.error("Erro ao carregar dados do admin:", error);
-            uiFeedback.showToast('Erro ao carregar dados do painel.', 'error');
+            if (appState.ui.activeUsersListener) {
+                appState.ui.activeUsersListener(); // Cancela o listener
+                appState.ui.activeUsersListener = null;
+            }
         }
-    }
+    };
+
+    adminPanelBtn.addEventListener('click', () => {
+        navigation.to('adminPanel');
+        adminManager.startListeners(); // Inicia os listeners ao entrar na tela
+    });
 
     document.getElementById('admin-panel-screen').addEventListener('click', async (e) => {
         const target = e.target;
@@ -1048,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); }    
                     else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); }    
                     else if (action === 'delete') { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); }
-                    if (action) await loadAdminPanelData();
+                    // Não precisa mais chamar loadAdminPanelData(), o listener cuida disso.
                 } catch (error) {
                     console.error(`Erro na ação '${action}':`, error);
                     uiFeedback.showToast('Ocorreu um erro ao processar a ação.', 'error');
@@ -1464,11 +1493,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appState.currentReport.cache.forEach((report, index) => {
              const li = document.createElement('li');
-             li.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-100';
-             li.innerHTML = `
-                 <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
-                 <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
-             list.appendChild(li);
+               li.className = 'flex items-center justify-between p-2 rounded-md hover:bg-gray-100';
+               li.innerHTML = `
+                    <span>${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a></span>
+                    <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2" title="Remover esta planilha do relatório atual">&times;</button>`;
+               list.appendChild(li);
         });
     }
     
