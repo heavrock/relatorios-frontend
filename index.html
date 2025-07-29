@@ -174,13 +174,14 @@
             print-color-adjust: exact;
         }
 
-        /* **NOVO**: Estilos aprimorados para a página de índice */
+        /* Estilos aprimorados para a página de índice */
         #index-page {
             display: block; /* Sobrescreve o 'flex' da classe .report-page para um fluxo natural */
         }
         #index-page .index-title {
             font-size: 1.25rem; /* text-xl */
             font-weight: 700;
+            margin-top: 2rem;
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #e5e7eb;
@@ -191,27 +192,17 @@
             align-items: baseline;
             font-size: 1rem; /* text-base */
             padding: 0.75rem 0.25rem;
-            border-bottom: 1px dotted #9ca3af;
-        }
-        #index-page .index-list-item:last-child {
-            border-bottom: none;
-        }
-        #index-page .item-dots {
-            flex-grow: 1;
-            border-bottom: 2px dotted #ccc;
-            margin: 0 0.5rem;
-            position: relative;
-            bottom: 4px;
         }
         #index-page #index-company-logo {
             height: 3.5rem; /* 56px */
         }
         #index-page #index-rep-logo1,
         #index-page #index-rep-logo2 {
-            height: 2.5rem; /* 40px */
+            height: 2.25rem; /* 36px */
         }
         #index-page footer {
-            margin-top: 4rem; /* Adiciona espaço antes do rodapé */
+            margin-top: auto; /* Empurra o rodapé para o final da página */
+            padding-top: 2rem;
         }
     </style>
 </head>
@@ -456,10 +447,10 @@
                     <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
                 </div>
 
-                <!-- **CORREÇÃO**: Layout do índice reestruturado para um fluxo natural -->
                 <div id="index-page" class="report-page">
+                    <!-- **CORREÇÃO**: Layout do índice reestruturado para um fluxo natural -->
                     <div>
-                        <header class="flex justify-between items-start">
+                        <header class="flex justify-between items-start pb-4 border-b-2 border-black">
                             <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
                             <div class="text-right text-xs">
                                 <p class="font-bold" id="index-company-name"></p>
@@ -473,11 +464,13 @@
                         </main>
                     </div>
                      <footer class="mt-auto pt-4">
-                        <div id="index-rep-logos" class="flex justify-center items-center gap-8 mb-4">
-                            <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
-                            <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-4">
+                                <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
+                                <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
+                            </div>
+                            <p class="text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
                         </div>
-                        <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
                     </footer>
                 </div>
             </div>
@@ -1560,16 +1553,11 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.currentReport.cache.forEach((report, index) => {
              const li = document.createElement('li');
                li.className = 'flex items-center justify-between index-list-item';
-               // **NOVO**: Adiciona a linha pontilhada e o número da página
                li.innerHTML = `
-                    <span class="flex-shrink-0">
+                    <span class="flex-grow">
                         ${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a>
                     </span>
-                    <span class="item-dots"></span>
-                    <span class="flex-shrink-0 font-semibold">
-                        ${index + 3}
-                        <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-2" title="Remover esta planilha do relatório atual">&times;</button>
-                    </span>`;
+                    <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-4 flex-shrink-0" title="Remover esta planilha do relatório atual">&times;</button>`;
                list.appendChild(li);
         });
     }
