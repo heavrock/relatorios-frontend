@@ -1647,10 +1647,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // **CORREÇÃO**: Lógica para mostrar/esconder seções do Gerador
         if (config.prefix === 'gen') {
             const pmgSection = container.querySelector('#gen-pmg-section-container');
-            const pmgOhmicRow = document.getElementById('gen-pmg-ohmic-row');
+            const pmgOhmicRow = container.querySelector('#gen-pmg-ohmic-row');
             const hasPmgData = reportData.sections['EXCITAÇÃO AUXILIAR (PMG)'];
 
             if (pmgSection) {
@@ -1659,8 +1658,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden', !shouldBeVisible);
             }
 
-            const diodesHeader = document.getElementById('gen-diodes-d7d12-header');
-            const diodesBody = document.getElementById('gen-diodes-d7d12-body');
+            const diodesHeader = container.querySelector('#gen-diodes-d7d12-header');
+            const diodesBody = container.querySelector('#gen-diodes-d7d12-body');
             const hasD7Data = reportData.sections['DIODOS ROTATIVOS']?.['gen-diodes-dir']?.d7;
 
             if (diodesHeader && diodesBody) {
@@ -1692,6 +1691,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loader.classList.remove('hidden');
         loader.classList.add('flex');
+        
+        const pdfRenderContainer = document.createElement('div');
+        pdfRenderContainer.style.position = 'absolute';
+        pdfRenderContainer.style.left = '-9999px';
+        pdfRenderContainer.style.top = '0';
+        document.body.appendChild(pdfRenderContainer);
 
         try {
             const { jsPDF } = window.jspdf;
@@ -1699,56 +1704,55 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
-            const coverPage = document.getElementById('cover-preview');
-            const canvasCover = await html2canvas(coverPage, { scale: 3 });
+            const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
+            pdfRenderContainer.appendChild(coverPageClone);
+            const canvasCover = await html2canvas(coverPageClone, { scale: 3 });
             doc.addImage(canvasCover.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            pdfRenderContainer.innerHTML = '';
 
             if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
-                const indexPage = document.getElementById('index-page');
-                const canvasIndex = await html2canvas(indexPage, { scale: 3 });
+                const indexPageClone = document.getElementById('index-page').cloneNode(true);
+                pdfRenderContainer.appendChild(indexPageClone);
+                const canvasIndex = await html2canvas(indexPageClone, { scale: 3 });
                 doc.addImage(canvasIndex.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+                pdfRenderContainer.innerHTML = '';
             }
 
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
-                const appContainer = document.getElementById(config.containerId);
                 
-                navigation.to(config.prefix, false);
-                populateSheetFromData(appContainer, reportSheet, config);
+                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
                 
-                const elementsToHide = appContainer.querySelectorAll('.pdf-hide');
-                elementsToHide.forEach(el => el.style.display = 'none');
+                populateSheetFromData(appContainerClone, reportSheet, config);
                 
-                appContainer.classList.add('pdf-page-render', 'pdf-fix-colors');
+                appContainerClone.classList.add('pdf-page-render', 'pdf-fix-colors');
+                appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
                 
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                const canvasSheet = await html2canvas(appContainer, {
+                pdfRenderContainer.appendChild(appContainerClone);
+
+                const canvasSheet = await html2canvas(appContainerClone, {
                     scale: 3,
                     useCORS: true,
-                    allowTaint: true,
-                    foreignObjectRendering: true,
                     backgroundColor: '#ffffff'
                 });
                 doc.addImage(canvasSheet.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
                 
-                appContainer.classList.remove('pdf-page-render', 'pdf-fix-colors');
-                elementsToHide.forEach(el => el.style.display = 'flex');
+                pdfRenderContainer.innerHTML = '';
             }
 
             const clienteText = document.getElementById('cover-cliente').value.trim() || "Relatorio";
             doc.save(`Relatorio_${clienteText.replace(/ /g,"_")}.pdf`);
 
         } catch (error) {
-            console.error("Erro ao gerar PDF:", error);
-            uiFeedback.showToast('Ocorreu um erro ao gerar o PDF.', 'error');
+            console.error("Erro detalhado ao gerar PDF:", error);
+            uiFeedback.showToast('Ocorreu um erro detalhado ao gerar o PDF. Verifique o console.', 'error');
         } finally {
+            document.body.removeChild(pdfRenderContainer);
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            navigation.to('index', false);
         }
     }
     
