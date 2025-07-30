@@ -1732,7 +1732,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const img = new Image();
                 img.src = companyData.logoDataUrl;
                 await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-                const logoHeight = 16; // mm
+                const logoHeight = 16; 
                 const logoWidth = (img.width * logoHeight) / img.height;
                 doc.addImage(companyData.logoDataUrl, 'PNG', MARGIN, currentY, logoWidth, logoHeight);
             } catch (e) {
@@ -1767,14 +1767,26 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(10);
         if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
             appState.currentReport.cache.forEach((report, index) => {
-                const text = `${index + 1}. ${report.header.equipamento || 'Planilha sem nome'}`;
-                doc.text(text, MARGIN + 5, currentY);
+                const prefix = `${index + 1}. `;
+                const equipmentName = report.header.equipamento || 'Planilha sem nome';
+                const prefixWidth = doc.getTextWidth(prefix);
+
+                // Desenha o número em preto
+                doc.setTextColor(0, 0, 0); // Preto
+                doc.text(prefix, MARGIN + 5, currentY);
+
+                // Desenha o nome do equipamento em azul
+                doc.setTextColor(41, 128, 185); // Azul (cor de link)
+                doc.text(equipmentName, MARGIN + 5 + prefixWidth, currentY);
+                
                 currentY += 7;
             });
         } else {
             doc.setTextColor(150, 150, 150);
             doc.text('Nenhuma planilha de equipamento foi adicionada.', MARGIN, currentY);
         }
+         // Resetar a cor para preto para o rodapé
+        doc.setTextColor(0, 0, 0);
         
         // --- RODAPÉ ---
         const footerY = pageHeight - MARGIN - 12;
