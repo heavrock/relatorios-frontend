@@ -1820,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('pdf-loader-overlay');
         
         if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram.', 'error');
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram. Verifique sua conexão.', 'error');
             return;
         }
 
