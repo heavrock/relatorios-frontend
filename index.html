@@ -2197,15 +2197,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
-                // Cria um container temporário para popular os dados de forma segura
-                const tempContainer = document.createElement('div');
-                tempContainer.innerHTML = document.getElementById(config.containerId).innerHTML;
-                populateSheetFromData(tempContainer, reportSheet, config);
+                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
+                populateSheetFromData(appContainerClone, reportSheet, config);
+                window[`recalculate_${config.prefix}`](appContainerClone);
                 
-                const appContainerClone = document.createElement('div');
-                appContainerClone.innerHTML = tempContainer.innerHTML;
-                
-                // Adiciona as classes e estilos para a visualização
                 appContainerClone.classList.add('report-page', 'pdf-fix-colors');
                 appContainerClone.style.margin = '2rem auto';
                 appContainerClone.style.border = '1px solid #ccc';
