@@ -2197,9 +2197,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
-                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
-                populateSheetFromData(appContainerClone, reportSheet, config);
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = document.getElementById(config.containerId).innerHTML;
+                populateSheetFromData(tempContainer, reportSheet, config);
                 
+                const appContainerClone = document.createElement('div');
+                appContainerClone.innerHTML = tempContainer.innerHTML;
                 appContainerClone.classList.add('report-page');
                 appContainerClone.style.margin = '2rem auto';
                 appContainerClone.style.border = '1px solid #ccc';
