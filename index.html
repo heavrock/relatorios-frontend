@@ -2172,18 +2172,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
     document.getElementById('preview-report-btn').addEventListener('click', previewFullReport);
 
-    // NOVA FUNÇÃO DE PRÉ-VISUALIZAÇÃO
+    // FUNÇÃO DE PRÉ-VISUALIZAÇÃO CORRIGIDA
     async function previewFullReport() {
         const loader = document.getElementById('pdf-loader-overlay');
+        loader.querySelector('h2').textContent = 'Gerando Visualização...';
         loader.classList.remove('hidden');
         loader.classList.add('flex');
-
-        const pdfRenderContainer = document.createElement('div');
-        pdfRenderContainer.style.position = 'absolute';
-        pdfRenderContainer.style.left = '-9999px';
-        pdfRenderContainer.style.top = '0';
-        pdfRenderContainer.style.width = '800px';
-        document.body.appendChild(pdfRenderContainer);
 
         try {
             const pagesHtml = [];
@@ -2202,12 +2196,19 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const reportSheet of appState.currentReport.cache) {
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
-                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
-                populateSheetFromData(appContainerClone, reportSheet, config);
+                
+                // Usar um container temporário para popular os dados
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = document.getElementById(config.containerId).innerHTML;
+                populateSheetFromData(tempContainer, reportSheet, config);
+                
+                const appContainerClone = document.createElement('div');
+                appContainerClone.innerHTML = tempContainer.innerHTML;
                 appContainerClone.classList.add('report-page', 'pdf-fix-colors');
                 appContainerClone.style.margin = '2rem auto';
                 appContainerClone.style.border = '1px solid #ccc';
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
+                
                 pagesHtml.push(appContainerClone.outerHTML);
             }
 
@@ -2243,17 +2244,21 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             const previewWindow = window.open('', '_blank');
-            previewWindow.document.open();
-            previewWindow.document.write(fullHtml);
-            previewWindow.document.close();
+            if (previewWindow) {
+                previewWindow.document.open();
+                previewWindow.document.write(fullHtml);
+                previewWindow.document.close();
+            } else {
+                uiFeedback.showToast('Por favor, habilite pop-ups para visualizar o relatório.', 'info');
+            }
 
         } catch (error) {
             console.error("Erro ao gerar visualização:", error);
             uiFeedback.showToast('Ocorreu um erro ao gerar a visualização.', 'error');
         } finally {
-            document.body.removeChild(pdfRenderContainer);
             loader.classList.add('hidden');
             loader.classList.remove('flex');
+            loader.querySelector('h2').textContent = 'Gerando Relatório em PDF...';
         }
     }
 });
