@@ -25,9 +25,9 @@
         .output-blue { background-color: #e0f2fe; }
         .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1rem; margin-bottom: 0.25rem; border-radius: 6px; }
         .unit-selector {
-            padding: 2px 4px;
-            font-size: 12px;
-            border-radius: 4px;
+            padding: 6px 8px; /* Aumentado para mais espaço interno */
+            font-size: 14px; /* Aumentado para melhor legibilidade */
+            border-radius: 6px;
             border: 1px solid #ccc;
             background-color: white;
             margin-left: 8px;
@@ -1827,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
     }
 
-    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA E FOCADA
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF CORRIGIDA E ROBUSTA
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         
