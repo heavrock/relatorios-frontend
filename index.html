@@ -2197,15 +2197,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
-                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
-                populateSheetFromData(appContainerClone, reportSheet, config);
-                window[`recalculate_${config.prefix}`](appContainerClone);
+                // Cria um container temporário para popular os dados de forma segura
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = document.getElementById(config.containerId).innerHTML;
                 
-                appContainerClone.classList.add('report-page');
-                appContainerClone.style.margin = '2rem auto';
-                appContainerClone.style.border = '1px solid #ccc';
-                appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
-                pagesHtml.push(appContainerClone.outerHTML);
+                // Popula os dados no container temporário
+                populateSheetFromData(tempContainer, reportSheet, config);
+                
+                // Recalcula os valores no container temporário
+                window[`recalculate_${config.prefix}`](tempContainer);
+                
+                // Adiciona a classe de página de relatório para estilização
+                const reportPageDiv = document.createElement('div');
+                reportPageDiv.classList.add('report-page');
+                reportPageDiv.style.margin = '2rem auto';
+                reportPageDiv.style.border = '1px solid #ccc';
+                reportPageDiv.innerHTML = tempContainer.innerHTML;
+                
+                pagesHtml.push(reportPageDiv.outerHTML);
             }
 
             const styles = Array.from(document.styleSheets)
@@ -2232,6 +2241,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         @media print {
                             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                             .report-page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
+                        }
+                        /* Garante que os valores dos inputs sejam visíveis na impressão */
+                        .input-yellow {
+                           -webkit-print-color-adjust: exact !important;
+                           print-color-adjust: exact !important;
                         }
                     </style>
                 </head>
