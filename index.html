@@ -2172,7 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
     document.getElementById('preview-report-btn').addEventListener('click', previewFullReport);
 
-    // FUNÇÃO DE PRÉ-VISUALIZAÇÃO CORRIGIDA
+    // NOVA FUNÇÃO DE PRÉ-VISUALIZAÇÃO CORRIGIDA
     async function previewFullReport() {
         const loader = document.getElementById('pdf-loader-overlay');
         loader.querySelector('h2').textContent = 'Gerando Visualização...';
@@ -2197,18 +2197,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
-                // Usar um container temporário para popular os dados
-                const tempContainer = document.createElement('div');
-                tempContainer.innerHTML = document.getElementById(config.containerId).innerHTML;
-                populateSheetFromData(tempContainer, reportSheet, config);
+                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
+                populateSheetFromData(appContainerClone, reportSheet, config);
                 
-                const appContainerClone = document.createElement('div');
-                appContainerClone.innerHTML = tempContainer.innerHTML;
-                appContainerClone.classList.add('report-page', 'pdf-fix-colors');
+                appContainerClone.classList.add('report-page');
                 appContainerClone.style.margin = '2rem auto';
                 appContainerClone.style.border = '1px solid #ccc';
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
-                
                 pagesHtml.push(appContainerClone.outerHTML);
             }
 
@@ -2258,7 +2253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            loader.querySelector('h2').textContent = 'Gerando Relatório em PDF...';
+            loader.querySelector('h2').textContent = 'Gerando Relatório...';
         }
     }
 });
