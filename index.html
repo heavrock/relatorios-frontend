@@ -1827,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
     }
 
-    // FUNÇÃO DE EXPORTAÇÃO DE PDF CORRIGIDA E ROBUSTA
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA E FOCADA
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         
@@ -1850,19 +1850,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
 
-            // Função auxiliar para adicionar uma página inteira ao PDF sem distorção
-            const addPageAsImageToPdf = async (element) => {
+            // Função auxiliar para adicionar uma página inteira ao PDF, forçando o encaixe
+            const addElementAsFullPage = async (element) => {
                 const canvas = await html2canvas(element, { scale: 3, useCORS: true });
-                const imgData = canvas.toDataURL('image/png');
-                const imgHeight = canvas.height * pageWidth / canvas.width;
-                doc.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight, undefined, 'FAST');
+                doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             };
 
             // 1. Renderiza a CAPA
             const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
             pdfRenderContainer.appendChild(coverPageClone);
-            await addPageAsImageToPdf(coverPageClone);
+            await addElementAsFullPage(coverPageClone);
             pdfRenderContainer.innerHTML = '';
 
             // 2. DESENHA O ÍNDICE NATIVAMENTE
@@ -1871,7 +1870,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await drawIndexPage(doc, appState.company.selected);
             }
 
-            // 3. Renderiza cada PLANILHA DE DADOS
+            // 3. Renderiza cada PLANILHA DE DADOS, forçando o encaixe em uma página
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
@@ -1879,12 +1878,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
                 populateSheetFromData(appContainerClone, reportSheet, config);
-                // IMPORTANTE: Não adicionar classes que restrinjam a altura aqui
-                appContainerClone.classList.add('pdf-fix-colors');
+                
+                // Aplica as classes para forçar a proporção de A4 antes da captura
+                appContainerClone.classList.add('report-page', 'pdf-fix-colors');
+                appContainerClone.style.margin = '0';
+                appContainerClone.style.border = 'none';
+                appContainerClone.style.maxWidth = 'none';
+                appContainerClone.style.boxShadow = 'none';
+                
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
                 pdfRenderContainer.appendChild(appContainerClone);
                 
-                await addPageAsImageToPdf(appContainerClone);
+                await addElementAsFullPage(appContainerClone);
 
                 pdfRenderContainer.innerHTML = '';
             }
