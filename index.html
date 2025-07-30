@@ -175,6 +175,10 @@
         }
 
         /* Estilos aprimorados para a página de índice */
+        #index-page {
+            display: flex;
+            flex-direction: column;
+        }
         #index-page .index-title {
             font-size: 1.25rem; /* text-xl */
             font-weight: 700;
@@ -445,7 +449,7 @@
                 </div>
 
                 <div id="index-page" class="report-page">
-                    <div class="flex-grow">
+                    <div class="flex-grow flex flex-col">
                         <header class="flex justify-between items-start pb-4 border-b-2 border-black">
                             <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
                             <div class="text-right text-xs">
