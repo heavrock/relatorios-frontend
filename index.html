@@ -1827,7 +1827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
     }
 
-    // FUNÇÃO DE EXPORTAÇÃO DE PDF CORRIGIDA
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA E FOCADA
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         
@@ -1843,25 +1843,24 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfRenderContainer.style.position = 'absolute';
         pdfRenderContainer.style.left = '-9999px';
         pdfRenderContainer.style.top = '0';
+        pdfRenderContainer.style.width = '800px'; // Largura fixa para renderização consistente
         document.body.appendChild(pdfRenderContainer);
 
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const pageWidth = doc.internal.pageSize.getWidth();
-
-            // Função auxiliar para adicionar uma página inteira ao PDF sem distorção
-            const addPageAsImageToPdf = async (element) => {
-                const canvas = await html2canvas(element, { scale: 3, useCORS: true });
-                const imgData = canvas.toDataURL('image/png');
-                const imgHeight = canvas.height * pageWidth / canvas.width;
-                doc.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight, undefined, 'FAST');
-            };
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const MARGIN = 15;
+            const contentWidth = pageWidth - (MARGIN * 2);
 
             // 1. Renderiza a CAPA
             const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
             pdfRenderContainer.appendChild(coverPageClone);
-            await addPageAsImageToPdf(coverPageClone);
+            const canvasCover = await html2canvas(coverPageClone, { scale: 3, useCORS: true });
+            const coverImgData = canvasCover.toDataURL('image/png');
+            const coverImgHeight = canvasCover.height * pageWidth / canvasCover.width;
+            doc.addImage(coverImgData, 'PNG', 0, 0, pageWidth, coverImgHeight, undefined, 'FAST');
             pdfRenderContainer.innerHTML = '';
 
             // 2. DESENHA O ÍNDICE NATIVAMENTE
@@ -1870,20 +1869,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 await drawIndexPage(doc, appState.company.selected);
             }
 
-            // 3. Renderiza cada PLANILHA DE DADOS
+            // 3. Renderiza cada PLANILHA DE DADOS, seção por seção
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
+                let currentY = MARGIN;
+
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
                 const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
                 populateSheetFromData(appContainerClone, reportSheet, config);
-                appContainerClone.classList.add('pdf-page-render', 'pdf-fix-colors');
+                appContainerClone.classList.add('pdf-fix-colors');
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
                 pdfRenderContainer.appendChild(appContainerClone);
-                
-                await addPageAsImageToPdf(appContainerClone);
 
+                const elementsToRender = appContainerClone.querySelectorAll('header, section');
+
+                for (const el of elementsToRender) {
+                    const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+                    if (currentY + imgHeight > pageHeight - MARGIN) {
+                        doc.addPage();
+                        currentY = MARGIN;
+                    }
+                    
+                    doc.addImage(canvas.toDataURL('image/png'), 'PNG', MARGIN, currentY, contentWidth, imgHeight, undefined, 'FAST');
+                    currentY += imgHeight + 5; // Adiciona um pequeno espaçamento
+                }
                 pdfRenderContainer.innerHTML = '';
             }
 
