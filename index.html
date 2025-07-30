@@ -2201,7 +2201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 populateSheetFromData(appContainerClone, reportSheet, config);
                 window[`recalculate_${config.prefix}`](appContainerClone);
                 
-                appContainerClone.classList.add('report-page', 'pdf-fix-colors');
+                appContainerClone.classList.add('report-page');
                 appContainerClone.style.margin = '2rem auto';
                 appContainerClone.style.border = '1px solid #ccc';
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
