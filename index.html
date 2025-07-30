@@ -1719,108 +1719,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // FUNÇÃO PARA DESENHAR O ÍNDICE NATIVAMENTE NO PDF (COM FONTES AJUSTADAS)
-    async function drawIndexPage(doc, companyData) {
-        const MARGIN = 15;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        let currentY = MARGIN;
-
-        // --- CABEÇALHO ---
-        if (companyData.logoDataUrl) {
-            try {
-                const img = new Image();
-                img.src = companyData.logoDataUrl;
-                await new Promise(resolve => img.onload = resolve);
-                const logoHeight = 20; // mm
-                const logoWidth = (img.width * logoHeight) / img.height;
-                doc.addImage(companyData.logoDataUrl, 'PNG', MARGIN, currentY, logoWidth, logoHeight);
-            } catch (e) {
-                console.error("Erro ao carregar logo da empresa para o PDF:", e);
-            }
-        }
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(10); // Tamanho ajustado
-        doc.setTextColor(0, 0, 0);
-        
-        doc.setFont('Helvetica', 'bold');
-        doc.text(companyData.name || '', pageWidth - MARGIN, currentY + 4, { align: 'right' });
-        doc.setFont('Helvetica', 'normal');
-        doc.text(companyData.address || '', pageWidth - MARGIN, currentY + 8, { align: 'right' });
-        doc.text(companyData.phones || '', pageWidth - MARGIN, currentY + 12, { align: 'right' });
-        doc.text(companyData.phone2 || '', pageWidth - MARGIN, currentY + 16, { align: 'right' });
-        
-        currentY += 30;
-        doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.5);
-        doc.line(MARGIN, currentY, pageWidth - MARGIN, currentY);
-        currentY += 20;
-
-        // --- CONTEÚDO (LISTA DE EQUIPAMENTOS) ---
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(12); // Tamanho ajustado
-        doc.text('Equipamentos Analisados:', MARGIN, currentY);
-        currentY += 12;
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(10); // Tamanho ajustado
-        if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
-            appState.currentReport.cache.forEach((report, index) => {
-                const text = `${index + 1}. ${report.header.equipamento || 'Planilha sem nome'}`;
-                doc.text(text, MARGIN + 5, currentY);
-                currentY += 7;
-            });
-        } else {
-            doc.setTextColor(150, 150, 150);
-            doc.text('Nenhuma planilha de equipamento foi adicionada.', MARGIN, currentY);
-        }
-        
-        // --- RODAPÉ ---
-        const footerY = pageHeight - MARGIN - 12;
-        let logo1Width = 0;
-        let logo2Width = 0;
-        const repLogoHeight = 8; // mm (tamanho miniatura)
-
-        if (companyData.repLogo1DataUrl) {
-            try {
-                const img = new Image();
-                img.src = companyData.repLogo1DataUrl;
-                await new Promise(resolve => img.onload = resolve);
-                logo1Width = (img.width * repLogoHeight) / img.height;
-            } catch (e) { console.error("Erro ao carregar repLogo1 para o PDF:", e); }
-        }
-        if (companyData.repLogo2DataUrl) {
-            try {
-                const img = new Image();
-                img.src = companyData.repLogo2DataUrl;
-                await new Promise(resolve => img.onload = resolve);
-                logo2Width = (img.width * repLogoHeight) / img.height;
-            } catch (e) { console.error("Erro ao carregar repLogo2 para o PDF:", e); }
-        }
-
-        const totalLogoWidth = logo1Width + logo2Width + (logo1Width > 0 && logo2Width > 0 ? 8 : 0);
-        let currentX = (pageWidth - totalLogoWidth) / 2;
-
-        if (logo1Width > 0) {
-            doc.addImage(companyData.repLogo1DataUrl, 'PNG', currentX, footerY, logo1Width, repLogoHeight);
-            currentX += logo1Width + 8;
-        }
-        if (logo2Width > 0) {
-            doc.addImage(companyData.repLogo2DataUrl, 'PNG', currentX, footerY, logo2Width, repLogoHeight);
-        }
-
-        doc.setFontSize(10); // Tamanho ajustado
-        doc.setTextColor(100, 100, 100);
-        doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
-    }
-
-    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF CORRIGIDA E SIMPLIFICADA
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
         
         if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram.', 'error');
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram. Verifique sua conexão.', 'error');
             return;
         }
 
@@ -1831,73 +1735,49 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfRenderContainer.style.position = 'absolute';
         pdfRenderContainer.style.left = '-9999px';
         pdfRenderContainer.style.top = '0';
-        pdfRenderContainer.style.width = '800px'; // Largura fixa para consistência
         document.body.appendChild(pdfRenderContainer);
 
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const MARGIN = 15;
-            const contentWidth = pageWidth - (MARGIN * 2);
 
-            // --- FUNÇÃO AUXILIAR PARA ADICIONAR CONTEÚDO E GERENCIAR PÁGINAS ---
-            let currentY = MARGIN;
-            const addCanvasToPdf = (canvas) => {
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-                const aspectRatio = canvasHeight / canvasWidth;
-                const imgHeight = contentWidth * aspectRatio;
-
-                if (currentY + imgHeight > pageHeight - MARGIN) {
-                    doc.addPage();
-                    currentY = MARGIN;
-                }
-                
-                doc.addImage(canvas.toDataURL('image/png'), 'PNG', MARGIN, currentY, contentWidth, imgHeight, undefined, 'FAST');
-                currentY += imgHeight + 5; // Adiciona um pequeno espaçamento
+            // Função auxiliar para adicionar uma página inteira ao PDF sem distorção
+            const addPageToPdf = async (element) => {
+                const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+                const imgData = canvas.toDataURL('image/png');
+                const imgHeight = canvas.height * pageWidth / canvas.width;
+                doc.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight, undefined, 'FAST');
             };
 
             // 1. Renderiza a CAPA
             const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
             pdfRenderContainer.appendChild(coverPageClone);
-            const canvasCover = await html2canvas(coverPageClone, { scale: 3, useCORS: true });
-            doc.addImage(canvasCover.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            await addPageToPdf(coverPageClone);
             pdfRenderContainer.innerHTML = '';
 
-            // 2. DESENHA O ÍNDICE
+            // 2. Renderiza o ÍNDICE
             if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
-                await drawIndexPage(doc, appState.company.selected);
+                const indexPageClone = document.getElementById('index-page').cloneNode(true);
+                pdfRenderContainer.appendChild(indexPageClone);
+                await addPageToPdf(indexPageClone);
+                pdfRenderContainer.innerHTML = '';
             }
 
-            // 3. Renderiza cada PLANILHA DE DADOS, seção por seção
+            // 3. Renderiza cada PLANILHA DE DADOS
             for (const reportSheet of appState.currentReport.cache) {
                 doc.addPage();
-                currentY = MARGIN; // Reseta a altura para cada nova planilha
-
                 const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
                 const config = configMap[reportSheet.type];
                 
                 const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
                 populateSheetFromData(appContainerClone, reportSheet, config);
+                appContainerClone.classList.add('pdf-page-render', 'pdf-fix-colors');
                 appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
                 pdfRenderContainer.appendChild(appContainerClone);
-
-                // Captura o cabeçalho da planilha
-                const headerEl = appContainerClone.querySelector('header');
-                if (headerEl) {
-                    const canvasHeader = await html2canvas(headerEl, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-                    addCanvasToPdf(canvasHeader);
-                }
                 
-                // Captura cada seção (tabela) individualmente
-                const sectionElements = appContainerClone.querySelectorAll('section');
-                for (const sectionEl of sectionElements) {
-                    const canvasSection = await html2canvas(sectionEl, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-                    addCanvasToPdf(canvasSection);
-                }
+                await addPageToPdf(appContainerClone);
 
                 pdfRenderContainer.innerHTML = '';
             }
