@@ -25,9 +25,9 @@
         .output-blue { background-color: #e0f2fe; }
         .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1rem; margin-bottom: 0.25rem; border-radius: 6px; }
         .unit-selector {
-            padding: 6px 8px;
-            font-size: 14px;
-            border-radius: 6px;
+            padding: 2px 4px;
+            font-size: 12px;
+            border-radius: 4px;
             border: 1px solid #ccc;
             background-color: white;
             margin-left: 8px;
@@ -79,7 +79,7 @@
         .measurement-item { text-align: center; }
         .measurement-item label { font-size: 11px; font-weight: 500; display: block; margin-bottom: 2px; }
         .measurement-item .input-group { display: flex; align-items: center; justify-content: center; }
-        .measurement-item input, .printable-page .measurement-item span { max-width: 70px; padding: 2px 4px; font-size: 13px; }
+        .measurement-item input { max-width: 70px; padding: 2px 4px; font-size: 13px; }
         .measurement-item span.unit { font-size: 12px; font-weight: 500; margin-left: 4px; }
         .correction-title { text-align: center; font-weight: 500; font-size: 12px; padding: 4px; background-color: #f9fafb; border-top: 1px solid #d1d5db; border-bottom: 1px solid #d1d5db; margin: 8px -8px; }
         .indices-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
@@ -151,66 +151,28 @@
             text-align: center;
         }
 
-        /* --- NOVOS ESTILOS PARA VISUALIZAÇÃO E PDF --- */
-        .printable-page {
+        /* Estilos para renderização do PDF */
+        .pdf-page-render {
+            width: 210mm;
+            min-height: 297mm;
             padding: 15mm;
+            margin: 0;
             display: flex;
             flex-direction: column;
+            background: white;
+            box-shadow: none;
+            border: none;
         }
-        .printable-page main {
-            flex-grow: 1;
-        }
-        .printable-page .input-yellow {
+        .pdf-fix-colors .input-yellow {
             background-color: #fef9c3 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
-            display: inline-block;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
         }
-        .printable-page .output-blue {
+        .pdf-fix-colors .output-blue {
             background-color: #e0f2fe !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-        .printable-page .data-table td, .printable-page .data-table th {
-            font-size: 10px;
-            padding: 4px;
-        }
-        .printable-page .section-title {
-            font-size: 13px;
-            padding: 5px;
-            margin-top: 12px;
-        }
-        .printable-page .header-info {
-            font-size: 11px;
-        }
-        .printable-page .header-info label {
-            font-weight: bold;
-            color: #4a5568;
-        }
-        .printable-page .header-info span {
-            background: #f7fafc;
-            padding: 3px 6px;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            font-weight: 500;
-        }
-        .printable-page .page-footer {
-            font-size: 9px;
-            color: #718096;
-            text-align: center;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 5px;
-            margin-top: 10px;
-        }
-        .printable-page .indices-row-print td {
-            border-bottom: 2px solid #4a5568;
-        }
-        .printable-page .data-row td {
-            border-bottom: 1px dashed #cbd5e0;
-        }
-
 
         /* Estilos aprimorados para a página de índice */
         #index-page {
@@ -483,8 +445,7 @@
                 <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
                     <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
                     <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-                    <button id="preview-report-btn" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 transition w-full sm:w-auto">Visualizar Relatório</button>
-                    <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exportar PDF</button>
+                    <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
                 </div>
 
                 <div id="index-page" class="report-page">
@@ -760,13 +721,13 @@
                 <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
             </div>
         </div>
-        <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[3000]">
+        <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[200]">
             <div>
                 <svg class="animate-spin h-10 w-10 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <h2 class="text-2xl font-bold">Gerando Relatório...</h2>
+                <h2 class="text-2xl font-bold">Gerando Relatório em PDF...</h2>
                 <p class="text-lg mt-2">Isso pode levar alguns segundos. Por favor, aguarde.</p>
             </div>
         </div>
@@ -1495,7 +1456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.currentReport.editingIndex = null;
         document.getElementById('cover-cliente').value = '';
         document.getElementById('cover-local').value = '';
-        initializeCoverApp();    
+        initializeCoverApp();   
         updateIndexPage();  
     }
 
@@ -1593,10 +1554,10 @@ document.addEventListener('DOMContentLoaded', () => {
              const li = document.createElement('li');
                li.className = 'flex items-center justify-between index-list-item';
                li.innerHTML = `
-                   <span class="flex-grow">
-                       ${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a>
-                   </span>
-                   <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-4 flex-shrink-0" title="Remover esta planilha do relatório atual">&times;</button>`;
+                    <span class="flex-grow">
+                        ${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a>
+                    </span>
+                    <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-4 flex-shrink-0" title="Remover esta planilha do relatório atual">&times;</button>`;
                list.appendChild(li);
         });
     }
@@ -1700,15 +1661,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!appContainer) return;  
         const getEl = (id) => document.getElementById(`${config.prefix}-${id}`);  
         const recalculate = (container = appContainer) => { const tempInput = container.querySelector(`#${config.prefix}-${config.tempInputId}`); const temp = parseFloat(tempInput?.value); const hasTemp = !isNaN(temp); const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1; const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1; config.sections.forEach(section => { if (section.type === 'insulation') { section.rows.forEach(row => { const getVal = (col) => container.querySelector(`input[data-row="${row.id}"][data-col="${col}"]`)?.value || ''; const updateSpan = (col, value, bgColor = '#e0f2fe', textColor = 'black') => { const el = container.querySelector(`span[data-row="${row.id}"][data-col="${col}"]`); if (el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const updateDiv = (col, value, bgColor = 'transparent', textColor = 'white') => { const el = container.querySelector(`div[data-row="${row.id}"][data-col="${col}"]`); if(el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const reg30s = parseFloat(getVal('reg30s')); const reg1min = parseFloat(getVal('reg1min')); const reg10min = parseFloat(getVal('reg10min')); const highValueThreshold = 21000; const isHigh30s = reg30s > highValueThreshold; const isHigh1min = reg1min > highValueThreshold; const isHigh10min = reg10min > highValueThreshold; const isAnyHigh = isHigh30s || isHigh1min || isHigh10min; const corr30sNum = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN; const corr1minNum = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN; const corr10minNum = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN; let ia_val, ip_val, ia_result, ip_result; if (isAnyHigh) { ia_val = 1.6; ip_val = 4.0; ia_result = { status: 'Excelente', color: statusColors['Excelente'] }; ip_result = { status: 'Excelente', color: statusColors['Excelente'] }; } else { if (!isNaN(reg1min) && !isNaN(reg30s)) { ia_val = (reg30s === 0) ? 0 : (reg1min / reg30s); } else { ia_val = null; } if (!isNaN(reg10min) && !isNaN(reg1min)) { ip_val = (reg1min === 0) ? 0 : (reg10min / reg1min); } else { ip_val = null; } ia_result = evaluateIA(ia_val); ip_result = evaluateIP(ip_val); } const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white'; const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white'; updateSpan('corr30s', isHigh30s ? '>21000' : (!isNaN(corr30sNum) ? corr30sNum.toFixed(0) : '')); updateSpan('corr1min', isHigh1min ? '>21000' : (!isNaN(corr1minNum) ? corr1minNum.toFixed(0) : '')); updateSpan('corr10min', isHigh10min ? '>21000' : (!isNaN(corr10minNum) ? corr10minNum.toFixed(0) : '')); updateSpan('ia_val', ia_val !== null ? ia_val.toFixed(2) : ''); updateSpan('ip_val', ip_val !== null ? ip_val.toFixed(2) : ''); if (config.layout === 'grid') { updateDiv('ia_status', ia_result.status, ia_result.color, iaTextColor); updateDiv('ip_status', ip_result.status, ip_result.color, ipTextColor); } else { updateSpan('ia_status', ia_result.status, ia_result.color, iaTextColor); updateSpan('ip_status', ip_result.status, ip_result.color, ipTextColor); } }); } else if (section.type === 'ohmic') { section.rows.forEach(row => { const regValue = parseFloat(container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`)?.value || ''); const corrValueNum = !isNaN(regValue) ? (hasTemp ? regValue * KtOhm : regValue) : NaN; const span = container.querySelector(`span[data-row="${row.id}"][data-col="corr"]`); if(span) span.textContent = !isNaN(corrValueNum) ? corrValueNum.toFixed(2) : ''; }); } }); };  
-        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = (container, config) => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; container.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); container.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); container.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; };  
+        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; };  
         createTables();  
         appContainer.addEventListener('input', (e) => (e.target.matches('input, select')) && recalculate());  
         if (config.specialHandlers && config.specialHandlers.init) {  
-            config.specialHandlers.init(appContainer, recalculate, getEl, clearForm, (container, config) => collectSheetData(appContainer, config), config);  
+            config.specialHandlers.init(appContainer, recalculate, getEl, (keep) => clearForm(config, keep), collectSheetData, config);  
         }  
         recalculate();  
         window[`recalculate_${config.prefix}`] = recalculate;  
-        window[`collectSheetData_${config.prefix}`] = (container) => collectSheetData(container || appContainer, config);
     };
     
     function populateSheetFromData(container, reportData, config) {
@@ -1746,9 +1706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 diodesBody.classList.toggle('hidden', !shouldBeVisible);
             }
         }
-        if (window[`recalculate_${config.prefix}`]) {
-            window[`recalculate_${config.prefix}`](container);
-        }
+        window[`recalculate_${config.prefix}`](container);
     }
     
     function isFormDirty(container) {
@@ -1868,249 +1826,16 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setTextColor(100, 100, 100);
         doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
     }
-    
-    // ==================================================================================
-    // --- NOVAS FUNÇÕES DE RENDERIZAÇÃO PARA PDF E VISUALIZAÇÃO ---
-    // ==================================================================================
 
-    /**
-     * [NOVO] Cria uma ou mais páginas estáticas de uma planilha para impressão/PDF.
-     * @param {object} sheetData - Os dados da planilha a serem renderizados.
-     * @returns {Array<string>} - Um array de strings HTML, cada uma representando uma página A4.
-     */
-    function createPrintableViewForSheet(sheetData) {
-        const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
-        const config = configMap[sheetData.type];
-        if (!config) return [''];
-
-        const temp = parseFloat(sheetData.header[config.tempInputId]);
-        const hasTemp = !isNaN(temp);
-        const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1;
-        const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1;
-
-        const headerFields = [
-            { label: 'CLIENTE:', value: sheetData.header.cliente }, { label: 'EQUIP.:', value: sheetData.header.equipamento },
-            { label: 'Nº SÉRIE:', value: sheetData.header.numeroSerie }, { label: 'LOCAL:', value: sheetData.header.local },
-            { label: 'AVR:', value: sheetData.header.avr }, { label: 'TENSÃO:', value: sheetData.header.tensao },
-            { label: 'POTÊNCIA:', value: sheetData.header.potencia }, { label: 'DATA:', value: sheetData.header.data },
-            { label: 'FAB./MODELO:', value: sheetData.header.fabricante }, { label: 'ROTAÇÃO:', value: sheetData.header.rotacao },
-        ];
-        
-        const headerHTML = `<header class="border-b-2 border-gray-300 pb-4 mb-4">
-            <div class="flex justify-between items-start">
-                <div><h1 class="text-2xl font-bold text-gray-800">${appState.company.selected.name}</h1></div>
-            </div>
-            <div class="grid grid-cols-4 gap-x-6 gap-y-2 mt-4">
-                ${headerFields.filter(f => f.value).map(f => `<div class="header-info col-span-2"><label>${f.label}</label> <span>${f.value || ''}</span></div>`).join('')}
-            </div>
-        </header>`;
-
-        const conditionsHTML = `<div class="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg border">
-            <div class="flex items-center gap-2"><label class="font-semibold">Temp. Amb. (°C):</label><span class="input-yellow w-full p-1 text-center">${sheetData.header.tempAmbiente || ''}</span></div>
-            <div class="flex items-center gap-2"><label class="font-semibold">${config.prefix === 'transformer' ? 'Temp. no Trafo (°C):' : 'Temp. Enrol. (°C):'}</label><span class="input-yellow w-full p-1 text-center">${sheetData.header[config.tempInputId] || ''}</span></div>
-            <div class="flex items-center gap-2"><label class="font-semibold">Umidade (%):</label><span class="input-yellow w-full p-1 text-center">${sheetData.header.umidadeRelativa || ''}</span></div>
-        </div>`;
-        
-        const footerHTML = `<footer class="page-footer">
-            <p>${appState.company.selected.name} | Relatório de Medição: ${sheetData.header.equipamento || 'N/A'}</p>
-        </footer>`;
-
-        const generateSectionHTML = (section) => {
-            const sectionData = sheetData.sections[section.name];
-            if (!sectionData) return '';
-            // ... (O restante da lógica de geração de HTML para cada tipo de seção permanece aqui)
-            // Esta função interna agora será responsável por gerar o HTML para uma única seção
-            let sectionContent = `<h2 class="section-title">${section.name}</h2>`;
-            
-            if (section.type === 'insulation') {
-                const rowsHTML = section.rows.map(row => {
-                    const rowData = sectionData[row.id] || {};
-                    const reg30s = parseFloat(rowData.reg30s);
-                    const reg1min = parseFloat(rowData.reg1min);
-                    const reg10min = parseFloat(rowData.reg10min);
-                    const isHigh = (v) => v > 21000;
-
-                    const corr30s = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN;
-                    const corr1min = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN;
-                    const corr10min = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN;
-
-                    const ia_val = (!isHigh(reg30s) && !isHigh(reg1min) && !isNaN(reg1min) && !isNaN(reg30s) && reg30s !== 0) ? (reg1min / reg30s) : (isHigh(reg30s) || isHigh(reg1min) ? 1.6 : null);
-                    const ip_val = (!isHigh(reg1min) && !isHigh(reg10min) && !isNaN(reg10min) && !isNaN(reg1min) && reg1min !== 0) ? (reg10min / reg1min) : (isHigh(reg1min) || isHigh(reg10min) ? 4.0 : null);
-                    
-                    const ia_result = evaluateIA(ia_val);
-                    const ip_result = evaluateIP(ip_val);
-                    const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white';
-                    const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white';
-
-                    if (config.layout === 'grid') {
-                        return `<div class="insulation-cell">
-                                <div class="cell-title">${row.title}</div>
-                                <div class="cell-content">
-                                    <div class="measurement-row">
-                                        <div class="measurement-item"><label>30s</label><div class="input-group"><span class="input-yellow">${rowData.reg30s || ''}</span><span class="unit">MΩ</span></div></div>
-                                        <div class="measurement-item"><label>1min</label><div class="input-group"><span class="input-yellow">${rowData.reg1min || ''}</span><span class="unit">MΩ</span></div></div>
-                                        <div class="measurement-item"><label>10min</label><div class="input-group"><span class="input-yellow">${rowData.reg10min || ''}</span><span class="unit">MΩ</span></div></div>
-                                    </div>
-                                    <div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div>
-                                    <div class="measurement-row">
-                                        <div class="measurement-item"><span class="output-span output-blue">${isHigh(reg30s) ? '>21000' : (!isNaN(corr30s) ? corr30s.toFixed(0) : '')}</span></div>
-                                        <div class="measurement-item"><span class="output-span output-blue">${isHigh(reg1min) ? '>21000' : (!isNaN(corr1min) ? corr1min.toFixed(0) : '')}</span></div>
-                                        <div class="measurement-item"><span class="output-span output-blue">${isHigh(reg10min) ? '>21000' : (!isNaN(corr10min) ? corr10min.toFixed(0) : '')}</span></div>
-                                    </div>
-                                    <div class="indices-row">
-                                        <div class="index-item"><label>Índice de Absorção</label><span class="output-span output-blue">${ia_val !== null ? ia_val.toFixed(2) : ''}</span></div>
-                                        <div class="index-item"><label>Índice de Polarização</label><span class="output-span output-blue">${ip_val !== null ? ip_val.toFixed(2) : ''}</span></div>
-                                    </div>
-                                    <div class="indices-row mt-2">
-                                        <div class="status-cell" style="background-color:${ia_result.color}; color:${iaTextColor};">${ia_result.status}</div>
-                                        <div class="status-cell" style="background-color:${ip_result.color}; color:${ipTextColor};">${ip_result.status}</div>
-                                    </div>
-                                </div>
-                            </div>`;
-                    } else { // layout table
-                        return `<tr class="data-row">
-                                <td class="label-cell">${row.label}</td>
-                                <td class="input-yellow">${rowData.reg30s || ''}</td>
-                                <td class="input-yellow">${rowData.reg1min || ''}</td>
-                                <td class="input-yellow">${rowData.reg10min || ''}</td>
-                                <td class="output-blue">${isHigh(reg30s) ? '>21000' : (!isNaN(corr30s) ? corr30s.toFixed(0) : '')}</td>
-                                <td class="output-blue">${isHigh(reg1min) ? '>21000' : (!isNaN(corr1min) ? corr1min.toFixed(0) : '')}</td>
-                                <td class="output-blue">${isHigh(reg10min) ? '>21000' : (!isNaN(corr10min) ? corr10min.toFixed(0) : '')}</td>
-                            </tr>
-                            <tr class="indices-row-print">
-                                <td class="label-cell">${row.label}</td>
-                                <td class="output-blue">${ia_val !== null ? ia_val.toFixed(2) : ''}</td>
-                                <td style="background-color:${ia_result.color}; color:${iaTextColor}; font-weight: bold;">${ia_result.status}</td>
-                                <td class="output-blue">${ip_val !== null ? ip_val.toFixed(2) : ''}</td>
-                                <td style="background-color:${ip_result.color}; color:${ipTextColor}; font-weight: bold;">${ip_result.status}</td>
-                                <td colspan="2"></td>
-                            </tr>`;
-                    }
-                }).join('');
-
-                if (config.layout === 'grid') {
-                    sectionContent += `<div id="${config.prefix}-insulation-grid">${rowsHTML}</div>`;
-                } else {
-                    sectionContent += `<div class="overflow-x-auto shadow-md rounded-lg">
-                        <table class="data-table">
-                            <thead>
-                                <tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr>
-                                <tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr>
-                            </thead>
-                            <tbody>${rowsHTML.replace(/<\/tr>\s*<tr class="indices-row-print">/g, '')}</tbody>
-                        </table>
-                        <table class="data-table mt-4">
-                            <thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th><th colspan="2"></th></tr></thead>
-                            <tbody>${rowsHTML.replace(/<tr class="data-row">[\s\S]*?<\/tr>/g, '')}</tbody>
-                        </table>
-                    </div>`;
-                }
-            } // ... other section types
-            return `<section>${sectionContent}</section>`;
-        };
-
-        if (sheetData.type === 'gen') {
-            const page1Sections = config.sections.filter(s => s.containerType === 'main' || s.containerType === 'pmg');
-            const page2Sections = config.sections.filter(s => s.containerType === 'extra');
-
-            const page1HTML = page1Sections.map(generateSectionHTML).join('');
-            
-            const hasPage2Data = page2Sections.some(s => sheetData.sections[s.name]);
-            const pages = [];
-
-            pages.push(`<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${page1HTML}</main>${footerHTML}</div>`);
-
-            if (hasPage2Data) {
-                const page2HTML = page2Sections.map(generateSectionHTML).join('');
-                pages.push(`<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${page2HTML}</main>${footerHTML}</div>`);
-            }
-            return pages;
-
-        } else {
-            const allSectionsHTML = config.sections.map(generateSectionHTML).join('');
-            const pageHTML = `<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${allSectionsHTML}</main>${footerHTML}</div>`;
-            return [pageHTML];
-        }
-    }
-
-    /**
-     * [ATUALIZADO] Gera uma visualização do relatório completo em uma nova aba.
-     */
-    async function previewFullReport() {
-        const loader = document.getElementById('pdf-loader-overlay');
-        loader.querySelector('h2').textContent = 'Gerando Visualização...';
-        loader.classList.add('flex');
-        loader.classList.remove('hidden');
-
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        try {
-            const pagesHtml = [];
-
-            // 1. Capa
-            pagesHtml.push(document.getElementById('cover-preview').outerHTML);
-
-            // 2. Índice
-            if (appState.currentReport.cache?.length > 0) {
-                pagesHtml.push(document.getElementById('index-page').outerHTML);
-            }
-
-            // 3. Planilhas
-            for (const reportSheet of appState.currentReport.cache) {
-                const sheetPages = createPrintableViewForSheet(reportSheet);
-                pagesHtml.push(...sheetPages);
-            }
-
-            const styles = Array.from(document.styleSheets)
-                .map(styleSheet => {
-                    try { return Array.from(styleSheet.cssRules).map(rule => rule.cssText).join(''); } 
-                    catch (e) { return ''; }
-                }).join('');
-
-            const fullHtml = `
-                <!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Visualização do Relatório</title>
-                <script src="https://cdn.tailwindcss.com"><\/script>
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                <style>${styles}</style>
-                <style>
-                    body { background-color: #6b7280; }
-                    .report-page { margin: 2rem auto; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-                    @media print {
-                        body { background-color: white; }
-                        .report-page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
-                        .report-page:last-of-type { page-break-after: auto; }
-                    }
-                </style></head><body>${pagesHtml.join('')}</body></html>`;
-
-            const previewWindow = window.open('', '_blank');
-            if (previewWindow) {
-                previewWindow.document.open();
-                previewWindow.document.write(fullHtml);
-                previewWindow.document.close();
-            } else {
-                uiFeedback.showToast('Por favor, habilite pop-ups para visualizar o relatório.', 'info');
-            }
-
-        } catch (error) {
-            console.error("Erro ao gerar visualização:", error);
-            uiFeedback.showToast('Ocorreu um erro ao gerar a visualização.', 'error');
-        } finally {
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-            loader.querySelector('h2').textContent = 'Gerando Relatório...';
-        }
-    }
-
-    /**
-     * [ATUALIZADO] Exporta o relatório completo para PDF.
-     */
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA E FOCADA
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
+        
         if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram.', 'error'); return;
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram. Verifique sua conexão.', 'error');
+            return;
         }
 
-        loader.querySelector('h2').textContent = 'Gerando Relatório PDF...';
         loader.classList.remove('hidden');
         loader.classList.add('flex');
         
@@ -2118,7 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pdfRenderContainer.style.position = 'absolute';
         pdfRenderContainer.style.left = '-9999px';
         pdfRenderContainer.style.top = '0';
-        pdfRenderContainer.style.width = '800px';
+        pdfRenderContainer.style.width = '800px'; // Largura fixa para renderização consistente
         document.body.appendChild(pdfRenderContainer);
 
         try {
@@ -2127,8 +1852,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
+            // Função auxiliar para adicionar uma página inteira ao PDF, forçando o encaixe
             const addElementAsFullPage = async (element) => {
-                const canvas = await html2canvas(element, { scale: 3, useCORS: true, logging: false });
+                const canvas = await html2canvas(element, { scale: 3, useCORS: true });
                 doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
             };
 
@@ -2138,23 +1864,34 @@ document.addEventListener('DOMContentLoaded', () => {
             await addElementAsFullPage(coverPageClone);
             pdfRenderContainer.innerHTML = '';
 
-            // 2. DESENHA O ÍNDICE
-            if (appState.currentReport.cache?.length > 0) {
+            // 2. DESENHA O ÍNDICE NATIVAMENTE
+            if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
                 doc.addPage();
                 await drawIndexPage(doc, appState.company.selected);
             }
 
-            // 3. Renderiza cada PLANILHA
+            // 3. Renderiza cada PLANILHA DE DADOS, forçando o encaixe em uma página
             for (const reportSheet of appState.currentReport.cache) {
-                const sheetPagesHTML = createPrintableViewForSheet(reportSheet);
-                for (const pageHTML of sheetPagesHTML) {
-                    doc.addPage();
-                    const pageElement = document.createElement('div');
-                    pageElement.innerHTML = pageHTML;
-                    pdfRenderContainer.appendChild(pageElement.firstChild);
-                    await addElementAsFullPage(pdfRenderContainer.querySelector('.report-page'));
-                    pdfRenderContainer.innerHTML = '';
-                }
+                doc.addPage();
+                const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
+                const config = configMap[reportSheet.type];
+                
+                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
+                populateSheetFromData(appContainerClone, reportSheet, config);
+                
+                // Aplica as classes para forçar a proporção de A4 antes da captura
+                appContainerClone.classList.add('report-page', 'pdf-fix-colors');
+                appContainerClone.style.margin = '0';
+                appContainerClone.style.border = 'none';
+                appContainerClone.style.maxWidth = 'none';
+                appContainerClone.style.boxShadow = 'none';
+                
+                appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
+                pdfRenderContainer.appendChild(appContainerClone);
+                
+                await addElementAsFullPage(appContainerClone);
+
+                pdfRenderContainer.innerHTML = '';
             }
 
             const clienteText = document.getElementById('cover-cliente').value.trim() || "Relatorio";
@@ -2162,12 +1899,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Erro detalhado ao gerar PDF:", error);
-            uiFeedback.showToast('Ocorreu um erro detalhado ao gerar o PDF.', 'error');
+            uiFeedback.showToast('Ocorreu um erro detalhado ao gerar o PDF. Verifique o console.', 'error');
         } finally {
             document.body.removeChild(pdfRenderContainer);
             loader.classList.add('hidden');
             loader.classList.remove('flex');
-            loader.querySelector('h2').textContent = 'Gerando Relatório...';
         }
     }
     
@@ -2433,8 +2169,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
-    document.getElementById('preview-report-btn').addEventListener('click', previewFullReport);
-
 });
 </script>
 </body>
