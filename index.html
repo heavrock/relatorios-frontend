@@ -79,7 +79,7 @@
         .measurement-item { text-align: center; }
         .measurement-item label { font-size: 11px; font-weight: 500; display: block; margin-bottom: 2px; }
         .measurement-item .input-group { display: flex; align-items: center; justify-content: center; }
-        .measurement-item input { max-width: 70px; padding: 2px 4px; font-size: 13px; }
+        .measurement-item input, .printable-page .measurement-item span { max-width: 70px; padding: 2px 4px; font-size: 13px; }
         .measurement-item span.unit { font-size: 12px; font-weight: 500; margin-left: 4px; }
         .correction-title { text-align: center; font-weight: 500; font-size: 12px; padding: 4px; background-color: #f9fafb; border-top: 1px solid #d1d5db; border-bottom: 1px solid #d1d5db; margin: 8px -8px; }
         .indices-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
@@ -151,49 +151,64 @@
             text-align: center;
         }
 
-        /* Estilos para renderização do PDF */
-        .pdf-page-render {
-            width: 210mm;
-            min-height: 297mm;
+        /* --- NOVOS ESTILOS PARA VISUALIZAÇÃO E PDF --- */
+        .printable-page {
             padding: 15mm;
-            margin: 0;
             display: flex;
             flex-direction: column;
-            background: white;
-            box-shadow: none;
-            border: none;
         }
-        .pdf-fix-colors .input-yellow,
+        .printable-page main {
+            flex-grow: 1;
+        }
         .printable-page .input-yellow {
             background-color: #fef9c3 !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            display: inline-block;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
         }
-        .pdf-fix-colors .output-blue,
         .printable-page .output-blue {
             background-color: #e0f2fe !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
         .printable-page .data-table td, .printable-page .data-table th {
-            font-size: 11px;
-            padding: 4px 6px;
+            font-size: 10px;
+            padding: 4px;
         }
         .printable-page .section-title {
-            font-size: 14px;
-            padding: 6px;
+            font-size: 13px;
+            padding: 5px;
+            margin-top: 12px;
         }
         .printable-page .header-info {
-            font-size: 12px;
+            font-size: 11px;
         }
         .printable-page .header-info label {
             font-weight: bold;
+            color: #4a5568;
         }
         .printable-page .header-info span {
-            background: #f3f4f6;
-            padding: 2px 6px;
+            background: #f7fafc;
+            padding: 3px 6px;
             border-radius: 4px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #e2e8f0;
+            font-weight: 500;
+        }
+        .printable-page .page-footer {
+            font-size: 9px;
+            color: #718096;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 5px;
+            margin-top: 10px;
+        }
+        .printable-page .indices-row-print td {
+            border-bottom: 2px solid #4a5568;
+        }
+        .printable-page .data-row td {
+            border-bottom: 1px dashed #cbd5e0;
         }
 
 
@@ -1859,57 +1874,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
 
     /**
-     * Cria uma versão estática de uma página de planilha para impressão ou PDF.
+     * [NOVO] Cria uma ou mais páginas estáticas de uma planilha para impressão/PDF.
      * @param {object} sheetData - Os dados da planilha a serem renderizados.
-     * @returns {string} - O HTML completo da página estática.
+     * @returns {Array<string>} - Um array de strings HTML, cada uma representando uma página A4.
      */
     function createPrintableViewForSheet(sheetData) {
         const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
         const config = configMap[sheetData.type];
-        if (!config) return '';
+        if (!config) return [''];
 
-        // Calcula todos os valores necessários
         const temp = parseFloat(sheetData.header[config.tempInputId]);
         const hasTemp = !isNaN(temp);
         const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1;
         const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1;
 
         const headerFields = [
-            { label: 'CLIENTE:', value: sheetData.header.cliente },
-            { label: 'EQUIP.:', value: sheetData.header.equipamento },
-            { label: 'Nº SÉRIE:', value: sheetData.header.numeroSerie },
-            { label: 'LOCAL:', value: sheetData.header.local },
-            { label: 'AVR:', value: sheetData.header.avr },
-            { label: 'TENSÃO:', value: sheetData.header.tensao },
-            { label: 'POTÊNCIA:', value: sheetData.header.potencia },
-            { label: 'DATA:', value: sheetData.header.data },
-            { label: 'FAB./MODELO:', value: sheetData.header.fabricante },
-            { label: 'ROTAÇÃO:', value: sheetData.header.rotacao },
+            { label: 'CLIENTE:', value: sheetData.header.cliente }, { label: 'EQUIP.:', value: sheetData.header.equipamento },
+            { label: 'Nº SÉRIE:', value: sheetData.header.numeroSerie }, { label: 'LOCAL:', value: sheetData.header.local },
+            { label: 'AVR:', value: sheetData.header.avr }, { label: 'TENSÃO:', value: sheetData.header.tensao },
+            { label: 'POTÊNCIA:', value: sheetData.header.potencia }, { label: 'DATA:', value: sheetData.header.data },
+            { label: 'FAB./MODELO:', value: sheetData.header.fabricante }, { label: 'ROTAÇÃO:', value: sheetData.header.rotacao },
         ];
         
-        const headerHTML = `
-            <header class="border-b-2 border-gray-200 pb-6 mb-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div><h1 class="text-xl sm:text-2xl font-bold text-blue-800">${appState.company.selected.name}</h1></div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
-                    ${headerFields.filter(f => f.value).map(f => `
-                        <div class="header-info"><label>${f.label}</label> <span>${f.value || ''}</span></div>
-                    `).join('')}
-                </div>
-            </header>`;
+        const headerHTML = `<header class="border-b-2 border-gray-300 pb-4 mb-4">
+            <div class="flex justify-between items-start">
+                <div><h1 class="text-2xl font-bold text-gray-800">${appState.company.selected.name}</h1></div>
+            </div>
+            <div class="grid grid-cols-4 gap-x-6 gap-y-2 mt-4">
+                ${headerFields.filter(f => f.value).map(f => `<div class="header-info col-span-2"><label>${f.label}</label> <span>${f.value || ''}</span></div>`).join('')}
+            </div>
+        </header>`;
 
-        const conditionsHTML = `
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
-                <div class="flex items-center gap-2"><label class="font-semibold">Temp. Amb. (°C):</label><span class="input-yellow w-full p-1">${sheetData.header.tempAmbiente || ''}</span></div>
-                <div class="flex items-center gap-2"><label class="font-semibold">${config.prefix === 'transformer' ? 'Temp. no Trafo (°C):' : 'Temp. Enrol. (°C):'}</label><span class="input-yellow w-full p-1">${sheetData.header[config.tempInputId] || ''}</span></div>
-                <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1"><label class="font-semibold">Umidade (%):</label><span class="input-yellow w-full p-1">${sheetData.header.umidadeRelativa || ''}</span></div>
-            </div>`;
+        const conditionsHTML = `<div class="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg border">
+            <div class="flex items-center gap-2"><label class="font-semibold">Temp. Amb. (°C):</label><span class="input-yellow w-full p-1 text-center">${sheetData.header.tempAmbiente || ''}</span></div>
+            <div class="flex items-center gap-2"><label class="font-semibold">${config.prefix === 'transformer' ? 'Temp. no Trafo (°C):' : 'Temp. Enrol. (°C):'}</label><span class="input-yellow w-full p-1 text-center">${sheetData.header[config.tempInputId] || ''}</span></div>
+            <div class="flex items-center gap-2"><label class="font-semibold">Umidade (%):</label><span class="input-yellow w-full p-1 text-center">${sheetData.header.umidadeRelativa || ''}</span></div>
+        </div>`;
+        
+        const footerHTML = `<footer class="page-footer">
+            <p>${appState.company.selected.name} | Relatório de Medição: ${sheetData.header.equipamento || 'N/A'}</p>
+        </footer>`;
 
-        const sectionsHTML = config.sections.map(section => {
+        const generateSectionHTML = (section) => {
             const sectionData = sheetData.sections[section.name];
             if (!sectionData) return '';
-
+            // ... (O restante da lógica de geração de HTML para cada tipo de seção permanece aqui)
+            // Esta função interna agora será responsável por gerar o HTML para uma única seção
             let sectionContent = `<h2 class="section-title">${section.name}</h2>`;
             
             if (section.type === 'insulation') {
@@ -1995,17 +2005,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         </table>
                     </div>`;
                 }
-            } else if (section.type === 'ohmic') {
-                 // Logic for ohmic section
             } // ... other section types
             return `<section>${sectionContent}</section>`;
-        }).join('');
+        };
 
-        return `<div class="report-page printable-page">${headerHTML}${conditionsHTML}${sectionsHTML}</div>`;
+        if (sheetData.type === 'gen') {
+            const page1Sections = config.sections.filter(s => s.containerType === 'main' || s.containerType === 'pmg');
+            const page2Sections = config.sections.filter(s => s.containerType === 'extra');
+
+            const page1HTML = page1Sections.map(generateSectionHTML).join('');
+            
+            const hasPage2Data = page2Sections.some(s => sheetData.sections[s.name]);
+            const pages = [];
+
+            pages.push(`<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${page1HTML}</main>${footerHTML}</div>`);
+
+            if (hasPage2Data) {
+                const page2HTML = page2Sections.map(generateSectionHTML).join('');
+                pages.push(`<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${page2HTML}</main>${footerHTML}</div>`);
+            }
+            return pages;
+
+        } else {
+            const allSectionsHTML = config.sections.map(generateSectionHTML).join('');
+            const pageHTML = `<div class="report-page printable-page">${headerHTML}${conditionsHTML}<main>${allSectionsHTML}</main>${footerHTML}</div>`;
+            return [pageHTML];
+        }
     }
 
     /**
-     * [CORRIGIDO] Gera uma visualização do relatório completo em uma nova aba.
+     * [ATUALIZADO] Gera uma visualização do relatório completo em uma nova aba.
      */
     async function previewFullReport() {
         const loader = document.getElementById('pdf-loader-overlay');
@@ -2013,59 +2042,45 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.classList.add('flex');
         loader.classList.remove('hidden');
 
-        await new Promise(resolve => setTimeout(resolve, 100)); // Allow loader to render
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
             const pagesHtml = [];
 
             // 1. Capa
-            const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
-            pagesHtml.push(coverPageClone.outerHTML);
+            pagesHtml.push(document.getElementById('cover-preview').outerHTML);
 
             // 2. Índice
-            if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
-                const indexPageClone = document.getElementById('index-page').cloneNode(true);
-                pagesHtml.push(indexPageClone.outerHTML);
+            if (appState.currentReport.cache?.length > 0) {
+                pagesHtml.push(document.getElementById('index-page').outerHTML);
             }
 
-            // 3. Planilhas (usando a nova função de renderização estática)
+            // 3. Planilhas
             for (const reportSheet of appState.currentReport.cache) {
-                const printableHTML = createPrintableViewForSheet(reportSheet);
-                pagesHtml.push(printableHTML);
+                const sheetPages = createPrintableViewForSheet(reportSheet);
+                pagesHtml.push(...sheetPages);
             }
 
             const styles = Array.from(document.styleSheets)
                 .map(styleSheet => {
-                    try {
-                        return Array.from(styleSheet.cssRules).map(rule => rule.cssText).join('');
-                    } catch (e) { return ''; }
+                    try { return Array.from(styleSheet.cssRules).map(rule => rule.cssText).join(''); } 
+                    catch (e) { return ''; }
                 }).join('');
 
             const fullHtml = `
-                <!DOCTYPE html>
-                <html lang="pt-BR">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Visualização do Relatório</title>
-                    <script src="https://cdn.tailwindcss.com"><\/script>
-                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                    <style>${styles}</style>
-                    <style>
-                        body { background-color: #555; }
-                        .report-page { 
-                            margin: 2rem auto; 
-                            border: 1px solid #ccc; 
-                            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-                        }
-                        @media print {
-                            body { background-color: white; }
-                            .report-page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
-                            .report-page:last-of-type { page-break-after: auto; }
-                        }
-                    </style>
-                </head>
-                <body>${pagesHtml.join('')}</body>
-                </html>`;
+                <!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Visualização do Relatório</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+                <style>${styles}</style>
+                <style>
+                    body { background-color: #6b7280; }
+                    .report-page { margin: 2rem auto; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+                    @media print {
+                        body { background-color: white; }
+                        .report-page { margin: 0; border: none; box-shadow: none; page-break-after: always; }
+                        .report-page:last-of-type { page-break-after: auto; }
+                    }
+                </style></head><body>${pagesHtml.join('')}</body></html>`;
 
             const previewWindow = window.open('', '_blank');
             if (previewWindow) {
@@ -2087,14 +2102,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * [CORRIGIDO] Exporta o relatório completo para PDF, garantindo que os dados sejam incluídos.
+     * [ATUALIZADO] Exporta o relatório completo para PDF.
      */
     async function exportFullReportAsPDF() {
         const loader = document.getElementById('pdf-loader-overlay');
-        
         if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
-            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram.', 'error');
-            return;
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram.', 'error'); return;
         }
 
         loader.querySelector('h2').textContent = 'Gerando Relatório PDF...';
@@ -2125,22 +2138,23 @@ document.addEventListener('DOMContentLoaded', () => {
             await addElementAsFullPage(coverPageClone);
             pdfRenderContainer.innerHTML = '';
 
-            // 2. DESENHA O ÍNDICE NATIVAMENTE
-            if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
+            // 2. DESENHA O ÍNDICE
+            if (appState.currentReport.cache?.length > 0) {
                 doc.addPage();
                 await drawIndexPage(doc, appState.company.selected);
             }
 
-            // 3. Renderiza cada PLANILHA DE DADOS usando a versão estática
+            // 3. Renderiza cada PLANILHA
             for (const reportSheet of appState.currentReport.cache) {
-                doc.addPage();
-                const printableHTML = createPrintableViewForSheet(reportSheet);
-                const pageElement = document.createElement('div');
-                pageElement.innerHTML = printableHTML;
-                
-                pdfRenderContainer.appendChild(pageElement.firstChild);
-                await addElementAsFullPage(pdfRenderContainer.querySelector('.report-page'));
-                pdfRenderContainer.innerHTML = '';
+                const sheetPagesHTML = createPrintableViewForSheet(reportSheet);
+                for (const pageHTML of sheetPagesHTML) {
+                    doc.addPage();
+                    const pageElement = document.createElement('div');
+                    pageElement.innerHTML = pageHTML;
+                    pdfRenderContainer.appendChild(pageElement.firstChild);
+                    await addElementAsFullPage(pdfRenderContainer.querySelector('.report-page'));
+                    pdfRenderContainer.innerHTML = '';
+                }
             }
 
             const clienteText = document.getElementById('cover-cliente').value.trim() || "Relatorio";
