@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             savedReports: document.getElementById('saved-reports-screen'),
             companyManagement: document.getElementById('company-management-screen'),
             reportSelection: document.getElementById('report-selection-screen'),
-            // Adicione aqui as outras telas de equipamento se elas ainda existirem
+            equipamentos: document.getElementById('equipamentos-screen'),
             // gen: document.getElementById('generator-app-screen'), 
             // motor: document.getElementById('motor-app-screen'), 
             // transformer: document.getElementById('transformer-app-screen'), 
@@ -483,6 +483,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('main-menu-back-to-selection-btn').addEventListener('click', () => {
         navigation.to('reportSelection');
     });
+
+    // --- BOTÕES DO PAINEL MEGAGEM ---
+    document.getElementById('cover-btn').addEventListener('click', () => navigation.to('cover'));
+    document.getElementById('index-btn').addEventListener('click', () => navigation.to('index'));
+    document.getElementById('saved-reports-btn').addEventListener('click', () => navigation.to('savedReports'));
+    document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
+    
+    // --- BOTÃO DE PERFIL ---
+    function goToProfile() {
+        // Adicione a lógica para popular o perfil aqui, se necessário
+        navigation.to('profile');
+    }
+    document.getElementById('profile-btn-from-selection').addEventListener('click', goToProfile);
+    document.getElementById('profile-back-to-selection-btn').addEventListener('click', () => navigation.to('reportSelection'));
 });
 </script>
 </body>
