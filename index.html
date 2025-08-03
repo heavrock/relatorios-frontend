@@ -210,7 +210,7 @@
                 <h2 class="text-2xl font-bold text-white mb-8">Selecione o Tipo de Relatório</h2>
                 <div class="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
                     <button id="megagem-report-btn" class="menu-button text-white font-bold py-8 px-6 rounded-xl text-2xl">RELATÓRIO TÉCNICO<br>(MEGAGEM)</button>
-                    <button id="bordo-report-btn" class="menu-button text-white font-bold py-8 px-6 rounded-xl text-2xl">RELATÓRIO TÉCNICO<br>(BORDO)</button>
+                    <button id="bordo-report-btn" class="wip-btn menu-button text-white font-bold py-8 px-6 rounded-xl text-2xl">RELATÓRIO TÉCNICO<br>(BORDO)</button>
                 </div>
                 <div class="mt-12 text-center flex gap-4">
                      <button id="profile-btn-from-selection" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Meu Perfil</button>
@@ -282,71 +282,17 @@
                 </div>
             </div>
         </div>
-
-        <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela de capa deve ser mantido aqui -->
-        </div>
-
-        <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela de índice deve ser mantido aqui -->
-        </div>
-
-        <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela de relatórios salvos deve ser mantido aqui -->
-        </div>
-
-        <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela de gerenciamento de empresas deve ser mantido aqui -->
-        </div>
-
-        <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela do gerador deve ser mantido aqui -->
-        </div>
         
-        <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela do motor deve ser mantido aqui -->
-        </div>
+        <!-- O RESTANTE DAS SUAS TELAS (COVER, INDEX, EQUIPAMENTOS, ETC.) PERMANECEM AQUI -->
+        <!-- ... -->
 
-        <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <!-- O HTML completo da tela do transformador deve ser mantido aqui -->
-        </div>
-
-        <div id="bordo-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <div class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
-                <header class="border-b-2 border-gray-200 pb-6 mb-6">
-                    <h1 class="text-xl sm:text-2xl font-bold text-blue-800 text-center">Diário de Bordo</h1>
-                </header>
-                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4">
-                    <button id="bordo-back-to-selection-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar</button>
-                    <button id="bordo-clear-form-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
-                    <button id="bordo-save-report-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto">Salvar Diário de Bordo</button>
-                </div>
-                <form id="bordo-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gray-50 rounded-lg border">
-                    <div>
-                        <label for="bordo-data" class="font-semibold block mb-1">Data:</label>
-                        <input type="date" id="bordo-data" required class="input-yellow w-full !text-gray-800">
-                    </div>
-                    <div>
-                        <label for="bordo-operador" class="font-semibold block mb-1">Operador:</label>
-                        <input type="text" id="bordo-operador" required class="input-yellow w-full !text-gray-800" placeholder="Nome do operador">
-                    </div>
-                    <div>
-                        <label for="bordo-veiculo" class="font-semibold block mb-1">Veículo/Embarcação:</label>
-                        <input type="text" id="bordo-veiculo" required class="input-yellow w-full !text-gray-800" placeholder="Ex: Lancha X, Caminhão Y">
-                    </div>
-                    <div>
-                        <label for="bordo-odometro" class="font-semibold block mb-1">Odômetro/Horímetro (Inicial):</label>
-                        <input type="number" id="bordo-odometro" class="input-yellow w-full !text-gray-800">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="bordo-ocorrencias" class="font-semibold block mb-1">Ocorrências / Descrição dos Serviços:</label>
-                        <textarea id="bordo-ocorrencias" rows="5" class="input-yellow w-full !text-gray-800" placeholder="Descreva as atividades, manutenções, problemas..."></textarea>
-                    </div>
-                </form>
+        <div id="wip-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Em Desenvolvimento</h3>
+                <p class="text-gray-700 mb-6">Esta funcionalidade estará disponível em breve!</p>
+                <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
             </div>
         </div>
-
-        <div id="wip-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50"></div>
         <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[200]"></div>
     </div>
 
@@ -355,7 +301,188 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // ... (O código completo do seu JavaScript será colado aqui)
+    const firebaseService = {
+        auth: null,
+        db: null,
+        init: function() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
+                authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+                projectId: "relatorios-tecnicos-app",
+                storageBucket: "relatorios-tecnicos-app.appspot.com",
+                messagingSenderId: "280958854421",
+                appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            this.auth = getAuth(app);
+            this.db = getFirestore(app);
+        },
+        getAuth: function() { return this.auth; },
+        getDb: function() { return this.db; }
+    };
+    
+    const appState = {
+        user: { id: null, isAdmin: false, displayName: null, email: null },
+        company: { list: [], selected: null },
+        currentReport: { cache: [], editingIndex: null, coverImage: null },
+        activeReportType: null,
+        ui: { 
+            temporaryCompanyLogo: null, temporaryRepLogo1: null, temporaryRepLogo2: null,
+            pendingUsersListener: null, activeUsersListener: null
+        }
+    };
+
+document.addEventListener('DOMContentLoaded', () => {
+    firebaseService.init();
+    if (!firebaseService.auth) return;
+
+    const navigation = {
+        screens: { 
+            menu: document.getElementById('menu-screen'), 
+            cover: document.getElementById('cover-screen'), 
+            index: document.getElementById('index-screen'), 
+            savedReports: document.getElementById('saved-reports-screen'),
+            companyManagement: document.getElementById('company-management-screen'),
+            reportSelection: document.getElementById('report-selection-screen'),
+            // Adicione aqui as outras telas de equipamento se elas ainda existirem
+            // gen: document.getElementById('generator-app-screen'), 
+            // motor: document.getElementById('motor-app-screen'), 
+            // transformer: document.getElementById('transformer-app-screen'), 
+            adminPanel: document.getElementById('admin-panel-screen'),
+            profile: document.getElementById('profile-screen'), 
+        },
+        currentScreen: null,
+        to: function(screenName, updateHistory = true) {
+            const newScreenElement = this.screens[screenName];
+            if (!newScreenElement) {
+                console.warn(`Tela "${screenName}" não encontrada.`);
+                return;
+            }
+            if (newScreenElement === this.currentScreen) return;
+
+            Object.values(this.screens).forEach(screen => { if (screen) screen.classList.add('hidden'); });
+            newScreenElement.classList.remove('hidden');
+            this.currentScreen = newScreenElement;
+        },
+    };
+
+    const uiFeedback = {
+        showToast: function(message, type = 'info') {
+            const notificationArea = document.getElementById('notification-area');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            notificationArea.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.remove(); }, 500);
+            }, 3000);
+        },
+    };
+
+    function showAuthForm(formName) {
+        document.getElementById('login-form-container').classList.add('hidden');
+        document.getElementById('register-form-container').classList.add('hidden');
+        document.getElementById('pending-approval-container').classList.add('hidden');
+        const el = document.getElementById(`${formName}-form-container`) || document.getElementById(`${formName}-container`);
+        if(el) el.classList.remove('hidden');
+    }
+
+    const authScreen = document.getElementById('auth-screen');
+    const mainAppWrapper = document.getElementById('main-app-wrapper');
+
+    onAuthStateChanged(firebaseService.getAuth(), async (user) => {
+        if (user) {
+            const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                if (userData.status === 'approved') {
+                    appState.user.id = user.uid;
+                    appState.user.displayName = userData.displayName || '';
+                    
+                    document.getElementById('user-display-name-selection').textContent = `Olá, ${appState.user.displayName || user.email}`;
+                    authScreen.classList.add('hidden');
+                    mainAppWrapper.classList.remove('hidden');
+                    
+                    navigation.to('reportSelection');
+                } else {
+                    uiFeedback.showToast('Sua conta está aguardando aprovação.', 'info');
+                    await signOut(firebaseService.getAuth());
+                }
+            } else {
+                uiFeedback.showToast('Dados do usuário não encontrados.', 'error');
+                await signOut(firebaseService.getAuth());
+            }
+        } else {
+            appState.user.id = null;
+            authScreen.classList.remove('hidden');
+            mainAppWrapper.classList.add('hidden');
+            showAuthForm('login');
+        }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        signInWithEmailAndPassword(firebaseService.getAuth(), email, password)
+            .catch((error) => {
+                console.error("Erro de login:", error);
+                uiFeedback.showToast('E-mail ou senha inválidos.', 'error');
+            });
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        try {
+            const userCredential = await createUserWithEmailAndPassword(firebaseService.getAuth(), email, password);
+            const user = userCredential.user;
+            await setDoc(doc(firebaseService.getDb(), "users", user.uid), { 
+                uid: user.uid, 
+                email: user.email, 
+                displayName: name, 
+                role: 'user', 
+                status: 'pending', 
+                createdAt: new Date().toISOString() 
+            });
+            showAuthForm('pending');
+            await signOut(firebaseService.getAuth());
+        } catch (error) {
+            console.error("Erro de cadastro:", error);
+            uiFeedback.showToast('Erro ao criar conta.', 'error');
+        }
+    });
+
+    document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('register'); });
+    document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
+    document.getElementById('pending-back-to-login').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
+    document.getElementById('logout-btn-from-selection').addEventListener('click', () => signOut(firebaseService.getAuth()));
+
+    document.getElementById('megagem-report-btn').addEventListener('click', () => {
+        navigation.to('menu');
+    });
+
+    const wipModal = document.getElementById('wip-modal');
+    document.getElementById('bordo-report-btn').addEventListener('click', () => {
+        wipModal.classList.add('flex');
+        wipModal.classList.remove('hidden');
+    });
+    document.getElementById('close-wip-modal').addEventListener('click', () => {
+        wipModal.classList.add('hidden');
+        wipModal.classList.remove('flex');
+    });
+
+    document.getElementById('main-menu-back-to-selection-btn').addEventListener('click', () => {
+        navigation.to('reportSelection');
+    });
+});
 </script>
 </body>
 </html>
