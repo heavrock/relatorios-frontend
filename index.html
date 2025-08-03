@@ -318,7 +318,10 @@
                 </div>
                 <div class="mt-12 text-center">
                     <p id="user-display-name" class="text-indigo-300 mb-2"></p>
-                    <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition">Sair</button>
+                    <div class="flex items-center justify-center gap-4">
+                        <button id="menu-back-to-selection-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar</button>
+                        <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition">Sair</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -338,7 +341,7 @@
                             <input type="email" id="profile-email" disabled class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100 text-gray-500 cursor-not-allowed">
                         </div>
                         <div class="flex gap-4">
-                            <button type="button" id="profile-back-to-menu-btn" class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+                            <button type="button" id="profile-back-to-menu-btn" class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition">Voltar</button>
                             <button type="submit" id="profile-save-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition">Salvar Alterações</button>
                         </div>
                     </form>
@@ -2133,6 +2136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeCoverApp();
     
     // --- EVENT LISTENERS DE NAVEGAÇÃO ---
+    document.getElementById('menu-back-to-selection-btn').addEventListener('click', () => navigation.to('reportTypeSelection'));
     document.getElementById('megagem-report-btn').addEventListener('click', () => navigation.to('menu'));
     document.getElementById('bordo-report-btn').addEventListener('click', () => { wipModal.classList.add('flex'); wipModal.classList.remove('hidden'); });
 
@@ -2153,9 +2157,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
-    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {  
-        btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('reportTypeSelection'));  
+    
+    // Botões "Voltar" dentro do fluxo de Megagem agora voltam para o menu de Megagem
+    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {
+        if (btn.id !== 'profile-back-to-menu-btn') {
+             btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu'));
+        }
     });
+
+    // Botão de perfil (e seu 'voltar') têm comportamento específico
     document.getElementById('profile-btn').addEventListener('click', () => {
         populateProfileScreen();
         navigation.to('profile');
@@ -2164,7 +2174,9 @@ document.addEventListener('DOMContentLoaded', () => {
         populateProfileScreen();
         navigation.to('profile');
     });
-    document.getElementById('profile-back-to-menu-btn').addEventListener('click', () => navigation.to('reportTypeSelection'));
+    // O botão de voltar do perfil sempre retorna para a tela de seleção de tipo de relatório
+    document.getElementById('profile-back-to-menu-btn').addEventListener('click', () => navigation.checkDirtyStateAndNavigate('reportTypeSelection'));
+
 
     document.getElementById('selection-logout-btn').addEventListener('click', () => {
         signOut(firebaseService.getAuth()).catch((error) => {
