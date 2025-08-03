@@ -233,7 +233,6 @@
                         <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
                         <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
                         <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
-                        <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
                     </div>
                 </div>
                 <div class="mt-12 text-center">
@@ -301,6 +300,7 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Módulo de serviço do Firebase
     const firebaseService = {
         auth: null,
         db: null,
@@ -322,6 +322,7 @@
         getDb: function() { return this.db; }
     };
     
+    // Objeto de Estado Centralizado
     const appState = {
         user: { id: null, isAdmin: false, displayName: null, email: null },
         company: { list: [], selected: null },
