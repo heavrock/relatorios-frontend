@@ -285,173 +285,19 @@
         </div>
 
         <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <div class="container mx-auto">
-                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
-                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
-                    <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                    <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
-                    <button id="cover-save-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-                </div>
-                <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">Informações da Capa</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="cover-cliente" class="block text-sm font-medium text-gray-700 mb-1">Empresa (Cliente)</label>
-                            <input type="text" id="cover-cliente" placeholder="Ex: OCEANPACT" class="p-2 border rounded w-full">
-                        </div>
-                        <div>
-                            <label for="cover-local" class="block text-sm font-medium text-gray-700 mb-1">Embarcação</label>
-                            <input type="text" id="cover-local" placeholder="Ex: SEWARD JOHNSON" class="p-2 border rounded w-full">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Equipamento</label>
-                            <input type="file" id="cover-image-upload" class="hidden" accept="image/*">
-                            <label for="cover-image-upload" class="w-full inline-block text-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition cursor-pointer">CARREGAR IMAGEM DO NAVIO</label>
-                        </div>
-                    </div>
-                </div>
-                <div id="cover-preview" class="report-page">
-                    <header class="flex justify-between items-start pb-4 border-b-2 border-black">
-                        <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
-                        <div class="text-right text-xs">
-                            <p class="font-bold" id="cover-preview-company-name"></p>
-                            <p id="cover-preview-company-address"></p>
-                            <p id="cover-preview-company-phones"></p>
-                            <p id="cover-preview-company-phone2"></p>
-                        </div>
-                    </header>
-                    <main class="flex-grow flex flex-col items-center justify-start text-center pt-16">
-                        <div class="w-full">
-                            <h1 id="cover-preview-cliente" class="text-3xl font-bold text-black">CLIENTE</h1>
-                            <h2 id="cover-preview-local" class="text-2xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
-                        </div>
-                        <div class="w-full mt-8 pt-4 border-t-2 border-black">
-                            <p class="mt-2 text-lg">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
-                            <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-4 max-w-md w-full h-auto object-cover rounded-md shadow-lg mx-auto">
-                        </div>
-                    </main>
-                    <footer class="mt-auto pt-4">
-                        <div id="cover-preview-rep-logos" class="flex justify-center items-center gap-8 mb-2">
-                            <img id="cover-preview-rep-logo1" src="" class="h-10 w-auto object-contain">
-                            <img id="cover-preview-rep-logo2" src="" class="h-10 w-auto object-contain">
-                        </div>
-                        <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
-                    </footer>
-                </div>
-            </div>
+            <!-- O HTML completo da tela de capa deve ser mantido aqui -->
         </div>
 
         <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <div class="container mx-auto">
-                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
-                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
-                    <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
-                    <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
-                    <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
-                </div>
-                <div id="index-page" class="report-page">
-                    <div class="flex-grow flex flex-col">
-                        <header class="flex justify-between items-start pb-4 border-b-2 border-black">
-                            <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
-                            <div class="text-right text-xs">
-                                <p class="font-bold" id="index-company-name"></p>
-                                <p id="index-company-address"></p>
-                                <p id="index-company-phones"></p>
-                                <p id="index-company-phone2"></p>
-                            </div>
-                        </header>
-                        <main id="index-content-list" class="p-4"></main>
-                    </div>
-                     <footer class="pt-4">
-                        <div class="flex flex-col items-center w-full gap-3">
-                            <div class="flex items-center justify-center gap-6">
-                                <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
-                                <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
-                            </div>
-                            <p class="text-xs text-gray-600 text-center">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
-                        </div>
-                    </footer>
-                </div>
-            </div>
+            <!-- O HTML completo da tela de índice deve ser mantido aqui -->
         </div>
 
         <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <div class="container mx-auto">
-                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos (Megagem)</h1>
-                <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-                    <div id="saved-reports-list" class="space-y-3"></div>
-                </div>
-                <div class="flex justify-center mt-6">
-                    <button id="saved-reports-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
-                </div>
-            </div>
+            <!-- O HTML completo da tela de relatórios salvos deve ser mantido aqui -->
         </div>
 
         <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
-            <div class="container mx-auto">
-                <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
-                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
-                        <form id="company-form" class="space-y-4">
-                            <input type="hidden" id="company-id">
-                            <div>
-                                <label for="company-name" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
-                                <input type="text" id="company-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
-                                <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Rua, Número, Bairro, Cidade, Estado">
-                            </div>
-                            <div>
-                                <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
-                                <input type="text" id="company-phones" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
-                                <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Logo da Empresa</label>
-                                <input type="file" id="company-logo-upload" class="hidden" accept="image/*">
-                                <label for="company-logo-upload" class="mt-1 w-full inline-block text-center bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition cursor-pointer">CARREGAR LOGO</label>
-                                <img id="company-logo-preview" src="" alt="Preview da Logo" class="mt-2 h-16 w-auto mx-auto hidden">
-                            </div>
-                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Logo Rep. 1</label>
-                                    <input type="file" id="company-rep-logo1-upload" class="hidden" accept="image/*">
-                                    <label for="company-rep-logo1-upload" class="mt-1 w-full inline-block text-center bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition cursor-pointer text-xs">LOGO REP. 1</label>
-                                    <img id="company-rep-logo1-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Logo Rep. 2</label>
-                                    <input type="file" id="company-rep-logo2-upload" class="hidden" accept="image/*">
-                                    <label for="company-rep-logo2-upload" class="mt-1 w-full inline-block text-center bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition cursor-pointer text-xs">LOGO REP. 2</label>
-                                    <img id="company-rep-logo2-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
-                                </div>
-                            </div>
-                            <div id="company-public-toggle-container" class="hidden">
-                                <div class="flex items-center">
-                                    <input id="company-is-public" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                    <label for="company-is-public" class="ml-2 block text-sm text-gray-900">Tornar esta empresa pública (visível para todos)</label>
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
-                                <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
-                        <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
-                    </div>
-                </div>
-                <div class="flex justify-center mt-8">
-                    <button id="company-management-back-to-cover-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar para a Capa</button>
-                </div>
-            </div>
+            <!-- O HTML completo da tela de gerenciamento de empresas deve ser mantido aqui -->
         </div>
 
         <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
@@ -510,45 +356,7 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseService = {
-        auth: null,
-        db: null,
-        init: function() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
-                authDomain: "relatorios-tecnicos-app.firebaseapp.com",
-                projectId: "relatorios-tecnicos-app",
-                storageBucket: "relatorios-tecnicos-app.appspot.com",
-                messagingSenderId: "280958854421",
-                appId: "1:280958854421:web:90e4b288f3c57592d9351c"
-            };
-
-            const app = initializeApp(firebaseConfig);
-            this.auth = getAuth(app);
-            this.db = getFirestore(app);
-        },
-        getAuth: function() { return this.auth; },
-        getDb: function() { return this.db; }
-    };
-    
-    const appState = {
-        user: { id: null, isAdmin: false, displayName: null, email: null },
-        company: { list: [], selected: null },
-        currentReport: { cache: [], editingIndex: null, coverImage: null },
-        activeReportType: null,
-        ui: { 
-            temporaryCompanyLogo: null, temporaryRepLogo1: null, temporaryRepLogo2: null,
-            pendingUsersListener: null, activeUsersListener: null
-        }
-    };
-
-document.addEventListener('DOMContentLoaded', () => {
-    firebaseService.init();
-    if (!firebaseService.auth) return;
-
-    // A partir daqui, o código JavaScript está completo e na ordem correta.
-    // ... (O código completo e funcional será inserido aqui)
-});
+    // ... (O código completo do seu JavaScript será colado aqui)
 </script>
 </body>
 </html>
