@@ -285,6 +285,7 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Módulo de serviço do Firebase
     const firebaseService = {
         auth: null,
         db: null,
@@ -306,6 +307,7 @@
         getDb: function() { return this.db; }
     };
     
+    // Objeto de Estado Centralizado
     const appState = {
         user: { id: null, isAdmin: false, displayName: null, email: null },
         company: { list: [], selected: null },
