@@ -6,11 +6,13 @@
     <title>Painel de Controle - Relatórios Técnicos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kLmbG4WdKCRpI72DhH1ZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
-        /* --- ESTILOS GERAIS E MEGAGEM --- */
-        body { font-family: 'Inter', sans-serif; font-size: 14px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
         .header-info { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; }
         .header-info label { font-weight: 600; text-align: right; }
         .data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
@@ -19,20 +21,58 @@
         .data-table td.label-cell { text-align: left; font-weight: 500; background-color: #f9fafb; }
         .input-yellow { background-color: #fef9c3; width: 100%; text-align: center; border: 1px solid #fde047; border-radius: 4px; padding: 4px; }
         .input-yellow::placeholder { color: #a1a1aa; }
-        .output-span { display: block; width: 100%; height: 100%; padding: 4px; min-height: 28px; border-radius: 4px; transition: background-color 0.3s; }
+        .output-span { display: block; width: 100%; height: 100%; padding: 4px; min-height: 28px; border-radius: 4px; transition: background-color: 0.3s; }
         .output-blue { background-color: #e0f2fe; }
         .section-title { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1rem; margin-bottom: 0.25rem; border-radius: 6px; }
-        .unit-selector { padding: 2px 4px; font-size: 12px; border-radius: 4px; border: 1px solid #ccc; background-color: white; margin-left: 8px; }
-        .menu-button { background-image: linear-gradient(to right, #4f46e5 0%, #7c3aed 51%, #4f46e5 100%); transition: 0.5s; background-size: 200% auto; box-shadow: 0 4px 15px 0 rgba(79, 70, 229, 0.75); }
-        .menu-button:hover { background-position: right center; }
-        .menu-button:disabled { background-image: none; background-color: #9ca3af; cursor: not-allowed; box-shadow: none; }
-        #transformer-insulation-grid { display: grid; grid-template-columns: repeat(1, 1fr); border: 2px solid #9ca3af; border-radius: 8px; overflow: hidden; margin-top: 1rem; }
+        .unit-selector {
+            padding: 2px 4px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            margin-left: 8px;
+        }
+        .menu-button {
+            background-image: linear-gradient(to right, #4f46e5 0%, #7c3aed 51%, #4f46e5 100%);
+            transition: 0.5s;
+            background-size: 200% auto;
+            box-shadow: 0 4px 15px 0 rgba(79, 70, 229, 0.75);
+        }
+        .menu-button:hover {
+            background-position: right center;
+        }
+        .menu-button:disabled {
+            background-image: none;
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        #transformer-insulation-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            border: 2px solid #9ca3af;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
         @media (min-width: 768px) { #transformer-insulation-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { #transformer-insulation-grid { grid-template-columns: repeat(3, 1fr); } }
+
         .insulation-cell { border-bottom: 1px solid #d1d5db; }
         .insulation-cell:last-child { border-bottom: none; }
-        @media (min-width: 1024px) { .insulation-cell { border-right: 1px solid #d1d5db; } .insulation-cell:nth-child(3n) { border-right: none; } .insulation-cell:nth-last-child(-n+3) { border-bottom: none; } }
-        @media (min-width: 768px) and (max-width: 1023px) { .insulation-cell { border-right: 1px solid #d1d5db; } .insulation-cell:nth-child(2n) { border-right: none; } .insulation-cell:nth-last-child(-n+2) { border-bottom: none; } }
+        
+        @media (min-width: 1024px) {
+            .insulation-cell { border-right: 1px solid #d1d5db; }
+            .insulation-cell:nth-child(3n) { border-right: none; }
+            .insulation-cell:nth-last-child(-n+3) { border-bottom: none; }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+             .insulation-cell { border-right: 1px solid #d1d5db; }
+             .insulation-cell:nth-child(2n) { border-right: none; }
+             .insulation-cell:nth-last-child(-n+2) { border-bottom: none; }
+        }
+
         .cell-title { background-color: #e5e7eb; font-weight: 600; padding: 6px; text-align: center; border-bottom: 1px solid #d1d5db; font-size: 12px; }
         .cell-content { padding: 8px; }
         .measurement-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; align-items: center; margin-bottom: 6px; }
@@ -48,61 +88,136 @@
         .index-item span { display: block; padding: 4px; border-radius: 4px; font-weight: 500; min-height: 28px; }
         .status-cell { padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; color: white; font-size: 12px; min-height: 32px; display: flex; align-items: center; justify-content: center; width: 100%; }
         .report-page { border: 1px solid #ccc; padding: 2rem; max-width: 800px; aspect-ratio: 210 / 297; margin: 2rem auto; background: white; display: flex; flex-direction: column; }
-        #notification-area { position: fixed; top: 20px; right: 20px; z-index: 2500; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 1rem 1.5rem; border-radius: 0.5rem; color: white; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); opacity: 0; transform: translateX(100%); transition: opacity 0.5s, transform 0.5s; }
-        .toast.show { opacity: 1; transform: translateX(0); }
+        
+        /* Estilo para notificações customizadas */
+        #notification-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
         .toast.success { background-color: #28a745; }
         .toast.error { background-color: #dc3545; }
         .toast.info { background-color: #17a2b8; }
-        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, .3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .confirm-modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .confirm-modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; }
-        .pdf-page-render { width: 210mm; min-height: 297mm; padding: 15mm; margin: 0; display: flex; flex-direction: column; background: white; box-shadow: none; border: none; }
-        .pdf-fix-colors .input-yellow { background-color: #fef9c3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .pdf-fix-colors .output-blue { background-color: #e0f2fe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        #index-page { display: flex; flex-direction: column; }
-        #index-page .index-title { font-size: 1.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
-        #index-page .index-list-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 1rem; padding: 0.75rem 0.25rem; }
-        #index-page #index-company-logo { height: 3.5rem; }
-        #index-page #index-rep-logo1, #index-page #index-rep-logo2 { height: 2.25rem; }
-        #index-page footer { margin-top: auto; padding-top: 2rem; }
-        
-        /* --- ESTILOS ADICIONAIS DO RELATÓRIO DE BORDO --- */
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
-        .bordo-report-page { background: white; width: 210mm; min-height: 297mm; margin: 2rem auto; padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .bordo-report-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 1rem; }
-        .bordo-report-header .company-info { text-align: right; font-size: 10px; }
-        .bordo-report-title-bar { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: 6px; }
-        .bordo-report-footer { margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 2rem; padding-top: 1rem; }
-        .bordo-report-footer img { height: 35px; }
-        .data-table-report { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .data-table-report th, .data-table-report td { border: 1px solid #ccc; padding: 4px 8px; }
-        .data-table-report th { background-color: #f0f0f0; text-align: left; }
-        .data-table-report tbody tr { height: 1.6em; }
-        .row-selected { background-color: #a5b4fc !important; }
-        .bordo-modal { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 1500; padding: 1rem; }
-        .photo-slot { border: 2px dashed #9ca3af; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 250px; background-color: #f9fafb; position: relative; }
-        .photo-slot .image-preview { width: 100%; height: calc(100% - 36px); object-fit: cover; border-radius: 0.5rem 0.5rem 0 0; }
-        .photo-slot .upload-label { position: absolute; top: 0; left: 0; right: 0; bottom: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6b7280; }
-        .photo-slot .upload-label:hover { background-color: rgba(0,0,0,0.05); }
-        .photo-slot input[type="file"] { display: none; }
-        .photo-slot .description-input { width: 100%; border: none; border-top: 1px solid #d1d5db; padding: 0.5rem; font-size: 0.875rem; border-radius: 0 0 0.5rem 0.5rem; background-color: #f3f4f6; }
-        .no-print { /* Utility class to hide elements during print */ }
-        @media print { .no-print { display: none !important; } .bordo-report-page { margin: 0; box-shadow: none; border: none; } }
+
+        /* Spinner para botões */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal customizado para confirmação */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .confirm-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* Estilos para renderização do PDF */
+        .pdf-page-render {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: none;
+            border: none;
+        }
+        .pdf-fix-colors .input-yellow {
+            background-color: #fef9c3 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .pdf-fix-colors .output-blue {
+            background-color: #e0f2fe !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Estilos aprimorados para a página de índice */
+        #index-page {
+            display: flex;
+            flex-direction: column;
+        }
+        #index-page .index-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        #index-page .index-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 1rem; /* text-base */
+            padding: 0.75rem 0.25rem;
+        }
+        #index-page #index-company-logo {
+            height: 3.5rem; /* 56px */
+        }
+        #index-page #index-rep-logo1,
+        #index-page #index-rep-logo2 {
+            height: 2.25rem; /* 36px */
+        }
+        #index-page footer {
+            margin-top: auto;
+            padding-top: 2rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
+    <!-- Área para notificações -->
     <div id="notification-area"></div>
 
+    <!-- TELA DE AUTENTICAÇÃO -->
     <div id="auth-screen">
         <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
             <h1 class="text-4xl font-bold text-white mb-8">Relatórios Técnicos</h1>
             
+            <!-- Formulário de Login -->
             <div id="login-form-container" class="w-full max-w-sm">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-white text-center mb-6">Acessar Conta</h2>
@@ -123,6 +238,7 @@
                 </div>
             </div>
 
+            <!-- Formulário de Cadastro -->
             <div id="register-form-container" class="w-full max-w-sm hidden">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-white text-center mb-6">Criar Nova Conta</h2>
@@ -147,6 +263,7 @@
                 </div>
             </div>
 
+            <!-- Tela de Aguardando Aprovação -->
             <div id="pending-approval-container" class="w-full max-w-sm hidden">
                 <div class="bg-gray-700 p-8 rounded-xl shadow-lg text-center">
                     <h2 class="text-2xl font-bold text-white mb-4">Aguardando Aprovação</h2>
@@ -157,8 +274,10 @@
         </div>
     </div>
 
+    <!-- APLICATIVO PRINCIPAL (INICIALMENTE ESCONDIDO) -->
     <div id="main-app-wrapper" class="hidden">
         
+        <!-- TELA DE SELEÇÃO DE TIPO DE RELATÓRIO (NOVA) -->
         <div id="report-type-selection-screen" class="hidden">
             <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4 text-white">
                 <h1 class="text-4xl font-bold mb-4">Painel de Controle</h1>
@@ -175,132 +294,1927 @@
             </div>
         </div>
 
+        <!-- TELA DO RELATÓRIO DE BORDO (NOVA) -->
+        <div id="bordo-app-screen" class="hidden bg-gray-200 min-h-screen p-4 sm:p-6">
+            <div class="container mx-auto max-w-5xl bg-slate-400 p-6 rounded-lg shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Seção Informações do Serviço -->
+                    <div class="md:col-span-4">
+                        <h2 class="text-xl font-bold text-center text-gray-800 mb-4">INFORMAÇÕES DO SERVIÇO</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="bordo-os" class="block text-sm font-medium text-gray-700">OS</label>
+                                <input type="text" id="bordo-os" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                            <div>
+                                <label for="bordo-rt" class="block text-sm font-medium text-gray-700">RT</label>
+                                <input type="text" id="bordo-rt" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                            <div>
+                                <label for="bordo-tipo-servico" class="block text-sm font-medium text-gray-700">TIPO DE SERVIÇO</label>
+                                <select id="bordo-tipo-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                    <option>Opção 1</option>
+                                    <option>Opção 2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="bordo-resumo-servico" class="block text-sm font-medium text-gray-700">RESUMO DO SERVIÇO</label>
+                                <select id="bordo-resumo-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                     <option>Opção 1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="bordo-status-servico" class="block text-sm font-medium text-gray-700">STATUS DO SERVIÇO</label>
+                                <select id="bordo-status-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                     <option>Opção 1</option>
+                                </select>
+                            </div>
+                             <div>
+                                <label for="bordo-idioma" class="block text-sm font-medium text-gray-700">IDIOMA</label>
+                                <select id="bordo-idioma" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                    <option>Português</option>
+                                    <option>Inglês</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção Cliente -->
+                    <div class="md:col-span-4 mt-6">
+                        <h2 class="text-xl font-bold text-center text-gray-800 mb-4">CLIENTE</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="bordo-cliente" class="block text-sm font-medium text-gray-700">CLIENTE</label>
+                                <select id="bordo-cliente" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                     <option>Cliente A</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="bordo-embarcacao" class="block text-sm font-medium text-gray-700">EMBARCAÇÃO</label>
+                                <input type="text" id="bordo-embarcacao" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                            <div>
+                                <label for="bordo-localizacao" class="block text-sm font-medium text-gray-700">LOCALIZAÇÃO</label>
+                                <select id="bordo-localizacao" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                     <option>Local 1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="bordo-cidade-estado" class="block text-sm font-medium text-gray-700">CIDADE - ESTADO</label>
+                                <input type="text" id="bordo-cidade-estado" value="NITERÓI - RJ" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100" readonly>
+                                <div class="mt-1 flex items-center">
+                                    <input id="bordo-cidade-nao-encontrada" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                    <label for="bordo-cidade-nao-encontrada" class="ml-2 block text-sm text-gray-900">Cidade não encontrada</label>
+                                </div>
+                            </div>
+                             <div>
+                                <label for="bordo-solicitacao" class="block text-sm font-medium text-gray-700">NUMERO DA SOLICITAÇÃO</label>
+                                <input type="text" id="bordo-solicitacao" value="Não informado." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                            <div>
+                                <label for="bordo-solicitante" class="block text-sm font-medium text-gray-700">SOLICITANTE</label>
+                                <input type="text" id="bordo-solicitante" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DO MENU PRINCIPAL -->
         <div id="menu-screen" class="hidden">
+            <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
+                <h1 class="text-4xl font-bold text-white mb-8">Painel de Controle (Megagem)</h1>
+                
+                <div class="mb-8 w-full max-w-sm">
+                    <label for="company-select" class="block text-center text-lg text-indigo-300 mb-2">Selecione a Empresa</label>
+                    <select id="company-select" class="w-full p-3 text-center rounded-lg border-2 border-indigo-400 bg-gray-700 text-white focus:outline-none focus:border-indigo-200">
+                        <!-- Opções de empresa carregadas dinamicamente -->
+                    </select>
+                </div>
+
+                <div class="w-full max-w-4xl flex flex-col gap-6 text-center">
+                    <button id="admin-panel-btn" class="menu-button bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl text-lg hidden">PAINEL ADMIN</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <button id="cover-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EDITAR CAPA</button>
+                        <button id="index-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">ÍNDICE / EXPORTAR</button>
+                        <button id="saved-reports-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">RELATÓRIOS SALVOS</button>
+                        <button id="equipamentos-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">EQUIPAMENTOS</button>
+                        <button id="profile-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MEU PERFIL</button>
+                    </div>
+                </div>
+                <div class="mt-12 text-center">
+                    <p id="user-display-name" class="text-indigo-300 mb-2"></p>
+                    <div class="flex items-center justify-center gap-4">
+                        <button id="menu-back-to-selection-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar</button>
+                        <button id="logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition">Sair</button>
+                    </div>
+                </div>
             </div>
-        <div id="profile-screen" class="hidden">
+        </div>
+        
+        <!-- TELA DE PERFIL DO USUÁRIO -->
+        <div id="profile-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto max-w-lg">
+                <h1 class="text-3xl font-bold text-center text-blue-800 mb-6">Meu Perfil</h1>
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <form id="profile-form">
+                        <div class="mb-4">
+                            <label for="profile-name" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                            <input type="text" id="profile-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="mb-6">
+                            <label for="profile-email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="profile-email" disabled class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100 text-gray-500 cursor-not-allowed">
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="button" id="profile-back-to-menu-btn" class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition">Voltar</button>
+                            <button type="submit" id="profile-save-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        <div id="admin-panel-screen" class="hidden">
+        </div>
+
+        <!-- TELA DO PAINEL ADMIN -->
+        <div id="admin-panel-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-3xl font-bold text-center text-blue-800 mb-6">Painel de Administração</h1>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Usuários Pendentes -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-4 text-yellow-600">Usuários Pendentes</h2>
+                        <div id="pending-users-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Lista de usuários pendentes será inserida aqui pelo JS -->
+                        </div>
+                    </div>
+                    <!-- Usuários Ativos -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-4 text-green-600">Usuários Ativos</h2>
+                        <div id="active-users-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Lista de usuários ativos será inserida aqui pelo JS -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button id="admin-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+                </div>
             </div>
+        </div>
+
+
+        <!-- TELA DE SELEÇÃO DE EQUIPAMENTOS (NOVA) -->
         <div id="equipamentos-screen" class="hidden">
+            <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
+                <h1 class="text-4xl font-bold text-white mb-8">Selecione o Equipamento</h1>
+                <div class="w-full max-w-4xl">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-center">
+                        <button id="gen-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">GERADOR</button>
+                        <button id="transformer-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X3</button>
+                        <button id="motor-btn" class="menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">MOTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO INDUTOR</button>
+                        <button class="wip-btn menu-button text-white font-bold py-4 px-6 rounded-xl text-lg">TRAFO X6</button>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <button id="equipamentos-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+                </div>
             </div>
-        <div id="cover-screen" class="hidden">
-            </div>
-        <div id="index-screen" class="hidden">
-            </div>
-        <div id="saved-reports-screen" class="hidden">
-            </div>
-        <div id="company-management-screen" class="hidden">
-            </div>
-        <div id="generator-app-screen" class="hidden">
-            </div>
-        <div id="motor-app-screen" class="hidden">
-            </div>
-        <div id="transformer-app-screen" class="hidden">
-            </div>
+        </div>
 
-        <div id="bordo-app-screen" class="hidden p-2 sm:p-6">
-            </div>
-        <div id="bordo-itens-screen" class="hidden p-4 sm:p-6">
-            </div>
-        <div id="bordo-report-preview-screen" class="hidden">
-            </div>
-        <div id="horasTrabalhadas-modal" class="bordo-modal">
-            </div>
-        <div id="horasViagem-modal" class="bordo-modal">
-            </div>
-        <div id="materiais-modal" class="bordo-modal">
-             </div>
-        <div id="comentarios-modal" class="bordo-modal">
-            </div>
-        <div id="descricaoServicos-modal" class="bordo-modal">
-             </div>
-        <div id="relatorioFotografico-modal" class="bordo-modal">
-             </div>
+        <!-- TELA DA CAPA DO RELATÓRIO -->
+        <div id="cover-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Editor da Capa do Relatório</h1>
+                
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                    <button id="cover-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="manage-companies-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Gerenciar Empresas</button>
+                    <button id="cover-save-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
+                </div>
 
+                <div class="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">Informações da Capa</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="cover-cliente" class="block text-sm font-medium text-gray-700 mb-1">Empresa (Cliente)</label>
+                            <input type="text" id="cover-cliente" placeholder="Ex: OCEANPACT" class="p-2 border rounded w-full">
+                        </div>
+                        <div>
+                            <label for="cover-local" class="block text-sm font-medium text-gray-700 mb-1">Embarcação</label>
+                            <input type="text" id="cover-local" placeholder="Ex: SEWARD JOHNSON" class="p-2 border rounded w-full">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem do Equipamento</label>
+                            <input type="file" id="cover-image-upload" class="hidden" accept="image/*">
+                            <label for="cover-image-upload" class="w-full inline-block text-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+                                CARREGAR IMAGEM DO NAVIO
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cover-preview" class="report-page">
+                    <header class="flex justify-between items-start pb-4 border-b-2 border-black">
+                        <img id="cover-preview-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
+                        <div class="text-right text-xs">
+                            <p class="font-bold" id="cover-preview-company-name"></p>
+                            <p id="cover-preview-company-address"></p>
+                            <p id="cover-preview-company-phones"></p>
+                            <p id="cover-preview-company-phone2"></p>
+                        </div>
+                    </header>
+                    <main class="flex-grow flex flex-col items-center justify-start text-center pt-16">
+                        <div class="w-full">
+                            <h1 id="cover-preview-cliente" class="text-3xl font-bold text-black">CLIENTE</h1>
+                            <h2 id="cover-preview-local" class="text-2xl font-bold text-black mt-2">EMBARCAÇÃO</h2>
+                        </div>
+                        <div class="w-full mt-8 pt-4 border-t-2 border-black">
+                            <p class="mt-2 text-lg">Relatório técnico de medição de resistência de isolamento elétrico (Megagem)</p>
+                            <img id="cover-preview-image" src="" alt="Imagem da Embarcação" class="mt-4 max-w-md w-full h-auto object-cover rounded-md shadow-lg mx-auto">
+                        </div>
+                    </main>
+                    <footer class="mt-auto pt-4">
+                        <div id="cover-preview-rep-logos" class="flex justify-center items-center gap-8 mb-2">
+                            <img id="cover-preview-rep-logo1" src="" class="h-10 w-auto object-contain">
+                            <img id="cover-preview-rep-logo2" src="" class="h-10 w-auto object-contain">
+                        </div>
+                        <p class="text-center text-xs text-gray-600">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DO ÍNDICE -->
+        <div id="index-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Índice do Relatório</h1>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
+                    <button id="index-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="save-full-report-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Salvar Relatório Completo</button>
+                    <button id="export-current-pdf-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Exporta Relatório Atual</button>
+                </div>
+
+                <div id="index-page" class="report-page">
+                    <div class="flex-grow flex flex-col">
+                        <header class="flex justify-between items-start pb-4 border-b-2 border-black">
+                            <img id="index-company-logo" src="" alt="Logo da Empresa" class="h-16 w-auto object-contain">
+                            <div class="text-right text-xs">
+                                <p class="font-bold" id="index-company-name"></p>
+                                <p id="index-company-address"></p>
+                                <p id="index-company-phones"></p>
+                                <p id="index-company-phone2"></p>
+                            </div>
+                        </header>
+                        <main id="index-content-list" class="p-4">
+                            <!-- Conteúdo do índice será carregado -->
+                        </main>
+                    </div>
+                     <footer class="pt-4">
+                        <div class="flex flex-col items-center w-full gap-3">
+                            <div class="flex items-center justify-center gap-6">
+                                <img id="index-rep-logo1" src="" class="h-10 w-auto object-contain">
+                                <img id="index-rep-logo2" src="" class="h-10 w-auto object-contain">
+                            </div>
+                            <p class="text-xs text-gray-600 text-center">Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4</p>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DE RELATÓRIOS SALVOS -->
+        <div id="saved-reports-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-4">Relatórios Salvos</h1>
+                <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                    <div id="saved-reports-list" class="space-y-3">
+                        <!-- A lista de relatórios salvos será inserida aqui -->
+                    </div>
+                </div>
+                <div class="flex justify-center mt-6">
+                    <button id="saved-reports-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar ao Menu</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DE GERENCIAMENTO DE EMPRESAS -->
+        <div id="company-management-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center text-blue-800 mb-6">Gerenciar Empresas</h1>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Formulário de Adicionar/Editar -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 id="company-form-title" class="text-xl font-semibold mb-4">Adicionar Nova Empresa</h2>
+                        <form id="company-form" class="space-y-4">
+                            <input type="hidden" id="company-id">
+                            <div>
+                                <label for="company-name" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
+                                <input type="text" id="company-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="company-address" class="block text-sm font-medium text-gray-700">Endereço</label>
+                                <input type="text" id="company-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Rua, Número, Bairro, Cidade, Estado">
+                            </div>
+                            <div>
+                                <label for="company-phones" class="block text-sm font-medium text-gray-700">Telefone 1</label>
+                                <input type="text" id="company-phones" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label for="company-phone2" class="block text-sm font-medium text-gray-700">Telefone 2</label>
+                                <input type="text" id="company-phone2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Logo da Empresa</label>
+                                <input type="file" id="company-logo-upload" class="hidden" accept="image/*">
+                                <label for="company-logo-upload" class="mt-1 w-full inline-block text-center bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition cursor-pointer">
+                                    CARREGAR LOGO
+                                </label>
+                                <img id="company-logo-preview" src="" alt="Preview da Logo" class="mt-2 h-16 w-auto mx-auto hidden">
+                            </div>
+                             <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Logo Rep. 1</label>
+                                    <input type="file" id="company-rep-logo1-upload" class="hidden" accept="image/*">
+                                    <label for="company-rep-logo1-upload" class="mt-1 w-full inline-block text-center bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition cursor-pointer text-xs">LOGO REP. 1</label>
+                                    <img id="company-rep-logo1-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Logo Rep. 2</label>
+                                    <input type="file" id="company-rep-logo2-upload" class="hidden" accept="image/*">
+                                    <label for="company-rep-logo2-upload" class="mt-1 w-full inline-block text-center bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition cursor-pointer text-xs">LOGO REP. 2</label>
+                                    <img id="company-rep-logo2-preview" src="" class="mt-2 h-12 w-auto mx-auto hidden">
+                                </div>
+                            </div>
+                            <div id="company-public-toggle-container" class="hidden">
+                                <div class="flex items-center">
+                                    <input id="company-is-public" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="company-is-public" class="ml-2 block text-sm text-gray-900">Tornar esta empresa pública (visível para todos)</label>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="submit" id="company-form-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Adicionar Empresa</button>
+                                <button type="button" id="company-form-cancel-btn" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition hidden">Cancelar Edição</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Lista de Empresas -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-4">Empresas Cadastradas</h2>
+                        <div id="company-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Lista de empresas será renderizada aqui -->
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button id="company-management-back-to-cover-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar para a Capa</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA DA PLANILHA DO GERADOR -->
+        <div id="generator-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="gen-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="gen-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="gen-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="gen-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="gen-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="gen-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>AVR:</label> <input type="text" id="gen-avr" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="gen-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="gen-potencia" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info sm:col-span-2 lg:col-span-1"><label>DATA:</label> <input type="date" id="gen-data" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="gen-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="gen-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="gen-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="gen-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="gen-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="gen-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="gen-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
+                        <input type="number" id="gen-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="gen-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="gen-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="gen-main-sections-container"></div>
+                <div class="text-center my-4 flex justify-center flex-wrap gap-4 pdf-hide">
+                    <button id="gen-togglePmg" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Seção PMG</button>
+                    <button id="gen-toggleDiodes" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition">Ativar Diodos D7-D12</button>
+                </div>
+                <div id="gen-pmg-section-container" class="hidden"></div>
+                <div id="gen-extra-sections-container"></div>
+            </div>
+        </div>
+        
+        <!-- TELA DA PLANILHA DO MOTOR -->
+        <div id="motor-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="motor-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="motor-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="motor-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="motor-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>DATA:</label> <input type="date" id="motor-data" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="motor-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="motor-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="motor-fabricante" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="motor-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="motor-potencia" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>ROTAÇÃO:</label> <input type="text" id="motor-rotacao" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="motor-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="motor-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="motor-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="motor-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="motor-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="motor-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="motor-tempEnrolamento" class="font-semibold">Temp. Enrol. (°C):</label>
+                        <input type="number" id="motor-tempEnrolamento" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="motor-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="motor-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="motor-sections-container"></div>
+            </div>
+        </div>
+
+        <!-- TELA DA PLANILHA DO TRANSFORMADOR X3 -->
+        <div id="transformer-app-screen" class="hidden bg-gray-100 min-h-screen p-4">
+            <div id="transformer-app-container" class="container mx-auto p-2 sm:p-4 md:p-6 bg-white shadow-lg my-4 sm:my-8">
+                <header class="border-b-2 border-gray-200 pb-6 mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h1 id="transformer-company-name-header" class="text-xl sm:text-2xl font-bold text-blue-800"></h1>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3">
+                        <div class="header-info"><label>CLIENTE:</label> <input type="text" id="transformer-cliente" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>LOCAL:</label> <input type="text" id="transformer-local" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>DATA:</label> <input type="date" id="transformer-data" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>EQUIP.:</label> <input type="text" id="transformer-equipamento" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>Nº SÉRIE:</label> <input type="text" id="transformer-numeroSerie" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>FAB./MODELO:</label> <input type="text" id="transformer-fabricante" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>TENSÃO:</label> <input type="text" id="transformer-tensao" class="border rounded px-2 py-1 w-full"></div>
+                        <div class="header-info"><label>POTÊNCIA:</label> <input type="text" id="transformer-potencia" class="border rounded px-2 py-1 w-full"></div>
+                    </div>
+                </header>
+
+                <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center my-4 pdf-hide">
+                    <button id="transformer-back-to-menu-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto">Voltar ao Menu</button>
+                    <button id="transformer-fillTestData" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition w-full sm:w-auto">Preencher Exemplo</button>
+                    <button id="transformer-clearForm" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition w-full sm:w-auto">Limpar</button>
+                    <button id="transformer-add-sheet-btn" class="menu-button text-white font-bold py-2 px-6 rounded-lg transition w-full sm:w-auto" disabled>Adicionar ao Relatório</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <label for="transformer-tempAmbiente" class="font-semibold">Temp. Amb. (°C):</label>
+                        <input type="number" id="transformer-tempAmbiente" class="input-yellow w-full">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="transformer-tempTrafo" class="font-semibold">Temp. no Trafo (°C):</label>
+                        <input type="number" id="transformer-tempTrafo" class="input-yellow w-full" placeholder="Essencial">
+                    </div>
+                    <div class="flex items-center gap-2 sm:col-span-2 md:col-span-1">
+                        <label for="transformer-umidadeRelativa" class="font-semibold">Umidade (%):</label>
+                        <input type="number" id="transformer-umidadeRelativa" class="input-yellow w-full">
+                    </div>
+                </div>
+                
+                <div id="transformer-sections-container"></div>
+            </div>
+        </div>
+
+        <!-- Modal de WIP -->
         <div id="wip-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
-             <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
-                 <h3 class="text-xl font-bold text-blue-800 mb-4">Em Desenvolvimento</h3>
-                 <p class="text-gray-700 mb-6">Esta funcionalidade estará disponível em breve!</p>
-                 <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
-             </div>
+            <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full text-center">
+                <h3 class="text-xl font-bold text-blue-800 mb-4">Em Desenvolvimento</h3>
+                <p class="text-gray-700 mb-6">Esta funcionalidade estará disponível em breve!</p>
+                <button id="close-wip-modal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Fechar</button>
+            </div>
         </div>
         <div id="pdf-loader-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center text-center text-white p-8 z-[200]">
-             <div>
-                 <svg class="animate-spin h-10 w-10 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                 </svg>
-                 <h2 class="text-2xl font-bold">Gerando Relatório em PDF...</h2>
-                 <p class="text-lg mt-2">Isso pode levar alguns segundos. Por favor, aguarde.</p>
-             </div>
+            <div>
+                <svg class="animate-spin h-10 w-10 text-white mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <h2 class="text-2xl font-bold">Gerando Relatório em PDF...</h2>
+                <p class="text-lg mt-2">Isso pode levar alguns segundos. Por favor, aguarde.</p>
+            </div>
         </div>
     </div>
 
 <script type="module">
-    // Importações do Firebase
+    // Importações dos módulos do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Módulo de serviço do Firebase
-    const firebaseService = { /* ... código completo e inalterado do firebaseService ... */ };
+    const firebaseService = {
+        auth: null,
+        db: null,
+        init: function() {
+            // As credenciais do seu projeto Firebase.
+            const firebaseConfig = {
+             apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
+             authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+             projectId: "relatorios-tecnicos-app",
+             storageBucket: "relatorios-tecnicos-app.appspot.com",
+             messagingSenderId: "280958854421",
+             appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+            };
+
+            if (firebaseConfig.apiKey.startsWith("AIza")) {
+                 // A chave parece válida, então inicializa.
+            } else {
+                console.error("CONFIGURAÇÃO DO FIREBASE INCOMPLETA. Substitua os placeholders pelas suas credenciais reais.");
+                return; 
+            }
+
+            const app = initializeApp(firebaseConfig);
+            this.auth = getAuth(app);
+            this.db = getFirestore(app);
+        },
+        getAuth: function() { return this.auth; },
+        getDb: function() { return this.db; }
+    };
     
     // Objeto de Estado Centralizado
-    const appState = { /* ... código completo e inalterado do appState ... */ };
+    const appState = {
+        user: { id: null, isAdmin: false, displayName: null, email: null },
+        company: { list: [], selected: null },
+        currentReport: { cache: [], editingIndex: null, coverImage: null },
+        ui: { 
+            temporaryCompanyLogo: null, 
+            temporaryRepLogo1: null, 
+            temporaryRepLogo2: null,
+            pendingUsersListener: null,
+            activeUsersListener: null
+        }
+    };
 
 
 document.addEventListener('DOMContentLoaded', () => {
     firebaseService.init();
-    if (!firebaseService.auth) { /* ... Lógica de erro de inicialização ... */ return; }
+
+    if (!firebaseService.auth) {
+        const authScreen = document.getElementById('auth-screen');
+        if (authScreen) {
+            authScreen.innerHTML = `
+                <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center p-4 text-white text-center">
+                    <h1 class="text-2xl font-bold text-red-500">Erro de Configuração</h1>
+                    <p class="mt-4">As credenciais do Firebase não foram configuradas corretamente no código-fonte.<br>
+                    Por favor, insira suas chaves de API para a aplicação funcionar.</p>
+                </div>`;
+            authScreen.style.display = 'block';
+        }
+        return;
+    }
 
     // ==================================================================================
-    // --- MÓDULO DE NAVEGAÇÃO UNIFICADO ---
+    // --- MÓDULO DE NAVEGAÇÃO ---
     // ==================================================================================
+    
     const navigation = {
         screens: { 
             reportTypeSelection: document.getElementById('report-type-selection-screen'),
-            menu: document.getElementById('menu-screen'), cover: document.getElementById('cover-screen'), index: document.getElementById('index-screen'), savedReports: document.getElementById('saved-reports-screen'),
-            companyManagement: document.getElementById('company-management-screen'), equipamentos: document.getElementById('equipamentos-screen'), gen: document.getElementById('generator-app-screen'), 
-            motor: document.getElementById('motor-app-screen'), transformer: document.getElementById('transformer-app-screen'), adminPanel: document.getElementById('admin-panel-screen'), profile: document.getElementById('profile-screen'),
-            bordoApp: document.getElementById('bordo-app-screen'), bordoItens: document.getElementById('bordo-itens-screen'), bordoReportPreview: document.getElementById('bordo-report-preview-screen'),
-        },
-        modals: {
-            horasTrabalhadas: document.getElementById('horasTrabalhadas-modal'), horasViagem: document.getElementById('horasViagem-modal'), materiais: document.getElementById('materiais-modal'),
-            comentarios: document.getElementById('comentarios-modal'), descricaoServicos: document.getElementById('descricaoServicos-modal'), relatorioFotografico: document.getElementById('relatorioFotografico-modal'),
+            bordoApp: document.getElementById('bordo-app-screen'),
+            menu: document.getElementById('menu-screen'), 
+            cover: document.getElementById('cover-screen'), 
+            index: document.getElementById('index-screen'), 
+            savedReports: document.getElementById('saved-reports-screen'),
+            companyManagement: document.getElementById('company-management-screen'),
+            equipamentos: document.getElementById('equipamentos-screen'),
+            gen: document.getElementById('generator-app-screen'), 
+            motor: document.getElementById('motor-app-screen'), 
+            transformer: document.getElementById('transformer-app-screen'), 
+            adminPanel: document.getElementById('admin-panel-screen'),
+            profile: document.getElementById('profile-screen'), 
         },
         currentScreen: null,
-        to: function(screenName, updateHistory = true) { /* ... código completo e inalterado da função to() ... */ },
-        showModal: function(modalName) { /* ... código da função showModal ... */ },
-        hideModal: function(modalName) { /* ... código da função hideModal ... */ },
-        init: function(defaultScreen = 'reportTypeSelection') { /* ... código completo e inalterado da função init() ... */ },
-        checkDirtyStateAndNavigate: async function(targetScreen) { /* ... código completo e inalterado ... */ }
+        to: function(screenName, updateHistory = true) {
+            const newScreenElement = this.screens[screenName];
+            if (!newScreenElement || newScreenElement === this.currentScreen) return;
+
+            if (this.currentScreen === this.screens.adminPanel) {
+                adminManager.stopListeners();
+            }
+
+            Object.values(this.screens).forEach(screen => { if (screen) screen.classList.add('hidden'); });
+            newScreenElement.classList.remove('hidden');
+            this.currentScreen = newScreenElement;
+            if (updateHistory && history.state?.screen !== screenName) {
+                history.pushState({ screen: screenName }, '', `#${screenName}`);
+            }
+        },
+        init: function(defaultScreen = 'menu') {
+            const initialScreenName = window.location.hash.substring(1) || defaultScreen;
+            // Valida se a tela do hash existe, senão vai para a padrão
+            if (this.screens[initialScreenName]) {
+                this.to(initialScreenName, false);
+                history.replaceState({ screen: initialScreenName }, '', `#${initialScreenName}`);
+            } else {
+                this.to(defaultScreen, false);
+                history.replaceState({ screen: defaultScreen }, '', `#${defaultScreen}`);
+            }
+            window.addEventListener('popstate', (event) => {
+                const screen = event.state ? event.state.screen : defaultScreen;
+                this.to(screen, false);
+            });
+        },
+        checkDirtyStateAndNavigate: async function(targetScreen) {
+            const currentScreenElement = this.currentScreen;
+            if (currentScreenElement) {
+                const appContainer = currentScreenElement.querySelector('[id$="-app-container"]');
+                if (appContainer && isFormDirty(appContainer)) {
+                    const userConfirmed = await uiFeedback.showConfirm('Você tem alterações não salvas. Deseja sair mesmo assim?');
+                    if (!userConfirmed) return;
+                }
+            }
+            this.to(targetScreen);
+        }
     };
 
     // ==================================================================================
-    // --- MÓDULO DE UI E FEEDBACK (INALTERADO) ---
+    // --- MÓDULO DE UI E FEEDBACK ---
     // ==================================================================================
-    const uiFeedback = { /* ... código completo e inalterado do uiFeedback ... */ };
+
+    const uiFeedback = {
+        toggleButtonLoading: function(button, isLoading) {
+            if (!button) return;
+            if (isLoading) {
+                button.disabled = true;
+                button.dataset.originalContent = button.innerHTML;
+                button.innerHTML = '<div class="spinner mx-auto"></div>';
+            } else {
+                button.disabled = false;
+                if (button.dataset.originalContent) {
+                    button.innerHTML = button.dataset.originalContent;
+                }
+            }
+        },
+        showToast: function(message, type = 'info') {
+            const notificationArea = document.getElementById('notification-area');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            notificationArea.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.remove(); }, 500);
+            }, 3000);
+        },
+        showConfirm: function(message) {
+            return new Promise(resolve => {
+                const overlay = document.createElement('div');
+                overlay.className = 'confirm-modal-overlay';
+                overlay.style.display = 'flex';
+                
+                const content = document.createElement('div');
+                content.className = 'confirm-modal-content';
+                
+                const messageEl = document.createElement('p');
+                messageEl.textContent = message;
+                messageEl.className = 'text-lg mb-6';
+
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'flex justify-center gap-4';
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = 'Confirmar';
+                confirmBtn.className = 'bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancelar';
+                cancelBtn.className = 'bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition';
+
+                const removeModal = () => document.body.removeChild(overlay);
+
+                confirmBtn.onclick = () => {
+                    removeModal();
+                    resolve(true);
+                };
+                cancelBtn.onclick = () => {
+                    removeModal();
+                    resolve(false);
+                };
+
+                btnContainer.append(cancelBtn, confirmBtn);
+                content.append(messageEl, btnContainer);
+                overlay.appendChild(content);
+                document.body.appendChild(overlay);
+            });
+        }
+    };
+
 
     // ==================================================================================
-    // --- LÓGICA DE AUTENTICAÇÃO, ADMIN E PERFIL (INALTERADA) ---
+    // --- LÓGICA DE AUTENTICAÇÃO E ADMINISTRAÇÃO ---
     // ==================================================================================
-    /* ... todo o código completo e inalterado para auth, admin e perfil vai aqui ... */
+
+    const authScreen = document.getElementById('auth-screen');
+    const mainAppWrapper = document.getElementById('main-app-wrapper');
+    const adminPanelBtn = document.getElementById('admin-panel-btn');
+    const userDisplayNameEl = document.getElementById('user-display-name');
+
+    onAuthStateChanged(firebaseService.getAuth(), async (user) => {
+        if (user) {
+            const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                
+                if (userData.status === 'approved') {
+                    appState.user.id = user.uid;
+                    appState.user.isAdmin = userData.role === 'admin';
+                    appState.user.displayName = userData.displayName || '';
+                    appState.user.email = userData.email || '';
+                    
+                    userDisplayNameEl.textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
+                    document.getElementById('selection-user-display-name').textContent = `Olá, ${appState.user.displayName || appState.user.email}`;
+
+                    authScreen.classList.add('hidden');
+                    mainAppWrapper.classList.remove('hidden');
+                    adminPanelBtn.classList.toggle('hidden', !appState.user.isAdmin);
+                    
+                    await loadAllCompanies();
+                    
+                    populateCompanyDropdown();
+                    navigation.init('reportTypeSelection');
+                } else {
+                    const message = userData.status === 'pending' ? 'Sua conta está aguardando aprovação.' : 'Seu acesso foi recusado.';
+                    uiFeedback.showToast(message, 'info');
+                    showAuthForm(userData.status === 'pending' ? 'pending' : 'login');
+                    await signOut(firebaseService.getAuth());
+                }
+            } else {
+                uiFeedback.showToast('Seus dados não foram encontrados. Cadastre-se novamente.', 'error');
+                await signOut(firebaseService.getAuth());
+                showAuthForm('login');
+            }
+        } else {
+            appState.user.id = null;
+            appState.user.isAdmin = false;
+            appState.user.displayName = null;
+            appState.user.email = null;
+            userDisplayNameEl.textContent = '';
+            authScreen.classList.remove('hidden');
+            mainAppWrapper.classList.add('hidden');
+            showAuthForm('login');
+            navigation.currentScreen = null;
+        }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        signInWithEmailAndPassword(firebaseService.getAuth(), email, password)
+            .then(() => uiFeedback.showToast('Login bem-sucedido! Verificando acesso...', 'success'))
+            .catch(() => uiFeedback.showToast('E-mail ou senha inválidos.', 'error'));
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        try {
+            const userCredential = await createUserWithEmailAndPassword(firebaseService.getAuth(), email, password);
+            const user = userCredential.user;
+            const userDocRef = doc(firebaseService.getDb(), "users", user.uid);
+            await setDoc(userDocRef, { 
+                uid: user.uid, 
+                email: user.email, 
+                displayName: name, 
+                role: 'user', 
+                status: 'pending', 
+                createdAt: new Date().toISOString() 
+            });
+            showAuthForm('pending');
+            await signOut(firebaseService.getAuth());
+        } catch (error) {
+            let msg = "Ocorreu um erro ao criar a conta.";
+            if (error.code === 'auth/email-already-in-use') msg = "Este e-mail já está em uso.";
+            else if (error.code === 'auth/weak-password') msg = "Senha muito fraca (mínimo 6 caracteres).";
+            else if (error.code === 'auth/invalid-email') msg = "O formato do e-mail é inválido.";
+            console.error("Register error:", error);
+            uiFeedback.showToast(msg, 'error');
+        }
+    });
     
+    const adminManager = {
+        renderUserList: (elementId, users, isPending) => {
+            const listEl = document.getElementById(elementId);
+            listEl.innerHTML = '';
+            if (users.length === 0) {
+                const message = isPending ? 'Nenhum usuário pendente.' : 'Nenhum usuário ativo.';
+                listEl.innerHTML = `<p class="text-gray-500">${message}</p>`;
+                return;
+            }
+            users.forEach(user => {
+                const userEl = document.createElement('div');
+                userEl.className = 'flex items-center justify-between p-2 border rounded-md';
 
-    // ==================================================================================
-    // --- LÓGICA PRINCIPAL DO RELATÓRIO DE MEGAGEM (INALTERADA) ---
-    // ==================================================================================
-    /* ... todo o código completo e inalterado para o relatório de megagem (constantes, configs, createApp, etc.) vai aqui ... */
+                const userInfoContainer = document.createElement('div');
+                const userInfo = document.createElement('span');
+                userInfo.className = 'text-sm truncate';
+                userInfo.title = user.email;
 
+                const strong = document.createElement('strong');
+                strong.className = 'block';
+                strong.textContent = user.displayName || '';
+                userInfo.appendChild(strong);
+                userInfo.append(document.createTextNode(user.email));
 
-    // ==================================================================================
-    // --- NOVO MÓDULO: RELATÓRIO DE BORDO ---
-    // ==================================================================================
-    const bordoReportManager = {
-        // ... (Aqui entra toda a lógica encapsulada do Relatório de Bordo: state, modalData, photoManager, saveDraft, loadDraft, saveToFirebase, exportPDF, init, etc.)
+                userInfoContainer.appendChild(userInfo);
+
+                if (!isPending) {
+                    const roleBadge = document.createElement('span');
+                    roleBadge.className = `text-xs ml-2 px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-yellow-200 text-yellow-800' : 'bg-blue-200 text-blue-800'}`;
+                    roleBadge.textContent = user.role;
+                    userInfoContainer.appendChild(roleBadge);
+                }
+
+                const buttons = document.createElement('div');
+                buttons.className = 'flex gap-2';
+
+                if (isPending) {
+                    buttons.innerHTML = `
+                        <button data-uid="${user.uid}" data-action="approve" class="bg-green-500 text-white px-2 py-1 text-xs rounded hover:bg-green-600">Aprovar</button>
+                        <button data-uid="${user.uid}" data-action="deny" class="bg-orange-500 text-white px-2 py-1 text-xs rounded hover:bg-orange-600">Recusar</button>`;
+                } else {
+                    buttons.innerHTML = `<button data-uid="${user.uid}" data-action="delete" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600">Excluir</button>`;
+                }
+
+                userEl.append(userInfoContainer, buttons);
+                listEl.appendChild(userEl);
+            });
+        },
+        startListeners: () => {
+            const db = firebaseService.getDb();
+            
+            const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
+            appState.ui.pendingUsersListener = onSnapshot(pendingQuery, (snapshot) => {
+                const pendingUsers = snapshot.docs.map(doc => doc.data());
+                adminManager.renderUserList('pending-users-list', pendingUsers, true);
+            }, (error) => {
+                console.error("Erro no listener de usuários pendentes:", error);
+                uiFeedback.showToast('Erro ao carregar usuários pendentes.', 'error');
+            });
+
+            const activeQuery = query(collection(db, "users"), where("status", "==", "approved"));
+            appState.ui.activeUsersListener = onSnapshot(activeQuery, (snapshot) => {
+                const activeUsers = snapshot.docs.map(doc => doc.data());
+                adminManager.renderUserList('active-users-list', activeUsers, false);
+            }, (error) => {
+                console.error("Erro no listener de usuários ativos:", error);
+                uiFeedback.showToast('Erro ao carregar usuários ativos.', 'error');
+            });
+        },
+        stopListeners: () => {
+            if (appState.ui.pendingUsersListener) {
+                appState.ui.pendingUsersListener();
+                appState.ui.pendingUsersListener = null;
+            }
+            if (appState.ui.activeUsersListener) {
+                appState.ui.activeUsersListener();
+                appState.ui.activeUsersListener = null;
+            }
+        }
     };
 
-    // --- INICIALIZAÇÃO E EVENT LISTENERS GERAIS ---
+    adminPanelBtn.addEventListener('click', () => {
+        navigation.to('adminPanel');
+        adminManager.startListeners();
+    });
+
+    document.getElementById('admin-panel-screen').addEventListener('click', async (e) => {
+        const target = e.target;
+        if (target.tagName === 'BUTTON' && target.dataset.uid) {
+            const uid = target.dataset.uid;
+            const action = target.dataset.action;
+            const userDocRef = doc(firebaseService.getDb(), "users", uid);
+            let confirmed = true;
+
+            if (action === 'deny' || action === 'delete') {
+                const message = action === 'delete' ? 'Tem certeza? Ação irreversível.' : 'Tem certeza que deseja recusar este usuário?';
+                confirmed = await uiFeedback.showConfirm(message);
+            }
+
+            if (confirmed) {
+                try {
+                    if (action === 'approve') { await updateDoc(userDocRef, { status: 'approved' }); uiFeedback.showToast('Usuário aprovado!', 'success'); } 
+                    else if (action === 'deny') { await updateDoc(userDocRef, { status: 'denied' }); uiFeedback.showToast('Usuário recusado.', 'info'); } 
+                    else if (action === 'delete') { await deleteDoc(userDocRef); uiFeedback.showToast('Usuário excluído.', 'info'); }
+                } catch (error) {
+                    console.error(`Erro na ação '${action}':`, error);
+                    uiFeedback.showToast('Ocorreu um erro ao processar a ação.', 'error');
+                }
+            }
+        }
+    });
+
+    function showAuthForm(formName) {
+        document.getElementById('login-form-container').classList.add('hidden');
+        document.getElementById('register-form-container').classList.add('hidden');
+        document.getElementById('pending-approval-container').classList.add('hidden');
+        const el = document.getElementById(`${formName}-form-container`) || document.getElementById(`${formName}-container`);
+        if(el) el.classList.remove('hidden');
+    }
+    
+    document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('register'); });
+    document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
+    document.getElementById('pending-back-to-login').addEventListener('click', (e) => { e.preventDefault(); showAuthForm('login'); });
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        signOut(firebaseService.getAuth()).catch((error) => {
+            console.error("Logout error:", error);
+            uiFeedback.showToast('Ocorreu um erro ao sair.', 'error');
+        });
+    });
+    
+    // ==================================================================================
+    // --- LÓGICA DO PERFIL DO USUÁRIO ---
+    // ==================================================================================
+
+    function populateProfileScreen() {
+        document.getElementById('profile-name').value = appState.user.displayName || '';
+        document.getElementById('profile-email').value = appState.user.email || '';
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = document.getElementById('profile-save-btn');
+        const newName = document.getElementById('profile-name').value.trim();
+
+        if (!newName) {
+            uiFeedback.showToast('O nome não pode ficar em branco.', 'error');
+            return;
+        }
+
+        if (newName === appState.user.displayName) {
+            uiFeedback.showToast('Nenhuma alteração detectada.', 'info');
+            navigation.to('reportTypeSelection');
+            return;
+        }
+
+        uiFeedback.toggleButtonLoading(button, true);
+
+        try {
+            const userDocRef = doc(firebaseService.getDb(), "users", appState.user.id);
+            await updateDoc(userDocRef, {
+                displayName: newName
+            });
+            appState.user.displayName = newName;
+            uiFeedback.showToast('Perfil atualizado com sucesso!', 'success');
+            navigation.to('reportTypeSelection');
+        } catch (error) {
+            console.error("Erro ao atualizar perfil:", error);
+            uiFeedback.showToast('Não foi possível atualizar o perfil.', 'error');
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
+        }
+    });
+
+
+    // ==================================================================================
+    // --- LÓGICA PRINCIPAL DO APLICATIVO ---
+    // ==================================================================================
+
+    const wipModal = document.getElementById('wip-modal');
+    const getKtInsulation = (temp, targetTemp) => Math.pow(2, (targetTemp - temp) / 10);
+    const getKtOhmic = (temp, targetTemp) => (234.5 + targetTemp) / (234.5 + temp);
+    const statusColors = { 'Perigoso': '#ef4444', 'Pobre': '#f97316', 'Questionável': '#facc15', 'Confiável': '#a3e635', 'Bom': '#4ade80', 'Excelente': '#16a34a', '': '#FFFFFF' };
+    const darkTextStatus = ['Questionável', 'Confiável', 'Bom'];
+    const evaluateIndex = (value, thresholds) => { if (isNaN(value) || value === null) return { status: '', color: statusColors[''] }; for (const t of thresholds) { if (value < t.limit) return { status: t.status, color: statusColors[t.status] }; } return { status: 'Excelente', color: statusColors['Excelente'] }; };
+    const evaluateIA = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.1, status: 'Pobre' }, { limit: 1.25, status: 'Questionável' }, { limit: 1.4, status: 'Confiável' }, { limit: 1.6, status: 'Bom' }]);
+    const evaluateIP = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.5, status: 'Pobre' }, { limit: 2, status: 'Questionável' }, { limit: 3, status: 'Confiável' }, { limit: 4, status: 'Bom' }]);
+    
+    const reportSheetHandlers = {
+        init: (container, recalc, getEl, clearForm, collectSheetData, config) => {
+            const addSheetBtn = getEl('add-sheet-btn');
+            const fillTestDataBtn = getEl('fillTestData');
+            const clearFormBtn = getEl('clearForm');
+
+            if (fillTestDataBtn) {
+                fillTestDataBtn.addEventListener('click', () => {
+                    if (!config.testData) { console.error(`Dados de teste não encontrados para ${config.appName}`); return; }
+                        Object.entries(config.testData.header).forEach(([key, value]) => {
+                            const el = getEl(key);
+                            if(el) el.value = value;
+                        });
+                        config.sections.forEach(section => {
+                            section.rows.forEach(row => {
+                                const data = config.testData.sections[section.name]?.[row.id];
+                                if (data === undefined) return;
+                                if (section.type === 'insulation') {
+                                        const reg30sInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg30s"]`); if(reg30sInput) reg30sInput.value = data[0];
+                                        const reg1minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg1min"]`); if(reg1minInput) reg1minInput.value = data[1];
+                                        const reg10minInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg10min"]`); if(reg10minInput) reg10minInput.value = data[2];
+                                } else if (section.type === 'diodes') {
+                                    if (data.d1_d6) { data.d1_d6.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 1}"]`); if (input) input.value = val; }); }
+                                    if (data.d7_d12) { data.d7_d12.forEach((val, i) => { const input = container.querySelector(`input[data-row="gen-diodes-dir"][data-col="d${i + 7}"]`); if (input) input.value = val; }); }
+                                } else {
+                                    const regInput = container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`);
+                                    if (regInput) {
+                                        regInput.value = (typeof data === 'object' && data !== null && data.reg !== undefined) ? data.reg : data;
+                                    }
+                                }
+                            });
+                        });
+                        recalc();
+                });
+            }
+            
+            clearFormBtn.addEventListener('click', async () => {
+                if (isFormDirty(container)) {
+                    const confirmed = await uiFeedback.showConfirm('Você tem certeza que deseja limpar o formulário? Os dados inseridos serão perdidos.');
+                    if (!confirmed) return;
+                }
+                clearForm(config);
+            });
+
+            if (!addSheetBtn) return;
+            const headerInputs = [getEl('equipamento')];
+            function validateHeader() {
+                addSheetBtn.disabled = !headerInputs.every(input => input && input.value.trim() !== '');
+            }
+            headerInputs.forEach(input => { if (input) input.addEventListener('input', validateHeader); });
+
+            addSheetBtn.addEventListener('click', () => {
+                const sheetData = collectSheetData(container, config);
+                
+                if (appState.currentReport.editingIndex !== null) {
+                    appState.currentReport.cache[appState.currentReport.editingIndex] = sheetData;
+                    uiFeedback.showToast(`Planilha "${sheetData.header.equipamento}" atualizada.`, 'success');
+                    appState.currentReport.editingIndex = null;
+                } else {
+                    appState.currentReport.cache.push(sheetData);
+                    uiFeedback.showToast(`Planilha para "${sheetData.header.equipamento}" adicionada.`, 'success');
+                }
+                
+                clearForm(config, true);  
+                ['equipamento', 'numeroSerie', 'avr', 'tensao', 'potencia', 'tecnico', 'responsavelTecnico', 'rotacao', 'fabricante'].forEach(id => { 
+                    const el = getEl(id); 
+                    if(el) el.value = ''; 
+                });
+                
+                addSheetBtn.textContent = 'Adicionar ao Relatório';
+                validateHeader();
+                
+                navigation.to('index');
+                updateIndexPage();
+            });
+            validateHeader();
+        }
+    };
+
+    const motorConfig = { prefix: 'motor', appName: 'Motor', containerId: 'motor-app-container', containerIds: [{ id: 'motor-sections-container', type: 'main' }], tempInputId: 'tempEnrolamento', insulation: { targetTemp: 40 }, ohmic: { targetTemp: 25 }, layout: 'table', specialHandlers: reportSheetHandlers, sections: [ { name: 'ESTATOR PRINCIPAL', type: 'insulation', rows: [ { id: 'motor-uxmassa', label: 'U x Massa' }, { id: 'motor-vxmassa', label: 'V x Massa' }, { id: 'motor-wxmassa', label: 'W x Massa' }, { id: 'motor-uxv', label: 'U x V' }, { id: 'motor-vxw', label: 'V x W' }, { id: 'motor-wxu', label: 'W x U' }, ]}, { name: 'RESISTÊNCIA AQUECIMENTO', type: 'heating', rows: [{ id: 'motor-heating-massa', label: 'Massa' }] }, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA', type: 'ohmic', rows: [ { id: 'motor-ohm-u', label: 'Fase U' }, { id: 'motor-ohm-v', label: 'Fase V' }, { id: 'motor-ohm-w', label: 'Fase W' }, ]} ], htmlTemplates: { 'heating': (s) => `<thead><tr><th>CONEXÃO</th><th>Resist. aquec. (MΩ)</th></tr></thead><tbody>${s.rows.map(r => `<tr><td class="label-cell">${r.label}</td><td><input type="number" step="any" data-row="${r.id}" data-col="reg" class="input-yellow"></td></tr>`).join('')}</tbody>`, 'ohmic': (s) => `<thead><tr><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th></tr></thead><tbody>${s.rows.map(r => `<tr><td class="label-cell"><div class="flex items-center justify-between"><span>${r.label}</span><select data-row="${r.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${r.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>` }, testData: { header: { cliente: 'Cliente Motor Exemplo', local: 'Oficina Central', data: new Date().toISOString().split('T')[0], equipamento: 'Motor Bomba Principal', numeroSerie: 'SN-MTR-1234', fabricante: 'WEG / W22', tensao: '440V', potencia: '150 CV', rotacao: '1750 RPM', tempAmbiente: 28, tempEnrolamento: 45, umidadeRelativa: 65 }, sections: { 'ESTATOR PRINCIPAL': { 'motor-uxmassa': [1500, 1800, 2500], 'motor-vxmassa': [1600, 1900, 2600], 'motor-wxmassa': [1550, 1850, 2550], 'motor-uxv': [2000, 2200, 3000], 'motor-vxw': [2100, 2300, 3100], 'motor-wxu': [2050, 2250, 3050] }, 'RESISTÊNCIA AQUECIMENTO': { 'motor-heating-massa': 2.5 }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA': { 'motor-ohm-u': 0.05, 'motor-ohm-v': 0.05, 'motor-ohm-w': 0.05 } } } };
+    const transformerConfig = { prefix: 'transformer', appName: 'Transformador', containerId: 'transformer-app-container', containerIds: [{ id: 'transformer-sections-container', type: 'main' }], tempInputId: 'tempTrafo', insulation: { targetTemp: 75 }, ohmic: { targetTemp: 25 }, layout: 'grid', specialHandlers: reportSheetHandlers, sections: [ { name: 'MEDIÇÕES REALIZADAS', type: 'insulation', rows: [ { id: 'h1h2-low-gnd', title: 'Alta(H1/H2) para Terra com Baixa(X1/X2) em Guard' }, { id: 'x1x2-high-gnd', title: 'Baixa(X1/X2) para Terra com Alta(H1/H2) em Guard' }, { id: 'h1h2-x1x2-gnd', title: 'Alta(H1/H2) para Baixa(X1/X2) com Terra em Guard' }, { id: 'h2h3-low-gnd', title: 'Alta(H2/H3) para Terra com Baixa(X2/X3) em Guard' }, { id: 'x2x3-high-gnd', title: 'Baixa(X2/X3) para Terra com Alta(H2/H3) em Guard' }, { id: 'h2h3-x2x3-gnd', title: 'Alta(H2/H3) para Baixa(X2/X3) com Terra em Guard' }, { id: 'h1h3-low-gnd', title: 'Alta(H1/H3) para Terra com Baixa(X1/X3) em Guard' }, { id: 'x1x3-high-gnd', title: 'Baixa(X1/X3) para Terra com Alta(H1/H3)em Guard' }, { id: 'h1h3-x1x3-gnd', title: 'Alta(H1/H3) para Baixa(X1/X3) com Terra em Guard' }, ]}, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)', type: 'ohmic', rows: [ { id: 'x1-x2', label: 'X1-X2' }, { id: 'x1-x1', label: 'X1-X1' }, { id: 'x2-x3', label: 'X2-X3' }, { id: 'x2-x2', label: 'X2-X2' }, { id: 'x1-x3', label: 'X1-X3' }, { id: 'x3-x3', label: 'X3-X3' }, { id: 'h1-h2', label: 'H1-H2' }, { id: 'h1-h1', label: 'H1-H1' }, { id: 'h2-h3', label: 'H2-H3' }, { id: 'h2-h2', label: 'H2-H2' }, { id: 'h1-h3', label: 'H1-H3' }, { id: 'h3-h3', label: 'H3-H3' }, ]} ], htmlTemplates: { 'ohmic': (s) => { let body = ''; for (let i = 0; i < 6; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r1.label}</td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td class="label-cell">${r2.label}</td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } return `<thead><tr><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th><th>Valor Registrado (mΩ)</th><th>CONEXÃO</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; } }, testData: { header: { cliente: 'OCEANPACT', local: 'MAC LAREN', data: '2025-01-04', equipamento: 'TRANSFORMADOR-BOW THRUSTER', numeroSerie: '155544KW', fabricante: 'WEG', tensao: 'Primário 440V / Secundário 440V', potencia: '50KVA', tempAmbiente: 33.7, tempTrafo: 40.7, umidadeRelativa: 50 }, sections: { 'MEDIÇÕES REALIZADAS': { 'h1h2-low-gnd': [22000, 22000, 22000], 'x1x2-high-gnd': [22000, 22000, 22000], 'h1h2-x1x2-gnd': [22000, 22000, 22000], 'h2h3-low-gnd': [22000, 22000, 22000], 'x2x3-high-gnd': [22000, 22000, 22000], 'h2h3-x2x3-gnd': [22000, 22000, 22000], 'h1h3-low-gnd': [22000, 22000, 22000], 'x1x3-high-gnd': [22000, 22000, 22000], 'h1h3-x1x3-gnd': [22000, 22000, 22000] }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA (Corrigido para 25°C)': { 'x1-x2': 0.35, 'x1-x1': 0.32, 'x2-x3': 0.34, 'x2-x2': 0.33, 'x1-x3': 0.36, 'x3-x3': 0.31, 'h1-h2': 0.45, 'h1-h1': 0.42, 'h2-h3': 0.44, 'h2-h2': 0.43, 'h1-h3': 0.46, 'h3-h3': 0.41 } } } };
+    const generatorConfig = { prefix: 'gen', appName: 'Gerador', containerId: 'gen-app-container', containerIds: [ { id: 'gen-main-sections-container', type: 'main' }, { id: 'gen-pmg-section-container', type: 'pmg' }, { id: 'gen-extra-sections-container', type: 'extra' }, ], tempInputId: 'tempEnrolamento', insulation: { targetTemp: 40 }, ohmic: { targetTemp: 25 }, layout: 'table', specialHandlers: { init: (container, recalc, getEl, clearForm, collectSheetData) => { reportSheetHandlers.init(container, recalc, getEl, clearForm, collectSheetData, generatorConfig); const pmgBtn = getEl('togglePmg'); const pmgSection = getEl('pmg-section-container'); const pmgOhmicRow = document.getElementById('gen-pmg-ohmic-row'); if(pmgBtn) { pmgBtn.addEventListener('click', () => { const isHidden = pmgSection.classList.contains('hidden'); pmgSection.classList.toggle('hidden'); if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden'); pmgBtn.textContent = isHidden ? 'Desativar Seção PMG' : 'Ativar Seção PMG'; pmgBtn.classList.toggle('bg-gray-200'); pmgBtn.classList.toggle('bg-yellow-400'); if (!isHidden) { pmgSection.querySelectorAll('input').forEach(i => i.value = ''); if (pmgOhmicRow) pmgOhmicRow.querySelectorAll('input').forEach(i => i.value = ''); recalc(); } }); } const diodesBtn = getEl('toggleDiodes'); const diodesHeader = document.getElementById('gen-diodes-d7d12-header'); const diodesBody = document.getElementById('gen-diodes-d7d12-body'); if (diodesBtn && diodesHeader && diodesBody) { diodesBtn.addEventListener('click', () => { const isHidden = diodesHeader.classList.contains('hidden'); diodesHeader.classList.toggle('hidden'); diodesBody.classList.toggle('hidden'); diodesBtn.textContent = isHidden ? 'Desativar Diodos D7-D12' : 'Ativar Diodos D7-D12'; diodesBtn.classList.toggle('bg-gray-200'); diodesBtn.classList.toggle('bg-red-400'); if (!isHidden) { diodesBody.querySelectorAll('input').forEach(i => { i.value = i.type === 'text' ? 'OL' : ''; }); recalc(); } }); } }, onClear: (container, getEl) => { const pmgBtn = getEl('togglePmg'); if (pmgBtn && pmgBtn.textContent.includes('Desativar')) { pmgBtn.click(); } const diodesBtn = getEl('toggleDiodes'); if (diodesBtn && diodesBtn.textContent.includes('Desativar')) { diodesBtn.click(); } } }, sections: [ { name: 'ESTATOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [ { id: 'gen-estator-uxmassa', label: 'U x Massa' }, { id: 'gen-estator-vxmassa', label: 'V x Massa' }, { id: 'gen-estator-wxmassa', label: 'W x Massa' }, { id: 'gen-estator-uxv', label: 'U x V' }, { id: 'gen-estator-uxw', label: 'U x W' }, { id: 'gen-estator-wxv', label: 'W x V' }, ]}, { name: 'ROTOR PRINCIPAL', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-rotor-principal', label: 'Rotor x Massa' }] }, { name: 'EXCITATRIZ MOTRIZ', type: 'insulation', containerType: 'main', rows: [{ id: 'gen-excitatriz-estator', label: 'Estator x Massa' }, { id: 'gen-excitatriz-rotor', label: 'Rotor x Massa' }] }, { name: 'EXCITAÇÃO AUXILIAR (PMG)', type: 'insulation', containerType: 'pmg', rows: [{ id: 'gen-pmg-estator', label: 'Estator x Massa' }] }, { name: 'RESISTÊNCIA AQUECIMENTO', type: 'heating', containerType: 'extra', rows: [{ id: 'gen-heating-massa', label: 'Massa' }] }, { name: 'MEDIÇÃO RESISTÊNCIA ÔHMICA', type: 'ohmic', containerType: 'extra', rows: [ { id: 'gen-ohm-uxu', label: 'Fase U x U (V)' }, { id: 'gen-ohm-rotorp', label: 'Rotor Principal' }, { id: 'gen-ohm-vxv', label: 'Fase V x V (W)' }, { id: 'gen-ohm-rotore', label: 'Rotor Excitatriz' }, { id: 'gen-ohm-wxw', label: 'Fase W x W (U)' }, { id: 'gen-ohm-estatore', label: 'Estator Ex. Motriz' }, { id: 'gen-ohm-pmg', label: 'PMG', isPmg: true }, ]}, { name: 'DIODOS ROTATIVOS', type: 'diodes', containerType: 'extra', rows: [{ id: 'gen-diodes-dir' }, { id: 'gen-diodes-rev' }] } ], htmlTemplates: { ...motorConfig.htmlTemplates, 'ohmic': (s) => { let body = ''; for (let i = 0; i < 3; i++) { const r1 = s.rows[i*2]; const r2 = s.rows[i*2+1]; body += `<tr><td class="label-cell">${r1.label}</td><td><input type="number" step="any" data-row="${r1.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r1.id}" data-col="corr" class="output-span output-blue"></span></td><td class="label-cell"><div class="flex items-center justify-between"><span>${r2.label}</span><select data-row="${r2.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${r2.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${r2.id}" data-col="corr" class="output-span output-blue"></span></td></tr>`; } const pmgRow = s.rows.find(r => r.isPmg); if (pmgRow) { body += `<tr id="gen-pmg-ohmic-row" class="hidden"><td class="label-cell"><div class="flex items-center justify-between"><span>${pmgRow.label}</span><select data-row="${pmgRow.id}" data-col="unit" class="unit-selector"><option>MΩ</option><option>Ω</option><option>mΩ</option><option>µΩ</option></select></div></td><td><input type="number" step="any" data-row="${pmgRow.id}" data-col="reg" class="input-yellow"></td><td><span data-row="${pmgRow.id}" data-col="corr" class="output-span output-blue"></span></td><td colspan="3"></td></tr>`; } return `<thead><tr><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th><th>CONEXÃO</th><th>Valor Registrado</th><th>Corrigido à 25°C</th></tr></thead><tbody>${body}</tbody>`; }, 'diodes': (s) => { const body1 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+1}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+1}" class="input-yellow"></td>`).join('')}</tr>`; const body2 = `<tr><td class="label-cell">Reversa (OL)</td>${Array.from({length: 6}, (_, i) => `<td><input type="text" data-row="gen-diodes-rev" data-col="d${i+7}" class="input-yellow" value="OL"></td>`).join('')}</tr><tr><td class="label-cell">Direta (Vdc)</td>${Array.from({length: 6}, (_, i) => `<td><input type="number" step="any" data-row="gen-diodes-dir" data-col="d${i+7}" class="input-yellow"></td>`).join('')}</tr>`; return `<thead><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+1}</th>`).join('')}</tr></thead><tbody>${body1}</tbody><thead id="gen-diodes-d7d12-header" class="hidden"><tr><th>Polarização</th>${Array.from({length: 6}, (_, i) => `<th>D${i+7}</th>`).join('')}</tr></thead><tbody id="gen-diodes-d7d12-body" class="hidden">${body2}</tbody>`; } }, testData: { header: { cliente: 'Estaleiro Naval', local: 'Navio Exemplo', data: new Date().toISOString().split('T')[0], tecnico: 'Téc. Exemplo', equipamento: 'Gerador Principal #1', numeroSerie: 'SN-5678', avr: 'AVR-123', tensao: '440V', potencia: '550 kVA', tempAmbiente: 25, tempEnrolamento: 50, umidadeRelativa: 70 }, sections: { 'ESTATOR PRINCIPAL': { 'gen-estator-uxmassa': [1200, 1500, 2000], 'gen-estator-vxmassa': [1300, 1600, 2100], 'gen-estator-wxmassa': [1250, 1550, 2050], 'gen-estator-uxv': [3000, 4000, 5000], 'gen-estator-uxw': [3100, 4100, 5100], 'gen-estator-wxv': [3050, 4050, 5050] }, 'ROTOR PRINCIPAL': { 'gen-rotor-principal': [500, 600, 800] }, 'EXCITATRIZ MOTRIZ': { 'gen-excitatriz-estator': [800, 900, 1100], 'gen-excitatriz-rotor': [700, 850, 1000] }, 'EXCITAÇÃO AUXILIAR (PMG)': { 'gen-pmg-estator': [1000, 1200, 1500] }, 'RESISTÊNCIA AQUECIMENTO': { 'gen-heating-massa': 1.5 }, 'MEDIÇÃO RESISTÊNCIA ÔHMICA': { 'gen-ohm-uxu': 1.1, 'gen-ohm-rotorp': 2.2, 'gen-ohm-vxv': 1.2, 'gen-ohm-rotore': 3.3, 'gen-ohm-wxw': 1.1, 'gen-ohm-estatore': 4.4, 'gen-ohm-pmg': 5.5 }, 'DIODOS ROTATIVOS': { 'gen-diodes-dir': { d1_d6: [0.432, 0.438, 0.441, 0.429, 0.435, 0.440], d7_d12: [0.425, 0.431, 0.428, 0.433, 0.439, 0.427] } } } } };
+
+    
+    // --- DECLARAÇÃO DE FUNÇÕES ---
+
+    async function getPrivateCompanies() {
+        if (!appState.user.id) return [];
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "users", appState.user.id, "data", "companies");
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() && docSnap.data().list ? docSnap.data().list : [];
+    }
+
+    async function getPublicCompanies() {
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "public_data", "companies");
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists() && appState.user.isAdmin) {
+            const defaultPublicCompanies = [
+                { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true },
+                { id: 'power', name: 'POWER', address: 'Endereço da Power', phones: 'Telefone da Power', phone2: '', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true }
+            ];
+            await setDoc(docRef, { list: defaultPublicCompanies });
+            return defaultPublicCompanies;
+        }
+        
+        return docSnap.exists() && docSnap.data().list ? docSnap.data().list : [];
+    }
+
+    async function loadAllCompanies() {
+        const privateCompanies = await getPrivateCompanies();
+        const publicCompanies = await getPublicCompanies();
+        appState.company.list = [...publicCompanies, ...privateCompanies];
+    }
+
+    async function savePrivateCompanies(companies) {
+        if (!appState.user.id) return;
+        const privateCompanies = companies.filter(c => !c.isPublic);
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "users", appState.user.id, "data", "companies");
+        await setDoc(docRef, { list: privateCompanies });
+    }
+
+    async function savePublicCompanies(companies) {
+        if (!appState.user.isAdmin) return;
+        const publicCompanies = companies.filter(c => c.isPublic);
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "public_data", "companies");
+        await setDoc(docRef, { list: publicCompanies });
+    }
+
+    function populateCompanyDropdown() {
+        const companySelect = document.getElementById('company-select');
+        const originalValue = companySelect.value;
+        companySelect.innerHTML = '';
+        appState.company.list.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.id;
+            option.textContent = company.name;
+            companySelect.appendChild(option);
+        });
+        
+        if (appState.company.list.some(c => c.id === originalValue)) {
+            companySelect.value = originalValue;
+        }
+
+        const selectedCompany = appState.company.list.find(c => c.id === companySelect.value);
+        appState.company.selected = selectedCompany || appState.company.list[0];
+        if (appState.company.selected) {
+            updateCompanyInfoOnPages();
+        }
+    }
+
+    function renderCompanyList() {
+        const listEl = document.getElementById('company-list');
+        listEl.innerHTML = '';
+        if (appState.company.list.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500">Nenhuma empresa cadastrada.</p>';
+            return;
+        }
+        appState.company.list.forEach(company => {
+            const isPublic = company.isPublic || false;
+            const canEdit = !isPublic || appState.user.isAdmin;
+
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between p-3 rounded-lg border';
+
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'flex items-center gap-4';
+
+            const img = document.createElement('img');
+            img.src = company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
+            img.className = 'h-10 w-auto object-contain bg-gray-100 p-1 rounded';
+
+            const textContainer = document.createElement('div');
+            const nameP = document.createElement('p');
+            nameP.className = 'font-semibold';
+            nameP.textContent = company.name;
+
+            if (isPublic) {
+                const publicSpan = document.createElement('span');
+                publicSpan.className = 'text-xs text-blue-500 ml-2';
+                publicSpan.textContent = '(Pública)';
+                nameP.appendChild(publicSpan);
+            }
+
+            const addressP = document.createElement('p');
+            addressP.className = 'text-xs text-gray-500';
+            addressP.textContent = company.address || 'Sem endereço';
+
+            textContainer.append(nameP, addressP);
+            infoContainer.append(img, textContainer);
+            div.appendChild(infoContainer);
+
+            if (canEdit) {
+                const btnContainer = document.createElement('div');
+                btnContainer.className = 'flex gap-2';
+                btnContainer.innerHTML = `
+                    <button data-edit-id="${company.id}" class="text-blue-500 hover:text-blue-700 font-bold py-1 px-2 rounded">Editar</button>
+                    <button data-delete-id="${company.id}" class="text-red-500 hover:text-red-700 font-bold py-1 px-2 rounded">Apagar</button>`;
+                div.appendChild(btnContainer);
+            }
+            
+            listEl.appendChild(div);
+        });
+    }
+
+    function resetCompanyForm() {
+        const form = document.getElementById('company-form');
+        form.reset();
+        document.getElementById('company-id').value = '';
+        document.getElementById('company-form-title').textContent = 'Adicionar Nova Empresa';
+        document.getElementById('company-form-submit-btn').textContent = 'Adicionar Empresa';
+        document.getElementById('company-form-cancel-btn').classList.add('hidden');
+        
+        document.getElementById('company-logo-preview').src = '';
+        document.getElementById('company-logo-preview').classList.add('hidden');
+        document.getElementById('company-rep-logo1-preview').src = '';
+        document.getElementById('company-rep-logo1-preview').classList.add('hidden');
+        document.getElementById('company-rep-logo2-preview').src = '';
+        document.getElementById('company-rep-logo2-preview').classList.add('hidden');
+        
+        appState.ui.temporaryCompanyLogo = null;
+        appState.ui.temporaryRepLogo1 = null;
+        appState.ui.temporaryRepLogo2 = null;
+    }
+    
+    async function getSavedFullReports() {
+        if (!appState.user.id) return [];
+        const db = firebaseService.getDb();
+        const reportsCol = collection(db, "users", appState.user.id, "reports");
+        const reportSnapshot = await getDocs(reportsCol);
+        const reportList = reportSnapshot.docs.map(doc => ({...doc.data(), firestoreId: doc.id}));
+        return reportList;
+    }
+
+    function resetCurrentReport() {
+        appState.currentReport.cache = [];
+        appState.currentReport.editingIndex = null;
+        document.getElementById('cover-cliente').value = '';
+        document.getElementById('cover-local').value = '';
+        initializeCoverApp();   
+        updateIndexPage();  
+    }
+
+    async function saveFullReport(event) {
+        const button = event.target;
+        if (!appState.user.id) { uiFeedback.showToast('Você precisa estar logado para salvar.', 'error'); return; }
+
+        const cliente = document.getElementById('cover-cliente').value.trim();
+        const local = document.getElementById('cover-local').value.trim();
+
+        if (!cliente || !local) { uiFeedback.showToast('Preencha "Cliente" e "Embarcação" na capa antes de salvar.', 'error'); navigation.to('cover'); return; }
+        if (appState.currentReport.cache.length === 0) { uiFeedback.showToast('Não há nenhuma planilha para salvar no relatório.', 'error'); return; }
+        
+        uiFeedback.toggleButtonLoading(button, true);
+        
+        const fullReport = {
+            cliente: cliente,
+            local: local,
+            imageDataUrl: appState.currentReport.coverImage,
+            companyKey: document.getElementById('company-select').value,
+            reportSheets: JSON.parse(JSON.stringify(appState.currentReport.cache)),
+            savedAt: new Date().toISOString()
+        };
+
+        try {
+            const db = firebaseService.getDb();
+            const reportsCol = collection(db, "users", appState.user.id, "reports");
+            await addDoc(reportsCol, fullReport);
+            uiFeedback.showToast(`Relatório para "${cliente}" salvo com sucesso!`, 'success');
+            resetCurrentReport();
+            navigation.to('reportTypeSelection');
+        } catch (error) {
+            console.error("Erro ao salvar relatório: ", error);
+            uiFeedback.showToast('Ocorreu um erro ao salvar o relatório.', 'error');
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
+        }
+    }
+
+    async function loadFullReport(reportId) {
+        const savedReports = await getSavedFullReports();
+        const reportToLoad = savedReports.find(r => r.firestoreId === reportId);
+        if (!reportToLoad) { uiFeedback.showToast("Erro: Relatório não encontrado.", 'error'); return; }
+
+        resetCurrentReport();
+        document.getElementById('cover-cliente').value = reportToLoad.cliente;
+        document.getElementById('cover-local').value = reportToLoad.local;
+        appState.currentReport.coverImage = reportToLoad.imageDataUrl;
+        document.getElementById('cover-preview-image').src = appState.currentReport.coverImage;
+        document.getElementById('company-select').value = reportToLoad.companyKey || 'unitech';
+        document.getElementById('company-select').dispatchEvent(new Event('change'));
+        appState.currentReport.cache = reportToLoad.reportSheets;
+        initializeCoverApp();
+        updateIndexPage();
+        uiFeedback.showToast(`Relatório para "${reportToLoad.cliente}" carregado!`, 'info');
+        navigation.to('menu');
+    }
+    
+    async function deleteSavedFullReport(reportId) {
+        if (!appState.user.id) return;
+        try {
+            const db = firebaseService.getDb();
+            await deleteDoc(doc(db, "users", appState.user.id, "reports", reportId));
+            uiFeedback.showToast('Relatório apagado.', 'success');
+            await showSavedReportsScreen();
+        } catch (error) {
+            console.error("Erro ao apagar relatório: ", error);
+            uiFeedback.showToast('Ocorreu um erro ao apagar o relatório.', 'error');
+        }
+    }
+
+    function updateIndexPage() {
+        const indexList = document.getElementById('index-content-list');
+        indexList.innerHTML = '';  
+        document.getElementById('cover-preview-cliente').textContent = document.getElementById('cover-cliente').value.toUpperCase() || 'CLIENTE';
+        document.getElementById('cover-preview-local').textContent = document.getElementById('cover-local').value.toUpperCase() || 'EMBARCAÇÃO';
+        updateCompanyInfoOnPages();
+
+        if (!appState.currentReport.cache || appState.currentReport.cache.length === 0) {
+            indexList.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma planilha de equipamento foi adicionada a este relatório ainda.</p>';
+            return;
+        }
+
+        const list = document.createElement('ul');
+        list.className = 'list-none space-y-2';
+        
+        const title = document.createElement('h2');
+        title.className = 'index-title';
+        title.textContent = 'Equipamentos Analisados:';
+        
+        indexList.appendChild(title);
+        indexList.appendChild(list);
+
+        appState.currentReport.cache.forEach((report, index) => {
+             const li = document.createElement('li');
+               li.className = 'flex items-center justify-between index-list-item';
+               li.innerHTML = `
+                   <span class="flex-grow">
+                       ${index + 1}. <a href="#" class="text-blue-600 hover:underline" data-report-index="${index}">${report.header.equipamento || 'Planilha sem nome'}</a>
+                   </span>
+                   <button data-delete-index="${index}" class="text-red-500 hover:text-red-700 font-bold text-xl px-2 ml-4 flex-shrink-0" title="Remover esta planilha do relatório atual">&times;</button>`;
+               list.appendChild(li);
+        });
+    }
+    
+    async function showSavedReportsScreen() {
+        const listEl = document.getElementById('saved-reports-list');
+        listEl.innerHTML = '<p class="text-gray-500 text-center">Carregando relatórios...</p>';
+        const savedReports = await getSavedFullReports();
+        
+        if (savedReports.length === 0) {
+            listEl.innerHTML = '<p class="text-gray-500 text-center">Nenhum relatório salvo na nuvem ainda.</p>';
+        } else {
+            listEl.innerHTML = savedReports.map(report => `
+                <div class="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50">
+                    <div>
+                        <a href="#" data-load-id="${report.firestoreId}" class="font-semibold text-blue-700 hover:underline">${report.cliente} - ${report.local}</a>
+                        <p class="text-xs text-gray-500">Salvo em: ${new Date(report.savedAt).toLocaleString('pt-BR')}</p>
+                    </div>
+                    <button data-delete-id="${report.firestoreId}" class="text-red-500 hover:text-red-700 font-bold text-2xl px-3" title="Apagar este relatório salvo">&times;</button>
+                </div>
+            `).join('');
+        }
+        navigation.to('savedReports');
+    }
+
+    function editSheetFromIndex(index) {
+        const sheetData = appState.currentReport.cache[index];
+        if (!sheetData) { console.error("Planilha não encontrada no índice:", index); return; }
+        const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
+        const config = configMap[sheetData.type];
+        if (!config) { console.error("Configuração não encontrada para o tipo de planilha:", sheetData.type); return; }
+        
+        appState.currentReport.editingIndex = index;
+        const container = document.getElementById(config.containerId);
+        navigation.to(config.prefix);
+        populateSheetFromData(container, sheetData, config);
+        const addBtn = document.getElementById(`${config.prefix}-add-sheet-btn`);
+        if (addBtn) {
+            addBtn.textContent = 'Salvar Alterações na Planilha';
+            addBtn.disabled = false;
+        }
+    }
+    
+    function createPlaceholderDataUrl(width, height, text) {
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#E2E8F0'; ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#475569'; ctx.font = 'bold 20px Inter';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(text, width / 2, height / 2);
+        return canvas.toDataURL();
+    }
+
+    function initializeCoverApp() {  
+        const inputs = { cliente: document.getElementById('cover-cliente'), local: document.getElementById('cover-local') };  
+        const imageUpload = document.getElementById('cover-image-upload');  
+        const previews = { cliente: document.getElementById('cover-preview-cliente'), local: document.getElementById('cover-preview-local'), image: document.getElementById('cover-preview-image') };  
+        
+        function updatePreviewText() {  
+            previews.cliente.textContent = inputs.cliente.value.toUpperCase() || 'CLIENTE';  
+            previews.local.textContent = inputs.local.value.toUpperCase() || 'EMBARCAÇÃO';  
+        }  
+        Object.values(inputs).forEach(input => input.addEventListener('input', updatePreviewText));  
+        
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 800, MAX_HEIGHT = 600;
+                    let {width, height} = img;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }  
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    if (dataUrl.length > 1048487) { uiFeedback.showToast('Imagem muito grande. Tente uma menor.', 'error'); return; }
+                    appState.currentReport.coverImage = dataUrl;
+                    previews.image.src = appState.currentReport.coverImage;
+                    uiFeedback.showToast('Imagem carregada e otimizada!', 'success');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        if (!previews.image.src) {
+            appState.currentReport.coverImage = createPlaceholderDataUrl(400, 200, 'Imagem da Embarcação');
+            previews.image.src = appState.currentReport.coverImage;
+        }
+        updatePreviewText();  
+    }
+
+    const createApp = (config) => {  
+        const appContainer = document.getElementById(config.containerId);  
+        if (!appContainer) return;  
+        const getEl = (id) => document.getElementById(`${config.prefix}-${id}`);  
+        const recalculate = (container = appContainer) => { const tempInput = container.querySelector(`#${config.prefix}-${config.tempInputId}`); const temp = parseFloat(tempInput?.value); const hasTemp = !isNaN(temp); const KtIns = hasTemp ? getKtInsulation(temp, config.insulation.targetTemp) : 1; const KtOhm = hasTemp ? getKtOhmic(temp, config.ohmic.targetTemp) : 1; config.sections.forEach(section => { if (section.type === 'insulation') { section.rows.forEach(row => { const getVal = (col) => container.querySelector(`input[data-row="${row.id}"][data-col="${col}"]`)?.value || ''; const updateSpan = (col, value, bgColor = '#e0f2fe', textColor = 'black') => { const el = container.querySelector(`span[data-row="${row.id}"][data-col="${col}"]`); if (el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const updateDiv = (col, value, bgColor = 'transparent', textColor = 'white') => { const el = container.querySelector(`div[data-row="${row.id}"][data-col="${col}"]`); if(el) { el.textContent = value; el.style.backgroundColor = bgColor; el.style.color = textColor; } }; const reg30s = parseFloat(getVal('reg30s')); const reg1min = parseFloat(getVal('reg1min')); const reg10min = parseFloat(getVal('reg10min')); const highValueThreshold = 21000; const isHigh30s = reg30s > highValueThreshold; const isHigh1min = reg1min > highValueThreshold; const isHigh10min = reg10min > highValueThreshold; const isAnyHigh = isHigh30s || isHigh1min || isHigh10min; const corr30sNum = !isNaN(reg30s) ? (hasTemp ? reg30s * KtIns : reg30s) : NaN; const corr1minNum = !isNaN(reg1min) ? (hasTemp ? reg1min * KtIns : reg1min) : NaN; const corr10minNum = !isNaN(reg10min) ? (hasTemp ? reg10min * KtIns : reg10min) : NaN; let ia_val, ip_val, ia_result, ip_result; if (isAnyHigh) { ia_val = 1.6; ip_val = 4.0; ia_result = { status: 'Excelente', color: statusColors['Excelente'] }; ip_result = { status: 'Excelente', color: statusColors['Excelente'] }; } else { if (!isNaN(reg1min) && !isNaN(reg30s)) { ia_val = (reg30s === 0) ? 0 : (reg1min / reg30s); } else { ia_val = null; } if (!isNaN(reg10min) && !isNaN(reg1min)) { ip_val = (reg1min === 0) ? 0 : (reg10min / reg1min); } else { ip_val = null; } ia_result = evaluateIA(ia_val); ip_result = evaluateIP(ip_val); } const iaTextColor = darkTextStatus.includes(ia_result.status) ? 'black' : 'white'; const ipTextColor = darkTextStatus.includes(ip_result.status) ? 'black' : 'white'; updateSpan('corr30s', isHigh30s ? '>21000' : (!isNaN(corr30sNum) ? corr30sNum.toFixed(0) : '')); updateSpan('corr1min', isHigh1min ? '>21000' : (!isNaN(corr1minNum) ? corr1minNum.toFixed(0) : '')); updateSpan('corr10min', isHigh10min ? '>21000' : (!isNaN(corr10minNum) ? corr10minNum.toFixed(0) : '')); updateSpan('ia_val', ia_val !== null ? ia_val.toFixed(2) : ''); updateSpan('ip_val', ip_val !== null ? ip_val.toFixed(2) : ''); if (config.layout === 'grid') { updateDiv('ia_status', ia_result.status, ia_result.color, iaTextColor); updateDiv('ip_status', ip_result.status, ip_result.color, ipTextColor); } else { updateSpan('ia_status', ia_result.status, ia_result.color, iaTextColor); updateSpan('ip_status', ip_result.status, ip_result.color, ipTextColor); } }); } else if (section.type === 'ohmic') { section.rows.forEach(row => { const regValue = parseFloat(container.querySelector(`input[data-row="${row.id}"][data-col="reg"]`)?.value || ''); const corrValueNum = !isNaN(regValue) ? (hasTemp ? regValue * KtOhm : regValue) : NaN; const span = container.querySelector(`span[data-row="${row.id}"][data-col="corr"]`); if(span) span.textContent = !isNaN(corrValueNum) ? corrValueNum.toFixed(2) : ''; }); } }); };  
+        const createTables = () => { config.containerIds.forEach(container => { const el = document.getElementById(container.id); if(el) el.innerHTML = ''; }); config.sections.forEach(section => { let html = `<section data-section-name="${section.name}">`; html += `<h2 class="section-title">${section.name}</h2>`; if (section.type === 'insulation') { if (config.layout === 'grid') { html += `<div id="${config.prefix}-insulation-grid" class="overflow-x-auto shadow-md">${createGridInsulation(section)}</div>`; } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${createTableInsulation(section)}</table></div>`; html += `<div class="overflow-x-auto shadow-md rounded-lg mt-4"><table class="data-table mt-4 indices-table">${createTableIndices(section)}</table></div>`; } } else { html += `<div class="overflow-x-auto shadow-md rounded-lg"><table class="data-table">${config.htmlTemplates[section.type](section)}</table></div>`; } html += `</section>`; const targetContainerId = config.containerIds.find(c => c.type === (section.containerType || 'main')).id; const targetContainer = document.getElementById(targetContainerId); if(targetContainer) targetContainer.innerHTML += html; }); }; const createTableInsulation = (section) => `<thead><tr><th rowspan="2">CONEXÃO</th><th colspan="3">Valor Registrado (MΩ)</th><th colspan="3">Corrigido à ${config.insulation.targetTemp}°C (MΩ)</th></tr><tr><th>30 Seg</th><th>01 min</th><th>10 min</th><th>30 Seg</th><th>01 min</th><th>10 min</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><input type="number" step="any" data-row="${row.id}" data-col="reg30s" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg1min" class="input-yellow"></td><td><input type="number" step="any" data-row="${row.id}" data-col="reg10min" class="input-yellow"></td><td><span data-row="${row.id}" data-col="corr30s" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr1min" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="corr10min" class="output-span output-blue"></span></td></tr>`).join('')}</tbody>`; const createTableIndices = (section) => `<thead><tr><th>CONEXÃO</th><th>IA Valor</th><th>IA Status</th><th>IP Valor</th><th>IP Status</th></tr></thead><tbody>${section.rows.map(row => `<tr><td class="label-cell">${row.label}</td><td><span data-row="${row.id}" data-col="ia_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ia_status" class="output-span"></span></td><td><span data-row="${row.id}" data-col="ip_val" class="output-span output-blue"></span></td><td><span data-row="${row.id}" data-col="ip_status" class="output-span"></span></td></tr>`).join('')}</tbody>`; const createGridInsulation = (section) => { let gridHtml = ''; section.rows.forEach(test => { gridHtml += `<div class="insulation-cell"><div class="cell-title">${test.title}</div><div class="cell-content"><div class="measurement-row"><div class="measurement-item"><label>30s</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg30s" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>1min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg1min" class="input-yellow"><span class="unit">MΩ</span></div></div><div class="measurement-item"><label>10min</label><div class="input-group"><input type="number" step="any" data-row="${test.id}" data-col="reg10min" class="input-yellow"><span class="unit">MΩ</span></div></div></div><div class="correction-title">Correção para ${config.insulation.targetTemp}°C</div><div class="measurement-row"><div class="measurement-item"><span data-row="${test.id}" data-col="corr30s" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr1min" class="output-span output-blue"></span></div><div class="measurement-item"><span data-row="${test.id}" data-col="corr10min" class="output-span output-blue"></span></div></div><div class="indices-row"><div class="index-item"><label>Índice de Absorção</label><span data-row="${test.id}" data-col="ia_val" class="output-span output-blue"></span></div><div class="index-item"><label>Índice de Polarização</label><span data-row="${test.id}" data-col="ip_val" class="output-span output-blue"></span></div></div><div class="indices-row mt-2"><div data-row="${test.id}" data-col="ia_status" class="status-cell"></div><div data-row="${test.id}" data-col="ip_status" class="status-cell"></div></div></div></div>`; }); return gridHtml; }; const clearForm = async (config, keepHeader = false) => { const appContainer = document.getElementById(config.containerId); const getEl = (id) => document.getElementById(`${config.prefix}-${id}`); const fieldsToKeep = ['cliente', 'local', 'data']; const headerData = {}; if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) headerData[id] = el.value; }); } appContainer.querySelectorAll('input:not([type=text][value=OL])').forEach(input => input.value = ''); appContainer.querySelectorAll('span[data-row], div[data-row]').forEach(el => { el.textContent = ''; el.style.backgroundColor = el.matches('.output-blue') ? '#e0f2fe' : 'transparent'; el.style.color = 'black'; }); if(keepHeader) { fieldsToKeep.forEach(id => { const el = getEl(id); if (el) el.value = headerData[id]; }); } if (config.specialHandlers && config.specialHandlers.onClear) { config.specialHandlers.onClear(appContainer, getEl); } recalculate(); }; const collectSheetData = () => { const data = { header: {}, sections: {}, type: config.prefix, appName: config.appName }; appContainer.querySelectorAll('header input, header select').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('div.grid input').forEach(input => { const key = input.id.replace(`${config.prefix}-`, ''); data.header[key] = input.value; }); appContainer.querySelectorAll('section[data-section-name]').forEach(sectionEl => { if (sectionEl.parentElement.classList.contains('hidden')) { return; } const sectionName = sectionEl.dataset.sectionName; data.sections[sectionName] = {}; sectionEl.querySelectorAll('input[data-row], select[data-row]').forEach(input => { const row = input.dataset.row; const col = input.dataset.col || 'reg'; if (!data.sections[sectionName][row]) data.sections[sectionName][row] = {}; data.sections[sectionName][row][col] = input.value; }); }); return data; };  
+        createTables();  
+        appContainer.addEventListener('input', (e) => (e.target.matches('input, select')) && recalculate());  
+        if (config.specialHandlers && config.specialHandlers.init) {  
+            config.specialHandlers.init(appContainer, recalculate, getEl, (keep) => clearForm(config, keep), collectSheetData, config);  
+        }  
+        recalculate();  
+        window[`recalculate_${config.prefix}`] = recalculate;  
+    };
+    
+    function populateSheetFromData(container, reportData, config) {
+        Object.entries(reportData.header).forEach(([key, value]) => {
+            const el = container.querySelector(`#${config.prefix}-${key}`);
+            if (el) el.value = value;
+        });
+        Object.entries(reportData.sections).forEach(([sectionName, sectionData]) => {
+            Object.entries(sectionData).forEach(([rowId, rowData]) => {
+                Object.entries(rowData).forEach(([colId, value]) => {
+                    const input = container.querySelector(`input[data-row="${rowId}"][data-col="${colId}"], select[data-row="${rowId}"][data-col="${colId}"]`);
+                    if (input) input.value = value;
+                });
+            });
+        });
+
+        if (config.prefix === 'gen') {
+            const pmgSection = container.querySelector('#gen-pmg-section-container');
+            const pmgOhmicRow = container.querySelector('#gen-pmg-ohmic-row');
+            const hasPmgData = reportData.sections['EXCITAÇÃO AUXILIAR (PMG)'];
+
+            if (pmgSection) {
+                const shouldBeVisible = !!hasPmgData;
+                pmgSection.classList.toggle('hidden', !shouldBeVisible);
+                if (pmgOhmicRow) pmgOhmicRow.classList.toggle('hidden', !shouldBeVisible);
+            }
+
+            const diodesHeader = container.querySelector('#gen-diodes-d7d12-header');
+            const diodesBody = container.querySelector('#gen-diodes-d7d12-body');
+            const hasD7Data = reportData.sections['DIODOS ROTATIVOS']?.['gen-diodes-dir']?.d7;
+
+            if (diodesHeader && diodesBody) {
+                const shouldBeVisible = !!hasD7Data;
+                diodesHeader.classList.toggle('hidden', !shouldBeVisible);
+                diodesBody.classList.toggle('hidden', !shouldBeVisible);
+            }
+        }
+        window[`recalculate_${config.prefix}`](container);
+    }
+    
+    function isFormDirty(container) {
+        const inputs = container.querySelectorAll('input[type="number"], input[type="text"]');
+        return Array.from(inputs).some(input => {
+            const id = input.id || '';
+            const value = input.value.trim();
+            if (id.includes('-cliente') || id.includes('-local') || value === 'OL') return false;
+            return value !== '';
+        });
+    }
+
+    // FUNÇÃO PARA DESENHAR O ÍNDICE NATIVAMENTE NO PDF (COM FONTES E TAMANHOS AJUSTADOS)
+    async function drawIndexPage(doc, companyData) {
+        const MARGIN = 15;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let currentY = MARGIN;
+
+        // --- CABEÇALHO ---
+        if (companyData.logoDataUrl) {
+            try {
+                const img = new Image();
+                img.src = companyData.logoDataUrl;
+                await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                const logoHeight = 16; 
+                const logoWidth = (img.width * logoHeight) / img.height;
+                doc.addImage(companyData.logoDataUrl, 'PNG', MARGIN, currentY, logoWidth, logoHeight);
+            } catch (e) {
+                console.error("Erro ao carregar logo da empresa para o PDF:", e);
+            }
+        }
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        
+        doc.setFont('Helvetica', 'bold');
+        doc.text(companyData.name || '', pageWidth - MARGIN, currentY + 4, { align: 'right' });
+        doc.setFont('Helvetica', 'normal');
+        doc.text(companyData.address || '', pageWidth - MARGIN, currentY + 8, { align: 'right' });
+        doc.text(companyData.phones || '', pageWidth - MARGIN, currentY + 12, { align: 'right' });
+        doc.text(companyData.phone2 || '', pageWidth - MARGIN, currentY + 16, { align: 'right' });
+        
+        currentY += 25;
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.5);
+        doc.line(MARGIN, currentY, pageWidth - MARGIN, currentY);
+        currentY += 20;
+
+        // --- CONTEÚDO (LISTA DE EQUIPAMENTOS) ---
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text('Equipamentos Analisados:', MARGIN, currentY);
+        currentY += 12;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(10);
+        if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
+            appState.currentReport.cache.forEach((report, index) => {
+                const prefix = `${index + 1}. `;
+                const equipmentName = report.header.equipamento || 'Planilha sem nome';
+                const prefixWidth = doc.getTextWidth(prefix);
+
+                // Desenha o número em preto
+                doc.setTextColor(0, 0, 0); // Preto
+                doc.text(prefix, MARGIN + 5, currentY);
+
+                // Desenha o nome do equipamento em azul
+                doc.setTextColor(41, 128, 185); // Azul (cor de link)
+                doc.text(equipmentName, MARGIN + 5 + prefixWidth, currentY);
+                
+                currentY += 7;
+            });
+        } else {
+            doc.setTextColor(150, 150, 150);
+            doc.text('Nenhuma planilha de equipamento foi adicionada.', MARGIN, currentY);
+        }
+        // Resetar a cor para preto para o rodapé
+        doc.setTextColor(0, 0, 0);
+        
+        // --- RODAPÉ ---
+        const footerY = pageHeight - MARGIN - 12;
+        let logo1Width = 0;
+        let logo2Width = 0;
+        const repLogoHeight = 8; // mm (tamanho miniatura)
+
+        if (companyData.repLogo1DataUrl) {
+            try {
+                const img = new Image();
+                img.src = companyData.repLogo1DataUrl;
+                await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                logo1Width = (img.width * repLogoHeight) / img.height;
+            } catch (e) { console.error("Erro ao carregar repLogo1 para o PDF:", e); }
+        }
+        if (companyData.repLogo2DataUrl) {
+            try {
+                const img = new Image();
+                img.src = companyData.repLogo2DataUrl;
+                await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+                logo2Width = (img.width * repLogoHeight) / img.height;
+            } catch (e) { console.error("Erro ao carregar repLogo2 para o PDF:", e); }
+        }
+
+        const totalLogoWidth = logo1Width + logo2Width + (logo1Width > 0 && logo2Width > 0 ? 8 : 0);
+        let currentX = (pageWidth - totalLogoWidth) / 2;
+
+        if (logo1Width > 0) {
+            doc.addImage(companyData.repLogo1DataUrl, 'PNG', currentX, footerY, logo1Width, repLogoHeight);
+            currentX += logo1Width + 8;
+        }
+        if (logo2Width > 0) {
+            doc.addImage(companyData.repLogo2DataUrl, 'PNG', currentX, footerY, logo2Width, repLogoHeight);
+        }
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Conformidade com as normas ABNT NBR5383-1, IEEE43 e IEC 60034-27-4', pageWidth / 2, pageHeight - MARGIN, { align: 'center' });
+    }
+
+    // FUNÇÃO DE EXPORTAÇÃO DE PDF REFEITA E FOCADA
+    async function exportFullReportAsPDF() {
+        const loader = document.getElementById('pdf-loader-overlay');
+        
+        if (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+            uiFeedback.showToast('Erro: Bibliotecas de PDF não carregaram. Verifique sua conexão.', 'error');
+            return;
+        }
+
+        loader.classList.remove('hidden');
+        loader.classList.add('flex');
+        
+        const pdfRenderContainer = document.createElement('div');
+        pdfRenderContainer.style.position = 'absolute';
+        pdfRenderContainer.style.left = '-9999px';
+        pdfRenderContainer.style.top = '0';
+        pdfRenderContainer.style.width = '800px'; // Largura fixa para renderização consistente
+        document.body.appendChild(pdfRenderContainer);
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Função auxiliar para adicionar uma página inteira ao PDF, forçando o encaixe
+            const addElementAsFullPage = async (element) => {
+                const canvas = await html2canvas(element, { scale: 3, useCORS: true });
+                doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+            };
+
+            // 1. Renderiza a CAPA
+            const coverPageClone = document.getElementById('cover-preview').cloneNode(true);
+            pdfRenderContainer.appendChild(coverPageClone);
+            await addElementAsFullPage(coverPageClone);
+            pdfRenderContainer.innerHTML = '';
+
+            // 2. DESENHA O ÍNDICE NATIVAMENTE
+            if (appState.currentReport.cache && appState.currentReport.cache.length > 0) {
+                doc.addPage();
+                await drawIndexPage(doc, appState.company.selected);
+            }
+
+            // 3. Renderiza cada PLANILHA DE DADOS, forçando o encaixe em uma página
+            for (const reportSheet of appState.currentReport.cache) {
+                doc.addPage();
+                const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
+                const config = configMap[reportSheet.type];
+                
+                const appContainerClone = document.getElementById(config.containerId).cloneNode(true);
+                populateSheetFromData(appContainerClone, reportSheet, config);
+                
+                // Aplica as classes para forçar a proporção de A4 antes da captura
+                appContainerClone.classList.add('report-page', 'pdf-fix-colors');
+                appContainerClone.style.margin = '0';
+                appContainerClone.style.border = 'none';
+                appContainerClone.style.maxWidth = 'none';
+                appContainerClone.style.boxShadow = 'none';
+                
+                appContainerClone.querySelectorAll('.pdf-hide').forEach(el => el.remove());
+                pdfRenderContainer.appendChild(appContainerClone);
+                
+                await addElementAsFullPage(appContainerClone);
+
+                pdfRenderContainer.innerHTML = '';
+            }
+
+            const clienteText = document.getElementById('cover-cliente').value.trim() || "Relatorio";
+            doc.save(`Relatorio_${clienteText.replace(/ /g,"_")}.pdf`);
+
+        } catch (error) {
+            console.error("Erro detalhado ao gerar PDF:", error);
+            uiFeedback.showToast('Ocorreu um erro detalhado ao gerar o PDF. Verifique o console.', 'error');
+        } finally {
+            document.body.removeChild(pdfRenderContainer);
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }
+    }
+    
+    function updateCompanyInfoOnPages() {
+        const company = appState.company.selected;
+        if (!company) return;
+
+        const logoUrl = company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
+        const repLogo1Url = company.repLogo1DataUrl;
+        const repLogo2Url = company.repLogo2DataUrl;
+
+        const setContent = (id, content) => { const el = document.getElementById(id); if (el) el.textContent = content || ''; };
+        const setSrc = (id, src) => { const el = document.getElementById(id); if (el) { el.src = src || ''; if (id.includes('rep-logo')) el.style.display = src ? 'block' : 'none'; } };
+
+        setSrc('cover-preview-company-logo', logoUrl);
+        setContent('cover-preview-company-name', company.name);
+        setContent('cover-preview-company-address', company.address);
+        setContent('cover-preview-company-phones', company.phones);
+        setContent('cover-preview-company-phone2', company.phone2);
+        setSrc('cover-preview-rep-logo1', repLogo1Url);
+        setSrc('cover-preview-rep-logo2', repLogo2Url);
+
+        setSrc('index-company-logo', logoUrl);
+        setContent('index-company-name', company.name);
+        setContent('index-company-address', company.address);
+        setContent('index-company-phones', company.phones);
+        setContent('index-company-phone2', company.phone2);
+        setSrc('index-rep-logo1', repLogo1Url);
+        setSrc('index-rep-logo2', repLogo2Url);
+    }
+
+    // --- INICIALIZAÇÃO E EVENT LISTENERS ---
+    
+    document.getElementById('company-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        const companyId = document.getElementById('company-id').value;
+        const companyName = document.getElementById('company-name').value;
+        if (!companyName.trim()) { uiFeedback.showToast('O nome da empresa é obrigatório.', 'error'); return; }
+
+        uiFeedback.toggleButtonLoading(button, true);
+
+        const newCompanyData = {
+            name: companyName,
+            address: document.getElementById('company-address').value,
+            phones: document.getElementById('company-phones').value,
+            phone2: document.getElementById('company-phone2').value,
+            logoDataUrl: appState.ui.temporaryCompanyLogo,
+            repLogo1DataUrl: appState.ui.temporaryRepLogo1,
+            repLogo2DataUrl: appState.ui.temporaryRepLogo2,
+            isPublic: appState.user.isAdmin ? document.getElementById('company-is-public').checked : false
+        };
+
+        try {
+            if (companyId) { // Editando
+                const companyIndex = appState.company.list.findIndex(c => c.id === companyId);
+                if (companyIndex > -1) {
+                    const oldCompany = appState.company.list[companyIndex];
+                    if (!newCompanyData.logoDataUrl) newCompanyData.logoDataUrl = oldCompany.logoDataUrl;
+                    if (!newCompanyData.repLogo1DataUrl) newCompanyData.repLogo1DataUrl = oldCompany.repLogo1DataUrl;
+                    if (!newCompanyData.repLogo2DataUrl) newCompanyData.repLogo2DataUrl = oldCompany.repLogo2DataUrl;
+                    
+                    appState.company.list[companyIndex] = { ...oldCompany, ...newCompanyData };
+                    uiFeedback.showToast('Empresa atualizada!', 'success');
+                }
+            } else { // Adicionando
+                newCompanyData.id = Date.now().toString();
+                appState.company.list.push(newCompanyData);
+                uiFeedback.showToast('Empresa adicionada!', 'success');
+            }
+
+            if (appState.user.isAdmin) {
+                await savePublicCompanies(appState.company.list);
+            }
+            await savePrivateCompanies(appState.company.list);
+
+            renderCompanyList();
+            populateCompanyDropdown();
+            resetCompanyForm();
+        } catch (error) {
+            console.error("Erro ao salvar empresa:", error);
+            uiFeedback.showToast('Erro ao salvar empresa.', 'error');
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
+        }
+    });
+
+    document.getElementById('company-list').addEventListener('click', async (e) => {
+        const editId = e.target.dataset.editId;
+        const deleteId = e.target.dataset.deleteId;
+
+        if (editId) {
+            const companyToEdit = appState.company.list.find(c => c.id === editId);
+            if (companyToEdit) {
+                document.getElementById('company-id').value = companyToEdit.id;
+                document.getElementById('company-name').value = companyToEdit.name;
+                document.getElementById('company-address').value = companyToEdit.address || '';
+                document.getElementById('company-phones').value = companyToEdit.phones || '';
+                document.getElementById('company-phone2').value = companyToEdit.phone2 || '';
+                
+                if (appState.user.isAdmin) {
+                    document.getElementById('company-is-public').checked = companyToEdit.isPublic || false;
+                }
+
+                const showPreview = (previewId, url) => {
+                    const el = document.getElementById(previewId);
+                    el.src = url || '';
+                    el.classList.toggle('hidden', !url);
+                };
+                showPreview('company-logo-preview', companyToEdit.logoDataUrl);
+                showPreview('company-rep-logo1-preview', companyToEdit.repLogo1DataUrl);
+                showPreview('company-rep-logo2-preview', companyToEdit.repLogo2DataUrl);
+                
+                document.getElementById('company-form-title').textContent = 'Editar Empresa';
+                document.getElementById('company-form-submit-btn').textContent = 'Salvar Alterações';
+                document.getElementById('company-form-cancel-btn').classList.remove('hidden');
+            }
+        }
+
+        if (deleteId) {
+            const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar esta empresa?');
+            if (confirmed) {
+                appState.company.list = appState.company.list.filter(c => c.id !== deleteId);
+                
+                if (appState.user.isAdmin) {
+                    await savePublicCompanies(appState.company.list);
+                }
+                await savePrivateCompanies(appState.company.list);
+
+                renderCompanyList();
+                populateCompanyDropdown();
+                resetCompanyForm();  
+                uiFeedback.showToast('Empresa apagada.', 'info');
+            }
+        }
+    });
+
+    document.getElementById('company-form-cancel-btn').addEventListener('click', resetCompanyForm);
+    
+    function processLogoUpload(file, previewElement, tempStateSetter) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const MAX_WIDTH = 200, MAX_HEIGHT = 80;
+                let {width, height} = img;
+                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }  
+                else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                canvas.width = width; canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/png');
+                if (dataUrl.length > 500000) { uiFeedback.showToast('Imagem muito grande.', 'error'); return; }
+                tempStateSetter(dataUrl);
+                previewElement.src = dataUrl;
+                previewElement.classList.remove('hidden');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    document.getElementById('company-logo-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-logo-preview'), (data) => appState.ui.temporaryCompanyLogo = data));
+    document.getElementById('company-rep-logo1-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo1-preview'), (data) => appState.ui.temporaryRepLogo1 = data));
+    document.getElementById('company-rep-logo2-upload').addEventListener('change', (e) => processLogoUpload(e.target.files[0], document.getElementById('company-rep-logo2-preview'), (data) => appState.ui.temporaryRepLogo2 = data));
+
+    document.getElementById('company-select').addEventListener('change', (e) => {
+        const selectedCompanyId = e.target.value;
+        appState.company.selected = appState.company.list.find(c => c.id === selectedCompanyId);
+        updateCompanyInfoOnPages();
+    });
+
+    const setupSheetScreen = (prefix) => {
+        const btn = document.getElementById(`${prefix}-btn`);
+        const configMap = { 'gen': generatorConfig, 'motor': motorConfig, 'transformer': transformerConfig };
+        const config = configMap[prefix];
+        if (!btn || !config) return;
+
+        btn.addEventListener('click', () => {
+            appState.currentReport.editingIndex = null;  
+            const addBtn = document.getElementById(`${prefix}-add-sheet-btn`);
+            if(addBtn) { addBtn.textContent = 'Adicionar ao Relatório'; addBtn.disabled = true; }
+            if (appState.company.selected) {
+                document.getElementById(`${prefix}-company-name-header`).textContent = appState.company.selected.name;
+            }
+            document.getElementById(`${prefix}-cliente`).value = document.getElementById('cover-cliente').value;
+            document.getElementById(`${prefix}-local`).value = document.getElementById('cover-local').value;
+            navigation.to(prefix);
+        });
+    };
+    
+    // --- CHAMADAS DE INICIALIZAÇÃO ---
     createApp(motorConfig);
     createApp(transformerConfig);
     createApp(generatorConfig);
@@ -309,12 +2223,91 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSheetScreen('transformer');
     initializeCoverApp();
     
-    // NOVO: Inicializa o módulo de Bordo
-    bordoReportManager.init();
-    
-    // --- EVENT LISTENERS DE NAVEGAÇÃO (ATUALIZADOS) ---
-    /* ... (Aqui entram todos os event listeners, antigos e novos, usando o objeto `navigation` unificado) ... */
+    // --- EVENT LISTENERS DE NAVEGAÇÃO ---
+    document.getElementById('menu-back-to-selection-btn').addEventListener('click', () => navigation.to('reportTypeSelection'));
+    document.getElementById('megagem-report-btn').addEventListener('click', () => navigation.to('menu'));
+    document.getElementById('bordo-report-btn').addEventListener('click', () => navigation.to('bordoApp'));
 
+    document.getElementById('cover-btn').addEventListener('click', () => { updateCompanyInfoOnPages(); navigation.to('cover'); });
+    document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
+    document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
+    
+    document.getElementById('manage-companies-btn').addEventListener('click', () => { 
+        renderCompanyList(); 
+        const publicToggle = document.getElementById('company-public-toggle-container');
+        if (appState.user.isAdmin) {
+            publicToggle.classList.remove('hidden');
+        } else {
+            publicToggle.classList.add('hidden');
+        }
+        navigation.to('companyManagement'); 
+    });
+
+    document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
+    document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
+    
+    // Botões "Voltar" dentro do fluxo de Megagem agora voltam para o menu de Megagem
+    document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {
+        if (btn.id !== 'profile-back-to-menu-btn') {
+             btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu'));
+        }
+    });
+
+    // Botão de perfil (e seu 'voltar') têm comportamento específico
+    document.getElementById('profile-btn').addEventListener('click', () => {
+        populateProfileScreen();
+        navigation.to('profile');
+    });
+    document.getElementById('selection-profile-btn').addEventListener('click', () => {
+        populateProfileScreen();
+        navigation.to('profile');
+    });
+    // O botão de voltar do perfil sempre retorna para a tela de seleção de tipo de relatório
+    document.getElementById('profile-back-to-menu-btn').addEventListener('click', () => navigation.checkDirtyStateAndNavigate('reportTypeSelection'));
+
+
+    document.getElementById('selection-logout-btn').addEventListener('click', () => {
+        signOut(firebaseService.getAuth()).catch((error) => {
+            console.error("Logout error:", error);
+            uiFeedback.showToast('Ocorreu um erro ao sair.', 'error');
+        });
+    });
+
+    // --- OUTROS EVENT LISTENERS ---
+    document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
+    document.getElementById('cover-save-report-btn').addEventListener('click', saveFullReport);
+    document.querySelectorAll('.wip-btn').forEach(btn => btn.addEventListener('click', () => { wipModal.classList.add('flex'); wipModal.classList.remove('hidden'); }));
+    document.getElementById('close-wip-modal').addEventListener('click', () => { wipModal.classList.add('hidden'); wipModal.classList.remove('flex'); });
+    
+    document.getElementById('saved-reports-list').addEventListener('click', async (e) => {
+        const loadButton = e.target.closest('[data-load-id]');
+        const deleteButton = e.target.closest('[data-delete-id]');
+        if (loadButton) { e.preventDefault(); await loadFullReport(loadButton.dataset.loadId); }
+        if (deleteButton) {  
+            e.preventDefault();  
+            const confirmed = await uiFeedback.showConfirm('Tem certeza que deseja apagar este relatório?');
+            if (confirmed) {  
+                await deleteSavedFullReport(deleteButton.dataset.deleteId);  
+            }  
+        }
+    });
+
+    document.getElementById('index-content-list').addEventListener('click', async (e) => {
+        const reportLink = e.target.closest('[data-report-index]');
+        const deleteButton = e.target.closest('[data-delete-index]');
+        if (reportLink) { e.preventDefault(); editSheetFromIndex(parseInt(reportLink.dataset.reportIndex, 10)); }
+        if (deleteButton) {
+            e.preventDefault();
+            const confirmed = await uiFeedback.showConfirm('Remover esta planilha do relatório atual?');
+            if (confirmed) {
+                appState.currentReport.cache.splice(parseInt(deleteButton.dataset.deleteIndex, 10), 1);
+                uiFeedback.showToast('Planilha removida.', 'info');
+                updateIndexPage();
+            }
+        }
+    });
+    
+    document.getElementById('export-current-pdf-btn').addEventListener('click', exportFullReportAsPDF);
 });
 </script>
 </body>
