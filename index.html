@@ -1452,7 +1452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCompany = appState.company.list.find(c => c.id === companySelect.value);
         appState.company.selected = selectedCompany || appState.company.list[0];
         if (appState.company.selected) {
-            // updateCompanyInfoOnPages(); // Esta função será definida mais tarde
+            updateCompanyInfoOnPages();
         }
     }
 
