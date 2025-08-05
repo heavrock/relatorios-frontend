@@ -1400,6 +1400,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- DECLARAÇÃO DE FUNÇÕES GERAIS E DE DADOS ---
+    // (Estas funções precisam ser definidas antes de serem chamadas)
+
+    async function getPrivateCompanies() {
+        if (!appState.user.id) return [];
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "users", appState.user.id, "data", "companies");
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() && docSnap.data().list ? docSnap.data().list : [];
+    }
+
+    async function getPublicCompanies() {
+        const db = firebaseService.getDb();
+        const docRef = doc(db, "public_data", "companies");
+        const docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists() && appState.user.isAdmin) {
+            const defaultPublicCompanies = [
+                { id: 'unitech', name: 'UNITECH-NIT', address: 'Rua Galvão Nº 28, Barreto – Niterói – Rio de Janeiro', phones: 'Telefones: (21) 96762-2155 / (21) 97119-2155', phone2: '(21)2608-4184', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true },
+                { id: 'power', name: 'POWER', address: 'Endereço da Power', phones: 'Telefone da Power', phone2: '', logoDataUrl: null, repLogo1DataUrl: null, repLogo2DataUrl: null, isPublic: true }
+            ];
+            await setDoc(docRef, { list: defaultPublicCompanies });
+            return defaultPublicCompanies;
+        }
+        
+        return docSnap.exists() && docSnap.data().list ? docSnap.data().list : [];
+    }
+
+    async function loadAllCompanies() {
+        const privateCompanies = await getPrivateCompanies();
+        const publicCompanies = await getPublicCompanies();
+        appState.company.list = [...publicCompanies, ...privateCompanies];
+    }
+
+    function populateCompanyDropdown() {
+        const companySelect = document.getElementById('company-select');
+        const originalValue = companySelect.value;
+        companySelect.innerHTML = '';
+        appState.company.list.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.id;
+            option.textContent = company.name;
+            companySelect.appendChild(option);
+        });
+        
+        if (appState.company.list.some(c => c.id === originalValue)) {
+            companySelect.value = originalValue;
+        }
+
+        const selectedCompany = appState.company.list.find(c => c.id === companySelect.value);
+        appState.company.selected = selectedCompany || appState.company.list[0];
+        if (appState.company.selected) {
+            // updateCompanyInfoOnPages(); // Esta função será definida mais tarde
+        }
+    }
+
 
     // ==================================================================================
     // --- LÓGICA DE AUTENTICAÇÃO E ADMINISTRAÇÃO ---
