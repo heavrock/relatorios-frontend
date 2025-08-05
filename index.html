@@ -298,7 +298,7 @@
                                          <option>DOME SERVIÇOS INTEGRADOS</option>
                                          <option>ELCANO</option>
                                          <option>EM&I GROUP</option>
-                                         <option>FLA-FLU SERVICOS SA</option>
+                                         <option>FLa-FLU SERVICOS SA</option>
                                          <option>FUGRO</option>
                                          <option>GRUPO BRAVANTE</option>
                                          <option>GRUPO CBO</option>
@@ -1230,7 +1230,7 @@
     const appState = {
         user: { id: null, isAdmin: false, displayName: null, email: null },
         company: { list: [], selected: null },
-        currentReport: { cache: [], editingIndex: null, coverImage: null }, // Para Relatório Megagem
+        currentReport: { cache: [], editingId: null, coverImage: null }, // Para Relatório Megagem
         ui: { 
             temporaryCompanyLogo: null, 
             temporaryRepLogo1: null, 
@@ -1401,8 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- DECLARAÇÃO DE FUNÇÕES GERAIS E DE DADOS ---
-    // (Estas funções precisam ser definidas antes de serem chamadas)
-
+    
     async function getPrivateCompanies() {
         if (!appState.user.id) return [];
         const db = firebaseService.getDb();
@@ -1772,10 +1771,205 @@ document.addEventListener('DOMContentLoaded', () => {
     const evaluateIA = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.1, status: 'Pobre' }, { limit: 1.25, status: 'Questionável' }, { limit: 1.4, status: 'Confiável' }, { limit: 1.6, status: 'Bom' }]);
     const evaluateIP = (v) => evaluateIndex(v, [{ limit: 1, status: 'Perigoso' }, { limit: 1.5, status: 'Pobre' }, { limit: 2, status: 'Questionável' }, { limit: 3, status: 'Confiável' }, { limit: 4, status: 'Bom' }]);
     
-    // ... (Toda a lógica e configurações do relatório de Megagem: reportSheetHandlers, motorConfig, transformerConfig, generatorConfig, etc.)
-    // Esta parte é muito grande e foi omitida para brevidade, mas ela está presente no código final.
-    // ...
-    // ... (Fim da lógica do relatório de Megagem) ...
+    // --- Funções para o fluxo de Relatório de Megagem (Salvar, Carregar, etc.) ---
+    
+    function updateIndexPage() {
+        const listContainer = document.getElementById('index-content-list');
+        listContainer.innerHTML = ''; // Limpa a lista
+
+        const title = document.createElement('h2');
+        title.className = 'text-2xl font-bold mb-6 text-center border-b-2 pb-2';
+        title.textContent = 'ÍNDICE';
+        listContainer.appendChild(title);
+
+        if (appState.currentReport.cache.length === 0) {
+            listContainer.innerHTML += '<p class="text-center text-gray-500 mt-8">Nenhum equipamento adicionado ao relatório.</p>';
+            return;
+        }
+
+        const list = document.createElement('div');
+        list.className = 'space-y-4';
+        
+        // Adiciona a Capa e o próprio Índice à contagem de páginas
+        const content = [
+            { name: 'Capa do Relatório', page: 1 },
+            { name: 'Índice', page: 2 },
+            ...appState.currentReport.cache.map((sheet, index) => ({
+                name: `${sheet.type.toUpperCase()} - ${sheet.data.header.equipamento || 'Sem nome'}`,
+                page: index + 3
+            }))
+        ];
+
+        content.forEach(item => {
+            const listItem = document.createElement('div');
+            listItem.className = 'index-list-item';
+            
+            const itemName = document.createElement('span');
+            itemName.textContent = item.name;
+            
+            const dots = document.createElement('span');
+            dots.textContent = '..................................................................................................................';
+            dots.className = 'flex-grow mx-2 text-gray-400 overflow-hidden';
+
+            const itemPage = document.createElement('span');
+            itemPage.textContent = item.page;
+            
+            listItem.appendChild(itemName);
+            listItem.appendChild(dots);
+            listItem.appendChild(itemPage);
+            list.appendChild(listItem);
+        });
+
+        listContainer.appendChild(list);
+    }
+
+    async function saveFullReport() {
+        const reportData = {
+            companyId: appState.company.selected?.id,
+            cover: {
+                cliente: document.getElementById('cover-cliente').value,
+                local: document.getElementById('cover-local').value,
+                image: appState.currentReport.coverImage,
+            },
+            sheets: appState.currentReport.cache,
+            createdAt: appState.currentReport.editingId ? undefined : new Date().toISOString(), // Só cria na primeira vez
+            updatedAt: new Date().toISOString()
+        };
+
+        if (!reportData.cover.cliente || !reportData.cover.local) {
+            uiFeedback.showToast("Preencha o Cliente e a Embarcação na capa antes de salvar.", "error");
+            return;
+        }
+
+        const db = firebaseService.getDb();
+        const user = appState.user;
+        const button = document.getElementById('save-full-report-btn') || document.getElementById('cover-save-report-btn');
+        uiFeedback.toggleButtonLoading(button, true);
+
+        try {
+            const reportId = appState.currentReport.editingId || doc(collection(db, `users/${user.id}/megagem_reports`)).id;
+            const reportRef = doc(db, `users/${user.id}/megagem_reports`, reportId);
+            
+            await setDoc(reportRef, reportData, { merge: true });
+            
+            appState.currentReport.editingId = reportId;
+            uiFeedback.showToast("Relatório salvo com sucesso!", "success");
+        } catch (error) {
+            console.error("Erro ao salvar relatório:", error);
+            uiFeedback.showToast("Ocorreu um erro ao salvar o relatório.", "error");
+        } finally {
+            uiFeedback.toggleButtonLoading(button, false);
+        }
+    }
+
+    async function showSavedReportsScreen() {
+        navigation.to('savedReports');
+        const listEl = document.getElementById('saved-reports-list');
+        listEl.innerHTML = '<p class="text-center text-gray-500">Carregando relatórios...</p>';
+
+        const db = firebaseService.getDb();
+        const user = appState.user;
+
+        try {
+            const reportsRef = collection(db, `users/${user.id}/megagem_reports`);
+            const q = query(reportsRef);
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                listEl.innerHTML = '<p class="text-center text-gray-500">Nenhum relatório salvo encontrado.</p>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+            querySnapshot.forEach(docSnap => {
+                const report = docSnap.data();
+                const reportId = docSnap.id;
+                const date = new Date(report.createdAt || report.updatedAt).toLocaleDateString('pt-BR');
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md border';
+                itemEl.innerHTML = `
+                    <div>
+                        <p class="font-bold">${report.cover.cliente} - ${report.cover.local}</p>
+                        <p class="text-sm text-gray-600">Salvo em: ${date}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button data-id="${reportId}" class="load-report-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Carregar</button>
+                        <button data-id="${reportId}" class="delete-report-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Excluir</button>
+                    </div>
+                `;
+                listEl.appendChild(itemEl);
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar relatórios salvos:", error);
+            listEl.innerHTML = '<p class="text-center text-red-500">Erro ao carregar relatórios.</p>';
+            uiFeedback.showToast("Não foi possível carregar os relatórios.", "error");
+        }
+    }
+    
+    async function loadSavedReport(reportId) {
+        const db = firebaseService.getDb();
+        const user = appState.user;
+        const reportRef = doc(db, `users/${user.id}/megagem_reports`, reportId);
+
+        try {
+            const docSnap = await getDoc(reportRef);
+            if (!docSnap.exists()) {
+                uiFeedback.showToast("Relatório não encontrado.", "error");
+                return;
+            }
+
+            const reportData = docSnap.data();
+            
+            appState.currentReport.cache = reportData.sheets || [];
+            appState.currentReport.editingId = reportId;
+            appState.currentReport.coverImage = reportData.cover.image || null;
+
+            document.getElementById('cover-cliente').value = reportData.cover.cliente || '';
+            document.getElementById('cover-local').value = reportData.cover.local || '';
+            const coverPreviewImage = document.getElementById('cover-preview-image');
+            if (reportData.cover.image) {
+                coverPreviewImage.src = reportData.cover.image;
+                coverPreviewImage.style.display = 'block';
+            } else {
+                coverPreviewImage.src = '';
+                coverPreviewImage.style.display = 'none';
+            }
+            
+            const companySelect = document.getElementById('company-select');
+            if (reportData.companyId) {
+                companySelect.value = reportData.companyId;
+                appState.company.selected = appState.company.list.find(c => c.id === reportData.companyId);
+                updateCompanyInfoOnPages();
+            }
+
+            uiFeedback.showToast("Relatório carregado com sucesso!", "success");
+            navigation.to('cover');
+
+        } catch (error) {
+            console.error("Erro ao carregar relatório:", error);
+            uiFeedback.showToast("Ocorreu um erro ao carregar o relatório.", "error");
+        }
+    }
+
+    function deleteSavedReport(reportId) {
+         uiFeedback.showConfirm("Tem certeza que deseja excluir este relatório? Esta ação não pode ser desfeita.", async () => {
+            const db = firebaseService.getDb();
+            const user = appState.user;
+            const reportRef = doc(db, `users/${user.id}/megagem_reports`, reportId);
+            try {
+                await deleteDoc(reportRef);
+                uiFeedback.showToast("Relatório excluído com sucesso.", "info");
+                showSavedReportsScreen();
+            } catch (error) {
+                console.error("Erro ao excluir relatório:", error);
+                uiFeedback.showToast("Ocorreu um erro ao excluir o relatório.", "error");
+            }
+        });
+    }
+
+    // ... (Restante da lógica de Megagem, como `reportSheetHandlers`, etc.)
 
 
     // ==================================================================================
@@ -2164,6 +2358,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
     
+    // Listeners para salvar e carregar relatórios de Megagem
+    document.getElementById('save-full-report-btn').addEventListener('click', saveFullReport);
+    document.getElementById('cover-save-report-btn').addEventListener('click', saveFullReport);
+    document.getElementById('saved-reports-list').addEventListener('click', (e) => {
+        const target = e.target;
+        const reportId = target.dataset.id;
+        if (reportId) {
+            if (target.classList.contains('load-report-btn')) {
+                loadSavedReport(reportId);
+            }
+            if (target.classList.contains('delete-report-btn')) {
+                deleteSavedReport(reportId);
+            }
+        }
+    });
+
     // Botões "Voltar" dentro do fluxo de Megagem
     document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {
         if (btn.id !== 'profile-back-to-menu-btn' && btn.id !== 'admin-back-to-menu-btn') {
