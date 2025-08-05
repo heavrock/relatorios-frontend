@@ -1236,7 +1236,8 @@
             temporaryRepLogo1: null, 
             temporaryRepLogo2: null,
             pendingUsersListener: null,
-            activeUsersListener: null
+            activeUsersListener: null,
+            isFormDirty: false // Flag para alterações não salvas
         }
     };
 
@@ -1292,6 +1293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.values(this.screens).forEach(screen => { if (screen) screen.classList.add('hidden'); });
             newScreenElement.classList.remove('hidden');
             this.currentScreen = newScreenElement;
+            appState.ui.isFormDirty = false; // Reseta a flag ao navegar
 
             if (updateHistory && history.state?.screen !== screenName) {
                 history.pushState({ screen: screenName }, '', `#${screenName}`);
@@ -1325,19 +1327,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         checkDirtyStateAndNavigate: async function(targetScreen) {
-            const currentScreenElement = this.currentScreen;
-            if (currentScreenElement) {
-                const appContainer = currentScreenElement.querySelector('[id$="-app-container"]');
-                if (appContainer && isFormDirty(appContainer)) {
-                    const userConfirmed = await new Promise(resolve => {
-                        uiFeedback.showConfirm('Você tem alterações não salvas. Deseja sair mesmo assim?', () => resolve(true));
-                        // Adicionar um listener para o botão de cancelar que resolve para false
-                        document.getElementById('confirm-modal-cancel-btn').onclick = () => {
-                            navigation.hideModal('confirm');
-                            resolve(false);
-                        };
-                    });
-                    if (!userConfirmed) return;
+            if (appState.ui.isFormDirty) {
+                const userConfirmed = await new Promise(resolve => {
+                    const confirmBtn = document.getElementById('confirm-modal-confirm-btn');
+                    const cancelBtn = document.getElementById('confirm-modal-cancel-btn');
+                    
+                    const onConfirm = () => {
+                        cleanup();
+                        resolve(true);
+                    };
+                    
+                    const onCancel = () => {
+                        cleanup();
+                        resolve(false);
+                    };
+                    
+                    const cleanup = () => {
+                        confirmBtn.removeEventListener('click', onConfirm);
+                        cancelBtn.removeEventListener('click', onCancel);
+                    };
+
+                    confirmBtn.addEventListener('click', onConfirm, { once: true });
+                    cancelBtn.addEventListener('click', onCancel, { once: true });
+
+                    uiFeedback.showConfirm('Você tem alterações não salvas. Deseja sair mesmo assim?', onConfirm);
+                });
+
+                if (!userConfirmed) {
+                    // Se o usuário cancelar, precisamos reatribuir o listener de cancelamento padrão
+                    document.getElementById('confirm-modal-cancel-btn').onclick = () => navigation.hideModal('confirm');
+                    return;
                 }
             }
             this.to(targetScreen);
@@ -1790,7 +1809,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.createElement('div');
         list.className = 'space-y-4';
         
-        // Adiciona a Capa e o próprio Índice à contagem de páginas
         const content = [
             { name: 'Capa do Relatório', page: 1 },
             { name: 'Índice', page: 2 },
@@ -1832,7 +1850,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: appState.currentReport.coverImage,
             },
             sheets: appState.currentReport.cache,
-            createdAt: appState.currentReport.editingId ? undefined : new Date().toISOString(), // Só cria na primeira vez
+            createdAt: appState.currentReport.editingId ? undefined : new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
 
@@ -1881,17 +1899,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             listEl.innerHTML = '';
+            const reports = [];
             querySnapshot.forEach(docSnap => {
-                const report = docSnap.data();
-                const reportId = docSnap.id;
-                const date = new Date(report.createdAt || report.updatedAt).toLocaleDateString('pt-BR');
+                reports.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            
+            // Ordenar por data de atualização (mais recente primeiro)
+            reports.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+            reports.forEach(report => {
+                const reportId = report.id;
+                const date = new Date(report.updatedAt || report.createdAt).toLocaleString('pt-BR');
 
                 const itemEl = document.createElement('div');
                 itemEl.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md border';
                 itemEl.innerHTML = `
                     <div>
                         <p class="font-bold">${report.cover.cliente} - ${report.cover.local}</p>
-                        <p class="text-sm text-gray-600">Salvo em: ${date}</p>
+                        <p class="text-sm text-gray-600">Atualizado em: ${date}</p>
                     </div>
                     <div class="flex gap-2">
                         <button data-id="${reportId}" class="load-report-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Carregar</button>
@@ -1903,8 +1928,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Erro ao carregar relatórios salvos:", error);
-            listEl.innerHTML = '<p class="text-center text-red-500">Erro ao carregar relatórios.</p>';
-            uiFeedback.showToast("Não foi possível carregar os relatórios.", "error");
+            const permissionErrorHtml = `
+                <div class="text-center text-red-600">
+                    <p class="font-bold">Erro ao carregar relatórios.</p>
+                    <p class="text-sm mt-2"><b>Causa provável:</b> Falha de permissão no Firebase.</p>
+                    <p class="text-xs mt-1">Verifique se as regras de segurança do Firestore permitem a leitura da coleção 'users/{userId}/megagem_reports'.</p>
+                </div>`;
+            listEl.innerHTML = permissionErrorHtml;
+            uiFeedback.showToast("Não foi possível carregar os relatórios. Verifique as permissões.", "error");
         }
     }
     
@@ -1961,15 +1992,111 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await deleteDoc(reportRef);
                 uiFeedback.showToast("Relatório excluído com sucesso.", "info");
-                showSavedReportsScreen();
+                showSavedReportsScreen(); // Recarrega a lista
             } catch (error) {
                 console.error("Erro ao excluir relatório:", error);
                 uiFeedback.showToast("Ocorreu um erro ao excluir o relatório.", "error");
             }
         });
     }
+    
+    // --- Handlers para planilhas de equipamentos (Megagem) ---
+    const reportSheetHandlers = {
+        _collectCommonData: (prefix) => {
+            const getVal = (id) => document.getElementById(`${prefix}-${id}`)?.value || '';
+            const getNum = (id) => document.getElementById(`${prefix}-${id}`)?.valueAsNumber || null;
 
-    // ... (Restante da lógica de Megagem, como `reportSheetHandlers`, etc.)
+            const header = {};
+            const headerFields = ['cliente', 'equipamento', 'numeroSerie', 'local', 'avr', 'tensao', 'potencia', 'data', 'fabricante', 'rotacao'];
+            headerFields.forEach(field => {
+                const element = document.getElementById(`${prefix}-${field}`);
+                if (element) header[field] = element.value;
+            });
+
+            const conditions = {};
+            const conditionFields = ['tempAmbiente', 'tempEnrolamento', 'tempTrafo', 'umidadeRelativa'];
+            conditionFields.forEach(field => {
+                const element = document.getElementById(`${prefix}-${field}`);
+                if (element) conditions[field] = element.valueAsNumber || null;
+            });
+
+            return {
+                header: header,
+                conditions: conditions,
+                sections: Array.from(document.querySelectorAll(`#${prefix}-app-container .data-table`)).map(table => {
+                    const sectionId = table.dataset.sectionId;
+                    const inputs = Array.from(table.querySelectorAll('input, select')).map(el => ({ id: el.id, value: el.value }));
+                    return { id: sectionId, inputs };
+                })
+            };
+        },
+        _restoreCommonData: (prefix, data) => {
+            const setVal = (id, value) => { const el = document.getElementById(`${prefix}-${id}`); if (el) el.value = value || ''; };
+            
+            Object.keys(data.header).forEach(key => setVal(key, data.header[key]));
+            Object.keys(data.conditions).forEach(key => setVal(key, data.conditions[key]));
+            
+            data.sections.forEach(section => {
+                section.inputs.forEach(input => {
+                    const el = document.getElementById(input.id);
+                    if (el) el.value = input.value;
+                });
+            });
+            // Dispara o evento de input para recalcular tudo
+            document.querySelectorAll(`#${prefix}-app-container input, #${prefix}-app-container select`).forEach(el => el.dispatchEvent(new Event('input', { bubbles: true })));
+        },
+
+        generator: {
+            collectData: () => reportSheetHandlers._collectCommonData('gen'),
+            restoreData: (data) => reportSheetHandlers._restoreCommonData('gen', data),
+            setup: () => {
+                document.getElementById('gen-company-name-header').textContent = appState.company.selected?.name || 'Empresa Padrão';
+                document.getElementById('gen-tempEnrolamento').addEventListener('input', (e) => {
+                    document.getElementById('gen-add-sheet-btn').disabled = !e.target.value;
+                });
+            }
+        },
+        motor: {
+            collectData: () => reportSheetHandlers._collectCommonData('motor'),
+            restoreData: (data) => reportSheetHandlers._restoreCommonData('motor', data),
+            setup: () => {
+                document.getElementById('motor-company-name-header').textContent = appState.company.selected?.name || 'Empresa Padrão';
+                document.getElementById('motor-tempEnrolamento').addEventListener('input', (e) => {
+                    document.getElementById('motor-add-sheet-btn').disabled = !e.target.value;
+                });
+            }
+        },
+        transformer: {
+            collectData: () => reportSheetHandlers._collectCommonData('transformer'),
+            restoreData: (data) => reportSheetHandlers._restoreCommonData('transformer', data),
+            setup: () => {
+                document.getElementById('transformer-company-name-header').textContent = appState.company.selected?.name || 'Empresa Padrão';
+                document.getElementById('transformer-tempTrafo').addEventListener('input', (e) => {
+                    document.getElementById('transformer-add-sheet-btn').disabled = !e.target.value;
+                });
+            }
+        }
+    };
+
+    function addSheetToReport(type) {
+        if (!reportSheetHandlers[type]) return;
+
+        const sheetData = reportSheetHandlers[type].collectData();
+        
+        if (!sheetData.header.equipamento) {
+            uiFeedback.showToast('Por favor, preencha o nome do equipamento.', 'error');
+            return;
+        }
+
+        appState.currentReport.cache.push({
+            type: type,
+            data: sheetData
+        });
+        
+        appState.ui.isFormDirty = false; // Reseta a flag após salvar
+        uiFeedback.showToast(`Planilha do ${type.toUpperCase()} adicionada ao relatório!`, 'success');
+        navigation.to('menu');
+    }
 
 
     // ==================================================================================
@@ -2321,6 +2448,81 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==================================================================================
     // --- LÓGICA DO RELATÓRIO DE BORDO (FIM) ---
     // ==================================================================================
+    
+    // ==================================================================================
+    // --- LÓGICA DE CÁLCULO DAS PLANILHAS (MEGAGEM) ---
+    // ==================================================================================
+    function megagemCalculations(container) {
+        appState.ui.isFormDirty = true;
+        const prefix = container.id.split('-')[0]; // 'gen', 'motor', 'transformer'
+        const tempEnrolamentoEl = document.getElementById(`${prefix}-tempEnrolamento`) || document.getElementById(`${prefix}-tempTrafo`);
+        const tempEnrolamento = parseFloat(tempEnrolamentoEl.value);
+
+        if (isNaN(tempEnrolamento)) {
+            // Se a temperatura essencial não estiver preenchida, não faz nada.
+            // O botão "Adicionar" já está desabilitado.
+            return;
+        }
+
+        container.querySelectorAll('.data-table').forEach(table => {
+            const isOhmic = table.dataset.type === 'ohmic';
+            const kt = isOhmic ? getKtOhmic(tempEnrolamento, 20) : getKtInsulation(tempEnrolamento, 40);
+
+            // Calcula valores corrigidos
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const measuredInput = row.querySelector('.measured-val');
+                const correctedSpan = row.querySelector('.corrected-val');
+                if (measuredInput && correctedSpan) {
+                    const measuredValue = parseFloat(measuredInput.value);
+                    if (!isNaN(measuredValue)) {
+                        const correctedValue = measuredValue * kt;
+                        correctedSpan.textContent = correctedValue.toFixed(2);
+                    } else {
+                        correctedSpan.textContent = '';
+                    }
+                }
+            });
+
+            // Calcula Índices (IA e IP) se a seção for de isolamento
+            if (table.dataset.type === 'insulation') {
+                const val1min = parseFloat(table.querySelector('.val-1min')?.value);
+                const val30s = parseFloat(table.querySelector('.val-30s')?.value);
+                const val10min = parseFloat(table.querySelector('.val-10min')?.value);
+
+                const iaSpan = table.querySelector('.ia-val');
+                const ipSpan = table.querySelector('.ip-val');
+                const iaStatusSpan = table.querySelector('.ia-status');
+                const ipStatusSpan = table.querySelector('.ip-status');
+
+                if (iaSpan && !isNaN(val1min) && !isNaN(val30s) && val30s > 0) {
+                    const ia = val1min / val30s;
+                    iaSpan.textContent = ia.toFixed(2);
+                    const { status, color } = evaluateIA(ia);
+                    iaStatusSpan.textContent = status;
+                    iaStatusSpan.style.backgroundColor = color;
+                    iaStatusSpan.style.color = darkTextStatus.includes(status) ? '#000' : '#fff';
+                } else if (iaSpan) {
+                    iaSpan.textContent = '';
+                    iaStatusSpan.textContent = '';
+                    iaStatusSpan.style.backgroundColor = 'transparent';
+                }
+
+                if (ipSpan && !isNaN(val10min) && !isNaN(val1min) && val1min > 0) {
+                    const ip = val10min / val1min;
+                    ipSpan.textContent = ip.toFixed(2);
+                    const { status, color } = evaluateIP(ip);
+                    ipStatusSpan.textContent = status;
+                    ipStatusSpan.style.backgroundColor = color;
+                    ipStatusSpan.style.color = darkTextStatus.includes(status) ? '#000' : '#fff';
+                } else if (ipSpan) {
+                    ipSpan.textContent = '';
+                    ipStatusSpan.textContent = '';
+                    ipStatusSpan.style.backgroundColor = 'transparent';
+                }
+            }
+        });
+    }
+
 
     // ==================================================================================
     // --- INICIALIZAÇÃO E EVENT LISTENERS GERAIS ---
@@ -2354,7 +2556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cover-btn').addEventListener('click', () => { updateCompanyInfoOnPages(); navigation.to('cover'); });
     document.getElementById('index-btn').addEventListener('click', () => { updateIndexPage(); navigation.to('index'); });
     document.getElementById('saved-reports-btn').addEventListener('click', () => { showSavedReportsScreen(); });
-    document.getElementById('manage-companies-btn').addEventListener('click', () => { renderCompanyList(); const publicToggle = document.getElementById('company-public-toggle-container'); if (appState.user.isAdmin) { publicToggle.classList.remove('hidden'); } else { publicToggle.classList.add('hidden'); } navigation.to('companyManagement'); });
+    document.getElementById('manage-companies-btn').addEventListener('click', () => { const publicToggle = document.getElementById('company-public-toggle-container'); if (appState.user.isAdmin) { publicToggle.classList.remove('hidden'); } else { publicToggle.classList.add('hidden'); } navigation.to('companyManagement'); });
     document.getElementById('equipamentos-btn').addEventListener('click', () => navigation.to('equipamentos'));
     document.getElementById('company-management-back-to-cover-btn').addEventListener('click', () => navigation.to('cover'));
     
@@ -2374,12 +2576,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Listeners para seleção de equipamento (Megagem)
+    document.getElementById('gen-btn').addEventListener('click', () => { reportSheetHandlers.generator.setup(); navigation.to('gen'); });
+    document.getElementById('motor-btn').addEventListener('click', () => { reportSheetHandlers.motor.setup(); navigation.to('motor'); });
+    document.getElementById('transformer-btn').addEventListener('click', () => { reportSheetHandlers.transformer.setup(); navigation.to('transformer'); });
+
+    // Listeners para adicionar planilha ao relatório (Megagem)
+    document.getElementById('gen-add-sheet-btn').addEventListener('click', () => addSheetToReport('generator'));
+    document.getElementById('motor-add-sheet-btn').addEventListener('click', () => addSheetToReport('motor'));
+    document.getElementById('transformer-add-sheet-btn').addEventListener('click', () => addSheetToReport('transformer'));
+
+    // Listeners para cálculos automáticos nas planilhas (Megagem)
+    ['gen-app-container', 'motor-app-container', 'transformer-app-container'].forEach(id => {
+        const container = document.getElementById(id);
+        if (container) {
+            container.addEventListener('input', () => megagemCalculations(container));
+        }
+    });
+
     // Botões "Voltar" dentro do fluxo de Megagem
     document.querySelectorAll('[id$="-back-to-menu-btn"]').forEach(btn => {
-        if (btn.id !== 'profile-back-to-menu-btn' && btn.id !== 'admin-back-to-menu-btn') {
+        if (btn.id !== 'profile-back-to-menu-btn' && btn.id !== 'admin-back-to-menu-btn' && btn.id !== 'equipamentos-back-to-menu-btn') {
              btn.addEventListener('click', () => navigation.checkDirtyStateAndNavigate('menu'));
         }
     });
+    document.getElementById('equipamentos-back-to-menu-btn').addEventListener('click', () => navigation.to('menu'));
     document.getElementById('admin-back-to-menu-btn').addEventListener('click', () => navigation.to('menu'));
 
     // Botão de perfil (e seu 'voltar')
@@ -2394,8 +2615,6 @@ document.addEventListener('DOMContentLoaded', () => {
             uiFeedback.showToast('Ocorreu um erro ao sair.', 'error');
         });
     });
-
-    // ... (restante dos event listeners e inicializações)
 
 });
 </script>
