@@ -1434,6 +1434,34 @@ document.addEventListener('DOMContentLoaded', () => {
         appState.company.list = [...publicCompanies, ...privateCompanies];
     }
 
+    function updateCompanyInfoOnPages() {
+        const company = appState.company.selected;
+        if (!company) return;
+
+        const logoUrl = company.logoDataUrl || 'https://placehold.co/100x40/e2e8f0/475569?text=Logo';
+        const repLogo1Url = company.repLogo1DataUrl;
+        const repLogo2Url = company.repLogo2DataUrl;
+
+        const setContent = (id, content) => { const el = document.getElementById(id); if (el) el.textContent = content || ''; };
+        const setSrc = (id, src) => { const el = document.getElementById(id); if (el) { el.src = src || ''; if (id.includes('rep-logo')) el.style.display = src ? 'block' : 'none'; } };
+
+        setSrc('cover-preview-company-logo', logoUrl);
+        setContent('cover-preview-company-name', company.name);
+        setContent('cover-preview-company-address', company.address);
+        setContent('cover-preview-company-phones', company.phones);
+        setContent('cover-preview-company-phone2', company.phone2);
+        setSrc('cover-preview-rep-logo1', repLogo1Url);
+        setSrc('cover-preview-rep-logo2', repLogo2Url);
+
+        setSrc('index-company-logo', logoUrl);
+        setContent('index-company-name', company.name);
+        setContent('index-company-address', company.address);
+        setContent('index-company-phones', company.phones);
+        setContent('index-company-phone2', company.phone2);
+        setSrc('index-rep-logo1', repLogo1Url);
+        setSrc('index-rep-logo2', repLogo2Url);
+    }
+
     function populateCompanyDropdown() {
         const companySelect = document.getElementById('company-select');
         const originalValue = companySelect.value;
