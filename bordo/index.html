@@ -7,162 +7,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar for better mobile experience */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* A4 Page Preview Styles */
-        .report-page {
-            background: white;
-            width: 210mm;
-            min-height: 297mm; /* Use min-height to allow content to grow */
-            margin: 2rem auto;
-            padding: 15mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #000;
-            padding-bottom: 1rem;
-        }
-        .report-header .company-info {
-            text-align: right;
-            font-size: 10px;
-        }
-        .report-title-bar {
-            background-color: #dbeafe;
-            color: #1e3a8a;
-            font-weight: 700;
-            text-align: center;
-            padding: 8px;
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: 6px;
-        }
-        .report-footer {
-            margin-top: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            padding-top: 1rem;
-        }
-        .report-footer img {
-            height: 35px;
-        }
-        .data-table-report {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        .data-table-report th, .data-table-report td {
-            border: 1px solid #ccc;
-            padding: 4px 8px;
-        }
-        .data-table-report th {
-            background-color: #f0f0f0;
-            text-align: left;
-        }
-        .data-table-report tbody tr {
-            height: 1.6em; /* Garante altura uniforme para as linhas */
-        }
-        .row-selected {
-            background-color: #a5b4fc !important; /* Cor de destaque para linha selecionada */
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-        
-        /* Photo Upload Styles */
-        .photo-slot {
-            border: 2px dashed #9ca3af;
-            border-radius: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 250px;
-            background-color: #f9fafb;
-            position: relative;
-        }
-        .photo-slot .image-preview {
-            width: 100%;
-            height: calc(100% - 36px);
-            object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-        .photo-slot .upload-label {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #6b7280;
-        }
-         .photo-slot .upload-label:hover {
-            background-color: rgba(0,0,0,0.05);
-         }
-        .photo-slot input[type="file"] {
-            display: none;
-        }
-        .photo-slot .description-input {
-            width: 100%;
-            border: none;
-            border-top: 1px solid #d1d5db;
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            border-radius: 0 0 0.5rem 0.5rem;
-            background-color: #f3f4f6;
-        }
-
-        @media print {
-            body, .report-page {
-                margin: 0;
-                box-shadow: none;
-            }
-            .report-preview-controls {
-                display: none;
-            }
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
+        .report-page { background: white; width: 210mm; min-height: 297mm; margin: 2rem auto; padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .report-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 1rem; }
+        .report-header .company-info { text-align: right; font-size: 10px; }
+        .report-title-bar { background-color: #dbeafe; color: #1e3a8a; font-weight: 700; text-align: center; padding: 8px; margin-top: 1.5rem; margin-bottom: 1.5rem; border-radius: 6px; }
+        .report-footer { margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 2rem; padding-top: 1rem; }
+        .report-footer img { height: 35px; }
+        .data-table-report { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-table-report th, .data-table-report td { border: 1px solid #ccc; padding: 4px 8px; }
+        .data-table-report th { background-color: #f0f0f0; text-align: left; }
+        .data-table-report tbody tr { height: 1.6em; }
+        .row-selected { background-color: #a5b4fc !important; }
+        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { background-color: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 90%; text-align: center; }
+        .photo-slot { border: 2px dashed #9ca3af; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 250px; background-color: #f9fafb; position: relative; }
+        .photo-slot .image-preview { width: 100%; height: calc(100% - 36px); object-fit: cover; border-radius: 0.5rem 0.5rem 0 0; }
+        .photo-slot .upload-label { position: absolute; top: 0; left: 0; right: 0; bottom: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6b7280; }
+        .photo-slot .upload-label:hover { background-color: rgba(0,0,0,0.05); }
+        .photo-slot input[type="file"] { display: none; }
+        .photo-slot .description-input { width: 100%; border: none; border-top: 1px solid #d1d5db; padding: 0.5rem; font-size: 0.875rem; border-radius: 0 0 0.5rem 0.5rem; background-color: #f3f4f6; }
+        @media print { body, .report-page { margin: 0; box-shadow: none; } .report-preview-controls { display: none; } }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -246,8 +115,8 @@
                     <!-- Seção Cliente -->
                     <div class="md:col-span-4 mt-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-4 border-b-2 border-gray-500 pb-2 gap-4">
-                            <a href="../" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto text-center">Voltar</a>
-                            <h2 class="text-xl font-bold text-center text-gray-800 order-first sm:order-none">CLIENTE</h2>
+                            <a href="../" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto text-center">Voltar ao Portal</a>
+                             <button id="bordo-saved-reports-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition w-full sm:w-auto">Relatórios Salvos</button>
                             <button id="bordo-avancar-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">Avançar</button>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -372,8 +241,9 @@
     <!-- TELA DE ITENS DO RELATÓRIO DE BORDO -->
     <div id="bordo-itens-screen" class="hidden p-4 sm:p-6">
         <div class="container mx-auto max-w-5xl">
-               <div class="mb-4">
+               <div class="mb-4 flex flex-wrap gap-4">
                     <button id="itens-back-to-info-btn" class="bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition">Voltar</button>
+                    <button id="bordo-save-report-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition">Salvar Relatório</button>
                </div>
             <div class="bg-slate-400 p-6 rounded-lg shadow-lg">
                 <h2 class="text-xl font-bold text-center text-gray-800 mb-6 border-b-2 border-gray-500 pb-2">ITENS DO RELATÓRIO</h2>
@@ -389,16 +259,14 @@
                 </div>
 
                 <!-- Botões Finais -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                       <button id="emitir-relatorio-btn" class="bg-orange-500 text-white font-bold py-3 px-4 rounded-lg shadow hover:bg-orange-600 transition">EMITIR RELATÓRIO</button>
-                       <button id="limpar-dados-btn" class="bg-red-600 text-white font-bold py-3 px-4 rounded-lg shadow hover:bg-red-700 transition">LIMPAR DADOS</button>
-                       <button class="bg-gray-600 text-white font-bold py-3 px-4 rounded-lg shadow hover:bg-gray-700 transition opacity-50 cursor-not-allowed">CANCELAR</button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <button id="emitir-relatorio-btn" class="bg-orange-500 text-white font-bold py-3 px-4 rounded-lg shadow hover:bg-orange-600 transition sm:col-span-2">EMITIR RELATÓRIO</button>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- MODAIS -->
+    <!-- MODAIS E TELAS ADICIONAIS -->
     <div id="modals-container">
         <!-- TELA HORAS TRABALHADAS (MODAL/OVERLAY) -->
         <div id="bordo-horas-trabalhadas-screen" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 p-4 sm:p-6 z-50 flex justify-center items-center">
@@ -686,6 +554,20 @@
             </div>
         </div>
 
+        <!-- TELA DE RELATÓRIOS SALVOS (MODAL) -->
+        <div id="saved-reports-screen" class="hidden modal-overlay">
+            <div class="container mx-auto max-w-3xl bg-slate-300 p-6 rounded-lg shadow-lg flex flex-col max-h-[95vh]">
+                <h2 class="text-xl font-bold text-center text-gray-800 mb-4 border-b-2 border-gray-500 pb-2">RELATÓRIOS SALVOS</h2>
+                <div id="saved-reports-list" class="bg-white rounded-lg shadow mb-4 flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3">
+                    <!-- Lista de relatórios será inserida aqui -->
+                </div>
+                <div class="flex justify-end gap-4">
+                     <button id="saved-reports-new-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Novo Relatório</button>
+                     <button id="saved-reports-close-btn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition">Fechar</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ÁREA DE PRÉ-VISUALIZAÇÃO DO RELATÓRIO -->
@@ -703,6 +585,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- MÓDULO DE NAVEGAÇÃO E MODAIS ---
     const uiManager = {
@@ -718,6 +601,7 @@
             comentarios: document.getElementById('bordo-comentarios-screen'),
             descricaoServicos: document.getElementById('bordo-descricao-servicos-screen'),
             relatorioFotografico: document.getElementById('bordo-relatorio-fotografico-screen'),
+            savedReports: document.getElementById('saved-reports-screen'),
             confirm: document.getElementById('confirm-modal'),
             notification: document.getElementById('notification-modal'),
         },
@@ -734,7 +618,6 @@
         showModal: function(modalName) {
             if(this.modals[modalName]) {
                 this.modals[modalName].classList.remove('hidden');
-                // On modal open, copy main data to temp data to allow safe editing
                 if (dataManager.modalData[modalName]) {
                     dataManager.modalData[modalName].load();
                 }
@@ -771,10 +654,17 @@
         }
     };
 
-    // --- MÓDULO DE GERENCIAMENTO DE DADOS ---
+    // --- MÓDULO DE GERENCIAMENTO DE DADOS COM FIRESTORE ---
     const dataManager = {
-        STORAGE_KEY: 'bordoReportData',
-        
+        reportData: {},
+        currentReportId: null, // ID do documento no Firestore
+        userId: null,
+
+        init: function(userId) {
+            this.userId = userId;
+            this.startNewReport();
+        },
+
         getNewReportData: function() {
             return {
                 os: '', rt: '', tipoServico: '', resumoServico: '', status: '', idioma: '',
@@ -784,49 +674,70 @@
                 materiais: [],
                 comentarios: '',
                 descricaoServicos: '',
-                fotos: [], // [[{src, desc}, ...], [{src, desc}, ...]]
+                fotos: [], 
             };
         },
-        
-        reportData: {},
 
-        saveState: function() {
-            try {
-                // Before saving, collect data from the info screen inputs
-                this.collectInfoScreenData();
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.reportData));
-                console.log("State saved to localStorage.");
-            } catch (error) {
-                console.error("Could not save state to localStorage:", error);
-            }
+        startNewReport: function() {
+            this.currentReportId = null;
+            this.reportData = this.getNewReportData();
+            this.populateInfoScreen();
+            console.log("Started new report.");
         },
 
-        loadState: function() {
+        saveReportToFirestore: async function() {
+            if (!this.userId) {
+                uiManager.showNotification("Erro: Utilizador não autenticado.");
+                return;
+            }
+            this.collectInfoScreenData();
+
+            const reportCollectionRef = collection(db, 'users', this.userId, 'bordoReports');
+            
             try {
-                const savedData = localStorage.getItem(this.STORAGE_KEY);
-                if (savedData) {
-                    this.reportData = JSON.parse(savedData);
-                    this.populateInfoScreen();
-                    console.log("State loaded from localStorage.");
+                if (this.currentReportId) {
+                    // Atualiza um relatório existente
+                    const reportRef = doc(db, 'users', this.userId, 'bordoReports', this.currentReportId);
+                    await setDoc(reportRef, { ...this.reportData, updatedAt: serverTimestamp() });
+                    uiManager.showNotification("Relatório atualizado com sucesso!");
                 } else {
-                    this.reportData = this.getNewReportData();
-                    console.log("No saved state found, initialized new report data.");
+                    // Cria um novo relatório
+                    const docRef = await addDoc(reportCollectionRef, { ...this.reportData, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+                    this.currentReportId = docRef.id; // Armazena o ID do novo documento
+                    uiManager.showNotification("Relatório salvo com sucesso!");
                 }
             } catch (error) {
-                console.error("Could not load state from localStorage:", error);
-                this.reportData = this.getNewReportData();
+                console.error("Error saving report to Firestore:", error);
+                uiManager.showNotification("Ocorreu um erro ao salvar o relatório.");
             }
         },
 
-        clearState: function() {
-            localStorage.removeItem(this.STORAGE_KEY);
-            this.reportData = this.getNewReportData();
-            this.populateInfoScreen(); // Clear the form fields as well
-            uiManager.showNotification("Todos os dados foram limpos.");
-            console.log("State cleared from localStorage and memory.");
+        loadReportFromFirestore: function(reportId, data) {
+            this.currentReportId = reportId;
+            // Garante que todos os campos existem, mesmo que o dado salvo seja antigo
+            this.reportData = { ...this.getNewReportData(), ...data };
+            this.populateInfoScreen();
+            uiManager.hideModal('savedReports');
+            uiManager.to('bordoApp');
+            console.log(`Loaded report ${reportId}`);
         },
 
-        // Helper to populate the form from reportData
+        deleteReportFromFirestore: async function(reportId) {
+             if (!this.userId) return;
+             try {
+                await deleteDoc(doc(db, 'users', this.userId, 'bordoReports', reportId));
+                uiManager.showNotification("Relatório excluído com sucesso.");
+                // Se o relatório excluído era o que estava aberto
+                if (this.currentReportId === reportId) {
+                    this.startNewReport();
+                }
+                loadAndDisplaySavedReports(); // Atualiza a lista
+             } catch(error) {
+                console.error("Error deleting report:", error);
+                uiManager.showNotification("Erro ao excluir o relatório.");
+             }
+        },
+
         populateInfoScreen: function() {
             document.getElementById('bordo-os').value = this.reportData.os || '';
             document.getElementById('bordo-rt').value = this.reportData.rt || '';
@@ -842,7 +753,6 @@
             document.getElementById('bordo-solicitante').value = this.reportData.solicitante || '';
         },
         
-        // Helper to collect data from form into reportData before saving
         collectInfoScreenData: function() {
             this.reportData.os = document.getElementById('bordo-os').value;
             this.reportData.rt = document.getElementById('bordo-rt').value;
@@ -858,22 +768,21 @@
             this.reportData.solicitante = document.getElementById('bordo-solicitante').value;
         },
 
-        // Logic for each modal's data
         modalData: {
             horasTrabalhadas: {
                 tempData: [], isDirty: false,
                 load: function() { this.tempData = JSON.parse(JSON.stringify(dataManager.reportData.horasTrabalhadas)); this.isDirty = false; updateTable('horasTrabalhadas', this.tempData); },
-                save: function() { dataManager.reportData.horasTrabalhadas = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Horas trabalhadas salvas com sucesso!'); uiManager.hideModal('horasTrabalhadas'); dataManager.saveState(); }
+                save: function() { dataManager.reportData.horasTrabalhadas = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Horas trabalhadas salvas com sucesso!'); uiManager.hideModal('horasTrabalhadas'); }
             },
             horasViagem: {
                 tempData: [], isDirty: false,
                 load: function() { this.tempData = JSON.parse(JSON.stringify(dataManager.reportData.horasViagem)); this.isDirty = false; updateTable('horasViagem', this.tempData); },
-                save: function() { dataManager.reportData.horasViagem = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Horas de viagem salvas com sucesso!'); uiManager.hideModal('horasViagem'); dataManager.saveState(); }
+                save: function() { dataManager.reportData.horasViagem = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Horas de viagem salvas com sucesso!'); uiManager.hideModal('horasViagem');}
             },
             materiaisFornecidos: {
                 tempData: [], isDirty: false,
                 load: function() { this.tempData = JSON.parse(JSON.stringify(dataManager.reportData.materiais)); this.isDirty = false; updateTable('materiais', this.tempData); },
-                save: function() { dataManager.reportData.materiais = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Materiais salvos com sucesso!'); uiManager.hideModal('materiaisFornecidos'); dataManager.saveState(); }
+                save: function() { dataManager.reportData.materiais = JSON.parse(JSON.stringify(this.tempData)); this.isDirty = false; uiManager.showNotification('Materiais salvos com sucesso!'); uiManager.hideModal('materiaisFornecidos'); }
             },
             relatorioFotografico: {
                 tempData: [], isDirty: false, currentPage: 0,
@@ -891,7 +800,6 @@
                     this.isDirty = false; 
                     uiManager.showNotification('Relatório fotográfico salvo!'); 
                     uiManager.hideModal('relatorioFotografico'); 
-                    dataManager.saveState();
                 }
             }
         }
@@ -899,11 +807,10 @@
 
     // --- LÓGICA DE GERAÇÃO DO RELATÓRIO ---
     function generateReportPreview() {
-        // Ensure the latest data from the info form is collected before generating
         dataManager.collectInfoScreenData();
 
         const container = document.getElementById('report-pages-container');
-        container.innerHTML = ''; // Limpa o conteúdo anterior
+        container.innerHTML = ''; 
 
         const formData = {
             rt: dataManager.reportData.rt,
@@ -922,13 +829,11 @@
         const createReportHeader = (data) => `<header class="report-header"><img src="https://placehold.co/150x50/cccccc/222222?text=UNITED+POWER" alt="Logo Empresa" style="height: 50px;"><div class="company-info"><p>atendimento@grupounitech.com.br</p><p>(21) 98762-2155 / (21) 97119-2155</p><p>(21) 2624-0109 / (21) 2628-6411</p></div><div class="text-right"><p><span class="font-bold">RT:</span> ${data.rt || 'N/P'}</p><p>${data.tipoServico || 'N/P'}</p><p>${data.resumoServico || 'N/P'}</p></div></header>`;
         const createReportFooter = () => `<footer class="report-footer"><img src="https://placehold.co/100x40/cccccc/222222?text=Service+Center" alt="Logo Parceiro 1"><img src="https://placehold.co/150x40/cccccc/222222?text=SCHALLER" alt="Logo Parceiro 2"></footer>`;
 
-        // PÁGINA 1: CAPA
         const capa = document.createElement('div');
         capa.className = 'report-page';
         capa.innerHTML = `${createReportHeader(formData)}<main class="flex-grow flex flex-col"><div class="report-title-bar">DADOS DO CLIENTE</div><div class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm"><div class="flex items-center gap-4 col-span-2"><img src="https://placehold.co/80x80/cccccc/222222?text=LOGO" alt="Logo Cliente"><div><p class="font-bold text-base">${formData.cliente || 'NÃO PREENCHIDO'}</p><p>${formData.embarcacao || 'EMBARCAÇÃO NÃO PREENCHIDA'}</p></div></div><div><p><span class="font-bold">LOCALIZAÇÃO:</span></p><p>${formData.localizacao || 'N/P'}</p><p>${formData.cidade || 'N/P'}</p></div><div><p><span class="font-bold">N° de Solicitação:</span> ${formData.solicitacao || 'N/P'}</p><p><span class="font-bold">Solicitante:</span> ${formData.solicitante || 'N/P'}</p></div></div><div class="report-title-bar">DESCRIÇÃO DOS SERVIÇOS</div><div class="border p-4 rounded-md text-xs whitespace-pre-wrap break-words flex-grow">${formData.descricao || 'NÃO PREENCHIDO'}</div><div class="mt-4"><span class="font-bold">Status do Serviço:</span> ${formData.status || 'NÃO PREENCHIDO'}</div></main>${createReportFooter()}`;
         container.appendChild(capa);
 
-        // PÁGINA 2: SUB-CAPA (COMENTÁRIOS E MATERIAIS)
         const subcapa = document.createElement('div');
         subcapa.className = 'report-page';
         let materiaisHtml = '';
@@ -936,7 +841,6 @@
         subcapa.innerHTML = `${createReportHeader(formData)}<main class="flex-grow flex flex-col" style="min-height: 0;"><div class="flex flex-col" style="flex-basis: 60%;"><div class="report-title-bar">COMENTÁRIOS</div><div class="border p-4 rounded-md text-xs whitespace-pre-wrap break-words h-full">${dataManager.reportData.comentarios || 'Nenhum comentário adicional.'}</div></div><div class="flex flex-col mt-4 flex-grow"><div class="report-title-bar">MATERIAIS FORNECIDOS</div><table class="data-table-report"><thead><tr><th>DESCRIÇÃO</th><th style="width: 120px;">QUANTIDADE</th></tr></thead><tbody>${materiaisHtml}</tbody></table></div></main>${createReportFooter()}`;
         container.appendChild(subcapa);
 
-        // PÁGINA 3: HORAS E ASSINATURAS
         const paginaHoras = document.createElement('div');
         paginaHoras.className = 'report-page';
         let horasViagemHtml = '';
@@ -946,7 +850,6 @@
         paginaHoras.innerHTML = `${createReportHeader(formData)}<main class="flex-grow flex flex-col text-xs"><div class="report-title-bar text-sm">HORAS DE VIAGEM</div><table class="data-table-report"><thead><tr><th>DATA</th><th>ORIGEM</th><th>DESTINO</th><th>SAÍDA</th><th>CHEGADA</th></tr></thead><tbody>${horasViagemHtml}</tbody></table><div class="report-title-bar text-sm mt-6">HORAS TRABALHADAS</div><table class="data-table-report"><thead><tr><th>DATA</th><th>COLABORADORES</th><th>INICIO</th><th>FIM</th></tr></thead><tbody>${horasTrabalhadasHtml}</tbody></table><div class="report-title-bar text-sm mt-6">DESLOCAMENTO DE RETORNO</div><table class="data-table-report"><thead><tr><th>DATA</th><th>DESCRIÇÃO</th><th style="width: 150px;">HORÁRIO</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td colspan="3" class="text-red-600 font-bold text-center">OBS.: HORÁRIO DE RETORNO SUJEITO A ALTERAÇÃO DEVIDO A LOGÍSTICA DE DESLOCAMENTO.</td></tr></tbody></table><div class="mt-auto pt-12 flex justify-around items-end text-center"><div><div class="border-b border-black w-64 pb-1"></div><p class="mt-1">ASS. TÉCNICO</p></div><div><div class="border-b border-black w-64 pb-1"></div><p class="mt-1">ASS. CLIENTE</p></div></div></main>${createReportFooter()}`;
         container.appendChild(paginaHoras);
 
-        // PÁGINAS DE FOTOS
         dataManager.reportData.fotos.forEach(pageData => {
             const hasPhotos = pageData.some(p => p.src);
             if (!hasPhotos) return;
@@ -957,35 +860,13 @@
 
             pageData.forEach(photo => {
                 if (photo.src) {
-                    photoGridHtml += `
-                        <div>
-                            <div class="border border-black p-1 flex items-center justify-center" style="height: 75mm;">
-                                <img src="${photo.src}" class="max-w-full max-h-full object-contain">
-                            </div>
-                            <div class="border border-black border-t-0 p-1 text-center text-xs flex items-center justify-center" style="height: 10mm;">
-                                <span>${photo.desc || '&nbsp;'}</span>
-                            </div>
-                        </div>
-                    `;
+                    photoGridHtml += `<div><div class="border border-black p-1 flex items-center justify-center" style="height: 75mm;"><img src="${photo.src}" class="max-w-full max-h-full object-contain"></div><div class="border border-black border-t-0 p-1 text-center text-xs flex items-center justify-center" style="height: 10mm;"><span>${photo.desc || '&nbsp;'}</span></div></div>`;
                 } else {
-                    photoGridHtml += `
-                        <div>
-                            <div class="border border-gray-300" style="height: 85mm;"></div>
-                        </div>
-                       `;
+                    photoGridHtml += `<div><div class="border border-gray-300" style="height: 85mm;"></div></div>`;
                 }
             });
 
-            photoPage.innerHTML = `
-                ${createReportHeader(formData)}
-                <main class="flex-grow flex flex-col">
-                    <div class="report-title-bar text-sm">RELATÓRIO FOTOGRÁFICO</div>
-                    <div class="grid grid-cols-2 gap-4" style="align-content: start;">
-                        ${photoGridHtml}
-                    </div>
-                </main>
-                ${createReportFooter()}
-            `;
+            photoPage.innerHTML = `${createReportHeader(formData)}<main class="flex-grow flex flex-col"><div class="report-title-bar text-sm">RELATÓRIO FOTOGRÁFICO</div><div class="grid grid-cols-2 gap-4" style="align-content: start;">${photoGridHtml}</div></main>${createReportFooter()}`;
             container.appendChild(photoPage);
         });
 
@@ -1133,7 +1014,7 @@
 
     function setupModalEventListeners() {
         const setupCrud = (type, inputs, dataStore, tableType) => {
-            const modalId = type.replace(/-/g, ''); // e.g., horastrabalhadas
+            const modalId = type.replace(/-/g, '');
             const modalInfo = {
                 'horastrabalhadas': { modalName: 'horasTrabalhadas', tableId: 'horas-trabalhadas-lista' },
                 'viagem': { modalName: 'horasViagem', tableId: 'viagem-lista' },
@@ -1186,19 +1067,16 @@
         setupCrud('viagem', ['data', 'origem', 'destino', 'saida', 'chegada'], dataManager.modalData.horasViagem, 'horasViagem');
         setupCrud('material', ['descricao', 'quantidade'], dataManager.modalData.materiaisFornecidos, 'materiais');
 
-        // --- Comentários ---
         const comentariosTextarea = document.getElementById('comentarios-texto');
         document.getElementById('comentarios-btn').addEventListener('click', () => { comentariosTextarea.value = dataManager.reportData.comentarios; uiManager.showModal('comentarios'); });
-        document.getElementById('comentarios-salvar-btn').addEventListener('click', () => { dataManager.reportData.comentarios = comentariosTextarea.value; uiManager.showNotification('Comentários salvos!'); uiManager.hideModal('comentarios'); dataManager.saveState(); });
+        document.getElementById('comentarios-salvar-btn').addEventListener('click', () => { dataManager.reportData.comentarios = comentariosTextarea.value; uiManager.showNotification('Comentários salvos!'); uiManager.hideModal('comentarios'); });
         document.getElementById('comentarios-voltar-btn').addEventListener('click', () => { if (dataManager.reportData.comentarios !== comentariosTextarea.value) { uiManager.showConfirm('Alterações não salvas. Deseja sair?', () => uiManager.hideModal('comentarios')); } else { uiManager.hideModal('comentarios'); } });
 
-        // --- Descrição dos Serviços ---
         const descTextarea = document.getElementById('descricao-servicos-texto');
         document.getElementById('descricao-servicos-btn').addEventListener('click', () => { descTextarea.value = dataManager.reportData.descricaoServicos; uiManager.showModal('descricaoServicos'); });
-        document.getElementById('descricao-servicos-salvar-btn').addEventListener('click', () => { dataManager.reportData.descricaoServicos = descTextarea.value; uiManager.showNotification('Descrição salva!'); uiManager.hideModal('descricaoServicos'); dataManager.saveState(); });
+        document.getElementById('descricao-servicos-salvar-btn').addEventListener('click', () => { dataManager.reportData.descricaoServicos = descTextarea.value; uiManager.showNotification('Descrição salva!'); uiManager.hideModal('descricaoServicos'); });
         document.getElementById('descricao-servicos-voltar-btn').addEventListener('click', () => { if (dataManager.reportData.descricaoServicos !== descTextarea.value) { uiManager.showConfirm('Alterações não salvas. Deseja sair?', () => uiManager.hideModal('descricaoServicos')); } else { uiManager.hideModal('descricaoServicos'); } });
         
-        // --- Relatório Fotográfico ---
         const photoModal = dataManager.modalData.relatorioFotografico;
         document.getElementById('photo-save-btn').addEventListener('click', () => photoModal.save());
         document.getElementById('relatorio-fotografico-voltar-btn').addEventListener('click', () => { if (photoModal.isDirty) { uiManager.showConfirm('Você tem fotos não salvas. Deseja sair?', () => uiManager.hideModal('relatorioFotografico')); } else { uiManager.hideModal('relatorioFotografico'); } });
@@ -1208,19 +1086,15 @@
         document.getElementById('photo-delete-page-btn').addEventListener('click', () => photoManager.deletePage());
     }
 
-    // --- LÓGICA DE AUTO-PREENCHIMENTO ---
     function setupClientLocationHandlers() {
-        // --- MAPS ---
         const clientLocationMap = { 'TRANSPETRO': 'FUNDEIO BAIA DE GUANABARA', 'PETROBRAS TRANSPORTES S/A': 'FUNDEIO BAIA DE GUANABARA', 'GRUPO CBO': 'PORTO DE NITERÓI', 'WILSONS SONS': 'PORTO DE SANTOS', 'MAERSK': 'PORTO DO RIO', 'DOF SUBSEA': 'FUNDEIO MACAÉ', 'GRUPO BRAVANTE': 'PORTO DO RIO', 'ALTERA INFRASTRUCTURE': 'FUNDEIO BAIA DE GUANABARA', 'CONSTELLATION': 'PORTO DE IMBETIBA', 'DOME SERVIÇOS INTEGRADOS': 'ESTALEIRO DOME', };
         const locationCityMap = { 'B PORT - PORTO DO AÇU': 'São João da Barra - RJ', 'ESTALEIRO RENAVE': 'Niterói - RJ', 'DOCK BRASIL': 'Niterói - RJ', 'PORTO DE NITERÓI': 'Niterói - RJ', 'MACLAREN - PONTA DA AREIA': 'Niterói - RJ', 'MACLAREN - ILHA DA CONCEIÇÃO': 'Niterói - RJ', 'ESTALEIRO ALIANÇA': 'Niterói - RJ', 'ESTALEIRO DOME': 'São João da Barra - RJ', 'FUNDEIO MACAÉ': 'Macaé - RJ', 'PORTO DE IMBETIBA': 'Macaé - RJ', 'ESTALEIRO MAUÁ': 'Niterói - RJ', 'TRIUNFO LOGÍSTICA': 'São Gonçalo - RJ', 'PORTO DO RIO': 'Rio de Janeiro - RJ', 'ESTALEIRO TYSSENKRUPP': 'Itaguaí - RJ', 'PORTO DE SANTOS': 'Santos - SP', 'FUNDEIO BAIA DE GUANABARA': 'Rio de Janeiro / Niterói - RJ', 'PORTO DE VITÓRIA': 'Vitória - ES', 'RECIFE': 'Recife - PE', 'FORTALEZA': 'Fortaleza - CE', 'PORTO DE CHIBATÃO': 'Manaus - AM', 'ESTALEIRO CAMORIM': 'Angra dos Reis - RJ', 'ARSENAL DA MARINHA DO RIO DE JANEIRO': 'Rio de Janeiro - RJ', 'MARINHA DO BRASIL - ILHA DE MOCANGUE': 'Niterói - RJ', 'PECÉM': 'São Gonçalo do Amarante - CE', 'ESTALEIRO BRASCO - ILHA DA CONCEIÇÃO': 'Niterói - RJ', 'ESTALEIRO BRASCO - CAJU': 'Rio de Janeiro - RJ', 'TERMINAL INTERMOOR': 'Niterói - RJ', 'GRUPO UNITECH': 'São Gonçalo - RJ', 'ESTALEIRO NAVSHIP': 'Navegantes - SC', 'ESTALEiro CASSINU': 'Itajaí - SC', 'ESTALEIRO SÃO MIGUEL': 'São Gonçalo - RJ', 'DETROIT BRASIL': 'Rio de Janeiro - RJ', 'FUNDEIO ANGRA DOS REIS': 'Angra dos Reis - RJ' };
 
-        // --- ELEMENTS ---
         const clienteSelect = document.getElementById('bordo-cliente');
         const localizacaoSelect = document.getElementById('bordo-localizacao');
         const cidadeInput = document.getElementById('bordo-cidade-estado');
         const cidadeNaoEncontradaCheckbox = document.getElementById('bordo-cidade-nao-encontrada');
 
-        // --- LOGIC ---
         function updateCityFromLocation() {
             if (cidadeNaoEncontradaCheckbox.checked) {
                 cidadeInput.value = '';
@@ -1242,7 +1116,6 @@
             }
         }
         
-        // --- EVENT LISTENERS ---
         clienteSelect.addEventListener('change', updateLocationFromClient);
         localizacaoSelect.addEventListener('change', () => {
             cidadeNaoEncontradaCheckbox.checked = false;
@@ -1250,7 +1123,6 @@
         });
         cidadeNaoEncontradaCheckbox.addEventListener('change', updateCityFromLocation);
 
-        // --- INITIAL STATE SETUP ---
         const loadedCity = dataManager.reportData.cidade || '';
         const mappedCity = locationCityMap[dataManager.reportData.localizacao] || '';
         if (loadedCity && loadedCity !== mappedCity) {
@@ -1264,7 +1136,68 @@
         }
     }
 
-    // --- FIREBASE AND APP INITIALIZATION ---
+    async function loadAndDisplaySavedReports() {
+        if (!dataManager.userId) return;
+        const reportCollectionRef = collection(db, 'users', dataManager.userId, 'bordoReports');
+        const listContainer = document.getElementById('saved-reports-list');
+        listContainer.innerHTML = '<p class="text-gray-500">A carregar relatórios...</p>';
+
+        try {
+            const querySnapshot = await getDocs(reportCollectionRef);
+            const reports = [];
+            querySnapshot.forEach((doc) => {
+                reports.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (reports.length === 0) {
+                listContainer.innerHTML = '<p class="text-gray-500">Nenhum relatório salvo.</p>';
+                return;
+            }
+            
+            // Ordena os relatórios pela data de atualização, do mais recente para o mais antigo
+            reports.sort((a, b) => (b.updatedAt?.toDate() || 0) - (a.updatedAt?.toDate() || 0));
+
+            listContainer.innerHTML = reports.map(report => {
+                 const date = report.updatedAt ? report.updatedAt.toDate().toLocaleString('pt-BR') : 'Data indisponível';
+                 return `
+                    <div class="flex items-center justify-between p-3 rounded-lg border bg-white hover:bg-gray-50">
+                        <div>
+                            <p class="font-semibold text-blue-700">${report.os || 'Sem OS'} - ${report.embarcacao || 'Sem Embarcação'}</p>
+                            <p class="text-xs text-gray-500">Última atualização: ${date}</p>
+                        </div>
+                        <div class="flex gap-2">
+                             <button data-load-id="${report.id}" class="bg-blue-500 text-white px-3 py-1 text-xs rounded hover:bg-blue-600">Carregar</button>
+                             <button data-delete-id="${report.id}" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Excluir</button>
+                        </div>
+                    </div>
+                 `
+            }).join('');
+            
+            // Adiciona os event listeners para os novos botões
+            listContainer.querySelectorAll('[data-load-id]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const reportId = button.dataset.loadId;
+                    const reportData = reports.find(r => r.id === reportId);
+                    dataManager.loadReportFromFirestore(reportId, reportData);
+                });
+            });
+            listContainer.querySelectorAll('[data-delete-id]').forEach(button => {
+                button.addEventListener('click', () => {
+                     const reportId = button.dataset.deleteId;
+                     uiManager.showConfirm("Tem certeza que deseja excluir este relatório permanentemente?", () => {
+                        dataManager.deleteReportFromFirestore(reportId);
+                     });
+                });
+            });
+
+        } catch (error) {
+            console.error("Error loading saved reports:", error);
+            listContainer.innerHTML = '<p class="text-red-500">Erro ao carregar relatórios.</p>';
+        }
+    }
+
+
+    // --- INICIALIZAÇÃO DO FIREBASE E APP ---
     const firebaseConfig = {
         apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
         authDomain: "relatorios-tecnicos-app.firebaseapp.com",
@@ -1276,26 +1209,22 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("Relatório Técnico de Bordo v4 (com troca de frontend) carregado.");
+            dataManager.init(user.uid);
             
-            dataManager.loadState();
             setupClientLocationHandlers();
             setupModalEventListeners();
 
-            // Navegação principal
             document.getElementById('bordo-avancar-btn').addEventListener('click', () => {
-                dataManager.saveState();
+                dataManager.collectInfoScreenData();
                 uiManager.to('bordoItens');
             });
-            document.getElementById('itens-back-to-info-btn').addEventListener('click', () => {
-                dataManager.saveState();
-                uiManager.to('bordoApp');
-            });
+            document.getElementById('itens-back-to-info-btn').addEventListener('click', () => uiManager.to('bordoApp'));
+            document.getElementById('bordo-save-report-btn').addEventListener('click', () => dataManager.saveReportToFirestore());
             
-            // Abrir modais
             document.getElementById('horas-trabalhadas-btn').addEventListener('click', () => uiManager.showModal('horasTrabalhadas'));
             document.getElementById('horas-viagem-btn').addEventListener('click', () => uiManager.showModal('horasViagem'));
             document.getElementById('materiais-btn').addEventListener('click', () => uiManager.showModal('materiaisFornecidos'));
@@ -1303,21 +1232,26 @@
             document.getElementById('descricao-servicos-btn').addEventListener('click', () => uiManager.showModal('descricaoServicos'));
             document.getElementById('relatorio-fotografico-btn').addEventListener('click', () => uiManager.showModal('relatorioFotografico'));
             
-            // Botões de ação final
             document.getElementById('emitir-relatorio-btn').addEventListener('click', generateReportPreview);
             document.getElementById('preview-back-to-edit-btn').addEventListener('click', () => uiManager.to('bordoItens'));
             document.getElementById('print-report-btn').addEventListener('click', () => window.print());
-            document.getElementById('limpar-dados-btn').addEventListener('click', () => {
-                uiManager.showConfirm("Tem certeza que deseja apagar todos os dados do relatório atual? Esta ação não pode ser desfeita.", () => {
-                    dataManager.clearState();
+            
+            document.getElementById('bordo-saved-reports-btn').addEventListener('click', () => {
+                loadAndDisplaySavedReports();
+                uiManager.showModal('savedReports');
+            });
+            document.getElementById('saved-reports-close-btn').addEventListener('click', () => uiManager.hideModal('savedReports'));
+            document.getElementById('saved-reports-new-btn').addEventListener('click', () => {
+                uiManager.showConfirm("Deseja iniciar um novo relatório? O progresso atual (se não foi salvo) será perdido.", () => {
+                    dataManager.startNewReport();
+                    uiManager.hideModal('savedReports');
+                    uiManager.to('bordoApp');
                 });
             });
             
-            // Inicia na primeira tela do aplicativo de Bordo
             uiManager.to('bordoApp');
 
         } else {
-            // Se não está logado, redireciona para o portal principal.
             window.location.href = '../index.html';
         }
     });
