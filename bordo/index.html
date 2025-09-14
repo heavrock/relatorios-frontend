@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Bordo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="bordo-app-screen" class="hidden bg-gray-200 min-h-screen p-4 sm:p-6">
+        <header class="max-w-5xl mx-auto mb-4">
+             <a href="../" class="text-blue-600 hover:underline">&larr; Voltar ao Portal</a>
+        </header>
+        <div class="container mx-auto max-w-5xl bg-white p-6 rounded-lg shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Seção Informações do Serviço -->
+                <div class="md:col-span-4">
+                    <h2 class="text-xl font-bold text-center text-gray-800 mb-4">INFORMAÇÕES DO SERVIÇO</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="bordo-os" class="block text-sm font-medium text-gray-700">OS</label>
+                            <input type="text" id="bordo-os" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="bordo-rt" class="block text-sm font-medium text-gray-700">RT</label>
+                            <input type="text" id="bordo-rt" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="bordo-tipo-servico" class="block text-sm font-medium text-gray-700">TIPO DE SERVIÇO</label>
+                            <select id="bordo-tipo-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Opção 1</option>
+                                <option>Opção 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bordo-resumo-servico" class="block text-sm font-medium text-gray-700">RESUMO DO SERVIÇO</label>
+                            <select id="bordo-resumo-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Opção 1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bordo-status-servico" class="block text-sm font-medium text-gray-700">STATUS DO SERVIÇO</label>
+                            <select id="bordo-status-servico" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Opção 1</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label for="bordo-idioma" class="block text-sm font-medium text-gray-700">IDIOMA</label>
+                            <select id="bordo-idioma" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Português</option>
+                                <option>Inglês</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção Cliente -->
+                <div class="md:col-span-4 mt-6">
+                    <h2 class="text-xl font-bold text-center text-gray-800 mb-4">CLIENTE</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="bordo-cliente" class="block text-sm font-medium text-gray-700">CLIENTE</label>
+                            <select id="bordo-cliente" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Cliente A</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bordo-embarcacao" class="block text-sm font-medium text-gray-700">EMBARCAÇÃO</label>
+                            <input type="text" id="bordo-embarcacao" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="bordo-localizacao" class="block text-sm font-medium text-gray-700">LOCALIZAÇÃO</label>
+                            <select id="bordo-localizacao" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option>Local 1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bordo-cidade-estado" class="block text-sm font-medium text-gray-700">CIDADE - ESTADO</label>
+                            <input type="text" id="bordo-cidade-estado" value="NITERÓI - RJ" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-100" readonly>
+                            <div class="mt-1 flex items-center">
+                                <input id="bordo-cidade-nao-encontrada" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                <label for="bordo-cidade-nao-encontrada" class="ml-2 block text-sm text-gray-900">Cidade não encontrada</label>
+                            </div>
+                        </div>
+                         <div>
+                            <label for="bordo-solicitacao" class="block text-sm font-medium text-gray-700">NUMERO DA SOLICITAÇÃO</label>
+                            <input type="text" id="bordo-solicitacao" value="Não informado." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="bordo-solicitante" class="block text-sm font-medium text-gray-700">SOLICITANTE</label>
+                            <input type="text" id="bordo-solicitante" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAoPtdpU3MYRUCdj0dvn1LHYBv-ESWWH80",
+        authDomain: "relatorios-tecnicos-app.firebaseapp.com",
+        projectId: "relatorios-tecnicos-app",
+        storageBucket: "relatorios-tecnicos-app.appspot.com",
+        messagingSenderId: "280958854421",
+        appId: "1:280958854421:web:90e4b288f3c57592d9351c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Se o usuário está logado, mostra o conteúdo do app.
+            document.getElementById('bordo-app-screen').classList.remove('hidden');
+        } else {
+            // Se não está logado, redireciona para o portal principal.
+            window.location.href = '../index.html';
+        }
+    });
+</script>
+</body>
+</html>
+
